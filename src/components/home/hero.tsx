@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { BRAND, HERO_FEATURES } from "@/lib/data";
 import {
@@ -12,26 +13,25 @@ const featureIcons = [Sparkles, ShieldCheck, Users, Leaf];
 
 export function Hero() {
   return (
-    <section className="relative bg-neutral-950 overflow-hidden">
+    <section className="relative bg-neutral-950 overflow-hidden h-[600px] lg:h-[640px]">
       {/* Desktop Hero */}
-      <div className="hidden lg:block">
-        <div className="mx-auto max-w-[1280px] px-6">
-          <div className="relative flex min-h-[560px] items-center">
+      <div className="hidden lg:block h-full">
+        <div className="mx-auto max-w-[1280px] px-6 h-full">
+          <div className="relative flex h-full items-center">
             {/* Background gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/90 to-transparent z-10" aria-hidden="true" />
 
-            {/* Hero background image placeholder - dark automotive scene */}
+            {/* Hero background image */}
             <div className="absolute inset-0" aria-hidden="true">
-              <div className="h-full w-full bg-gradient-to-br from-neutral-900 via-neutral-950 to-black" />
-              {/* Subtle grid pattern */}
-              <div
-                className="absolute inset-0 opacity-[0.03]"
-                aria-hidden="true"
-                style={{
-                  backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-                  backgroundSize: "60px 60px",
-                }}
+              <Image
+                src="/hero image.png.png"
+                alt=""
+                fill
+                priority
+                className="object-cover"
+                sizes="100vw"
               />
+              <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/80 to-transparent" />
             </div>
 
             {/* Content */}
@@ -69,11 +69,15 @@ export function Hero() {
 
             {/* Decorative elements - product silhouette area */}
             <div className="absolute right-0 top-0 z-10 hidden h-full w-1/2 items-center justify-center xl:flex" aria-hidden="true">
-              <div className="relative">
-                {/* Abstract product shapes */}
-                <div className="h-[400px] w-[300px] rounded-2xl bg-gradient-to-b from-neutral-800/40 to-neutral-900/20 backdrop-blur-sm border border-neutral-700/30" />
-                <div className="absolute -right-8 top-12 h-[200px] w-[120px] rounded-xl bg-gradient-to-b from-orange-500/10 to-orange-600/5 border border-orange-500/20" />
-                <div className="absolute -left-6 bottom-16 h-[160px] w-[100px] rounded-xl bg-gradient-to-b from-neutral-700/30 to-neutral-800/20 border border-neutral-600/20" />
+              <div className="relative h-[500px] w-full">
+                <Image
+                  src="/hero image.png.png"
+                  alt=""
+                  fill
+                  priority
+                  className="object-contain object-right"
+                  sizes="50vw"
+                />
               </div>
             </div>
           </div>
@@ -100,21 +104,23 @@ export function Hero() {
       </div>
 
       {/* Mobile Hero */}
-      <div className="lg:hidden">
-        <div className="relative min-h-[480px] overflow-hidden">
+      <div className="lg:hidden h-full">
+        <div className="relative h-full overflow-hidden">
           {/* Background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-neutral-900 via-neutral-950 to-black" aria-hidden="true" />
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            aria-hidden="true"
-            style={{
-              backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-              backgroundSize: "40px 40px",
-            }}
-          />
+          <div className="absolute inset-0" aria-hidden="true">
+            <Image
+              src="/hero image.png.png"
+              alt=""
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/60 via-neutral-950/80 to-black" />
+          </div>
 
           {/* Content */}
-          <div className="relative z-10 flex min-h-[480px] flex-col justify-center px-5 py-12">
+          <div className="relative z-10 flex h-full flex-col justify-center px-5 py-12">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-orange-500">
               Drive Cleaner. Drive Better.
             </p>

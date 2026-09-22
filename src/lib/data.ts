@@ -1,4 +1,5 @@
 export const BRAND = {
+  logo: "/logo.png",
   name: "MOTOMAN",
   tagline: "PREMIUM CAR CARE",
   slogan: "Drive Cleaner. Drive Better.",

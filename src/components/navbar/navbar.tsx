@@ -60,10 +60,8 @@ export function Navbar() {
         <div className="hidden lg:block">
           <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-6">
             {/* Left: Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-xl font-bold tracking-wider text-white">
-                {BRAND.name}
-              </span>
+            <Link href="/" className="flex items-center  gap-2">
+              <img className="h-16 w-36" src="/logo.png" alt="logo" />
             </Link>
 
             {/* Center: Nav Links */}
@@ -135,9 +133,7 @@ export function Navbar() {
               <Menu className="h-5 w-5" />
             </button>
 
-            <Link href="/" className="text-lg font-bold tracking-wider text-white">
-              {BRAND.name}
-            </Link>
+            <img className="h-16 w-36" src="/logo.png" alt="" />
 
             <div className="flex items-center gap-1">
               <Link

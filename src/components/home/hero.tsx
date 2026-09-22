@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { BRAND, HERO_FEATURES } from "@/lib/data";
 import {
@@ -13,27 +12,11 @@ const featureIcons = [Sparkles, ShieldCheck, Users, Leaf];
 
 export function Hero() {
   return (
-    <section className="relative bg-neutral-950 overflow-hidden h-[600px] lg:h-[640px]">
+    <section className="relative bg-neutral-950 overflow-hidden">
       {/* Desktop Hero */}
-      <div className="hidden lg:block h-full">
-        <div className="mx-auto max-w-[1280px] px-6 h-full">
-          <div className="relative flex h-full items-center">
-            {/* Background gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/90 to-transparent z-10" aria-hidden="true" />
-
-            {/* Hero background image */}
-            <div className="absolute inset-0" aria-hidden="true">
-              <Image
-                src="/hero image.png.png"
-                alt=""
-                fill
-                priority
-                className="object-cover"
-                sizes="100vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/80 to-transparent" />
-            </div>
-
+      <div className="hidden lg:block">
+        <div className="mx-auto max-w-[1280px] px-6">
+          <div className="relative flex min-h-[560px] items-center">
             {/* Content */}
             <div className="relative z-20 max-w-xl">
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-orange-500">
@@ -66,20 +49,6 @@ export function Hero() {
                 </Link>
               </div>
             </div>
-
-            {/* Decorative elements - product silhouette area */}
-            <div className="absolute right-0 top-0 z-10 hidden h-full w-1/2 items-center justify-center xl:flex" aria-hidden="true">
-              <div className="relative h-[500px] w-full">
-                <Image
-                  src="/hero image.png.png"
-                  alt=""
-                  fill
-                  priority
-                  className="object-contain object-right"
-                  sizes="50vw"
-                />
-              </div>
-            </div>
           </div>
         </div>
 
@@ -104,23 +73,10 @@ export function Hero() {
       </div>
 
       {/* Mobile Hero */}
-      <div className="lg:hidden h-full">
-        <div className="relative h-full overflow-hidden">
-          {/* Background */}
-          <div className="absolute inset-0" aria-hidden="true">
-            <Image
-              src="/hero image.png.png"
-              alt=""
-              fill
-              priority
-              className="object-cover"
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/60 via-neutral-950/80 to-black" />
-          </div>
-
+      <div className="lg:hidden">
+        <div className="relative min-h-[480px] overflow-hidden">
           {/* Content */}
-          <div className="relative z-10 flex h-full flex-col justify-center px-5 py-12">
+          <div className="relative z-10 flex min-h-[480px] flex-col justify-center px-5 py-12">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-orange-500">
               Drive Cleaner. Drive Better.
             </p>

@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users & Auth ───────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String?
+  role         String   @default("customer") // customer | admin
+  phone        String?
+  orders       Order[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ─── Catalogue ──────────────────────────────────────────
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  sortOrder   Int       @default(0)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+model Product {
+  id             String         @id @default(cuid())
+  name           String
+  slug           String         @unique
+  sku            String         @unique
+  description    String
+  price          Float
+  compareAtPrice Float?
+  categoryId     String
+  category       Category       @relation(fields: [categoryId], references: [id])
+  collectionId   String?
+  collection     Collection?    @relation(fields: [collectionId], references: [id])
+  inStock        Boolean        @default(true)
+  featured       Boolean        @default(false)
+  isNew          Boolean        @default(false)
+  weight         Float?
+  brand          String?
+  tags           String[]
+  images         ProductImage[]
+  variants       ProductVariant[]
+  orderItems     OrderItem[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([slug])
+  @@index([sku])
+  @@index([categoryId])
+  @@index([collectionId])
+  @@index([featured])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  sortOrder Int     @default(0)
+
+  @@index([productId])
+}
+
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String  // e.g. "500ml", "1L", "Red"
+  sku       String  @unique
+  price     Float?
+  stock     Int     @default(0)
+  size      String?
+  color     String?
+
+  @@index([productId])
+  @@index([sku])
+}
+
+model Collection {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+// ─── Orders ─────────────────────────────────────────────
+
+model Order {
+  id              String       @id @default(cuid())
+  orderNumber     String       @unique
+  userId          String?
+  user            User?        @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  payments        Payment[]
+  status          String       @default("pending") // pending | paid | processing | shipped | delivered | cancelled | refunded
+  subtotal        Float
+  shippingCost    Float        @default(0)
+  total           Float
+  shippingAddress Json
+  customerEmail   String
+  customerName    String
+  customerPhone   String?
+  razorpayOrderId String?
+  notes           String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([orderNumber])
+  @@index([userId])
+  @@index([status])
+  @@index([customerEmail])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  name      String
+  price     Float
+  quantity  Int
+  image     String
+
+  @@index([orderId])
+}
+
+// ─── Payments ───────────────────────────────────────────
+
+model Payment {
+  id                String   @id @default(cuid())
+  orderId           String
+  order             Order    @relation(fields: [orderId], references: [id])
+  razorpayPaymentId String?  @unique
+  razorpayOrderId   String?
+  razorpaySignature String?
+  amount            Float
+  currency          String   @default("INR")
+  status            String   @default("pending") // pending | success | failed | refunded
+  method            String?  // upi, card, netbanking, wallet
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([razorpayPaymentId])
+  @@index([status])
+}

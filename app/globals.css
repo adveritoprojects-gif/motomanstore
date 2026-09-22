@@ -56,8 +56,9 @@
   --warning: #f59e0b;
 
   /* ── Typography ── */
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: var(--font-google-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-google-sans-display), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* ── Border Radius ── */
   --radius-sm: 0.25rem;
@@ -128,6 +129,7 @@
   --color-neutral-950: var(--neutral-950);
 
   --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
   --font-mono: var(--font-mono);
 
   --radius-sm: var(--radius-sm);

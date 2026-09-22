@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { BRAND, HERO_FEATURES } from "@/lib/data";
 import {
@@ -12,11 +13,21 @@ const featureIcons = [Sparkles, ShieldCheck, Users, Leaf];
 
 export function Hero() {
   return (
-    <section className="relative bg-neutral-950 overflow-hidden">
+    <section className="relative bg-neutral-950 overflow-hidden ">
       {/* Desktop Hero */}
-      <div className="hidden lg:block">
-        <div className="mx-auto max-w-[1280px] px-6">
-          <div className="relative flex min-h-[560px] items-center">
+      <div className="relative hidden lg:block">
+        {/* Background Image - Full Width */}
+        <Image
+          src="/hero image.png"
+          alt="MOTOMAN premium car care"
+          fill
+          className="object-cover object-center"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/80 to-transparent" />
+
+        <div className="relative mx-auto max-w-[1280px] px-6">
+          <div className="flex min-h-[560px] items-center">
             {/* Content */}
             <div className="relative z-20 max-w-xl">
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-orange-500">
@@ -51,8 +62,6 @@ export function Hero() {
             </div>
           </div>
         </div>
-
-        {/* Feature indicators */}
         <div className="border-t border-neutral-800">
           <div className="mx-auto max-w-[1280px] px-6">
             <div className="grid grid-cols-4 divide-x divide-neutral-800">
@@ -71,10 +80,19 @@ export function Hero() {
           </div>
         </div>
       </div>
-
       {/* Mobile Hero */}
       <div className="lg:hidden">
         <div className="relative min-h-[480px] overflow-hidden">
+          {/* Background Image */}
+          <Image
+            src="/hero image.png"
+            alt="MOTOMAN premium car care"
+            fill
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/80 via-neutral-950/60 to-neutral-950" />
+
           {/* Content */}
           <div className="relative z-10 flex min-h-[480px] flex-col justify-center px-5 py-12">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-orange-500">

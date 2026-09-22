@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Google_Sans, Google_Sans_Flex } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { MobileBottomNav } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -7,14 +7,19 @@ import { CartDrawerProvider } from "@/components/cart";
 import { Analytics } from "@/components/analytics";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const googleSans = Google_Sans({
+  variable: "--font-google-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  fallback: ["Arial", "Helvetica Neue", "sans-serif"],
+  adjustFontFallback: false,
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const googleSansDisplay = Google_Sans_Flex({
+  variable: "--font-google-sans-display",
   subsets: ["latin"],
+  fallback: ["Arial", "Helvetica Neue", "sans-serif"],
+  adjustFontFallback: false,
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://motoman.in";
@@ -77,7 +82,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${googleSans.variable} ${googleSansDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Analytics />

@@ -4,6 +4,10 @@ import { Container } from "@/components/ui/container";
 import { Typography } from "@/components/ui/typography";
 import { getCategoryBySlug, getProducts } from "@/lib/queries";
 import { CategoryContent } from "@/components/shop/category-content";
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
+import { JsonLd } from "@/components/seo/json-ld";
+import { itemListJsonLd } from "@/lib/seo/json-ld";
+import { truncate } from "@/lib/seo/metadata";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -19,30 +23,33 @@ export async function generateMetadata({
   try {
     const category = await getCategoryBySlug(slug);
     if (!category) {
-      return { title: "Category Not Found" };
+      return { title: "Category Not Found", robots: { index: false } };
     }
+    const title = `${category.name} Products`;
+    const description =
+      category.description
+        ? truncate(
+            `Shop ${category.name.toLowerCase()} products online at MOTOMAN — ${category.description}.`,
+            155
+          )
+        : `Shop ${category.name.toLowerCase()} products online at MOTOMAN.`;
     return {
-      title: category.name,
-      description:
-        category.description ||
-        `Shop ${category.name} products at MOTOMAN Premium Car Care.`,
+      title,
+      description,
       alternates: {
         canonical: `/categories/${category.slug}`,
       },
       openGraph: {
-        title: `${category.name} | MOTOMAN`,
-        description:
-          category.description ||
-          `Shop ${category.name} products at MOTOMAN Premium Car Care.`,
+        title: `${title} | MOTOMAN`,
+        description,
         type: "website",
         siteName: "MOTOMAN",
+        url: `/categories/${category.slug}`,
       },
       twitter: {
         card: "summary_large_image",
-        title: `${category.name} | MOTOMAN`,
-        description:
-          category.description ||
-          `Shop ${category.name} products at MOTOMAN Premium Car Care.`,
+        title: `${title} | MOTOMAN`,
+        description,
       },
     };
   } catch {
@@ -83,8 +90,24 @@ export default async function CategoryPage({
     notFound();
   }
 
+  const itemList =
+    products && products.length > 0
+      ? itemListJsonLd({
+          name: `${category!.name} products`,
+          items: products.map((p) => ({ name: p.name, slug: p.slug })),
+        })
+      : null;
+
   return (
     <Container size="xl" className="py-8 md:py-12">
+      <Breadcrumbs
+        items={[
+          { name: "Categories", item: "/categories" },
+          { name: category!.name, item: `/categories/${category!.slug}` },
+        ]}
+      />
+      {itemList && <JsonLd data={itemList} />}
+
       {/* Category Header */}
       <div className="mb-8">
         <Typography variant="overline" className="mb-2 text-orange-500">
@@ -103,6 +126,9 @@ export default async function CategoryPage({
         </Typography>
       </div>
 
+      <h2 className="mb-4 text-lg font-semibold text-neutral-950">
+        Shop {category!.name} Products
+      </h2>
       <CategoryContent
         products={products ?? []}
         total={total}

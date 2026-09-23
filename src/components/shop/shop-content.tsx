@@ -147,9 +147,9 @@ export function ShopContent({
       <div className="flex gap-6">
         {/* Category Sidebar */}
         <aside className="hidden w-56 shrink-0 md:block">
-          <h3 className="mb-3 text-sm font-semibold text-neutral-950">
+          <h2 className="mb-3 text-sm font-semibold text-neutral-950">
             Categories
-          </h3>
+          </h2>
           <ul className="space-y-1">
             <li>
               <button
@@ -197,9 +197,9 @@ export function ShopContent({
               <div className="mb-4 rounded-full bg-neutral-100 p-4">
                 <Search className="h-8 w-8 text-neutral-400" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-neutral-900">
+              <h2 className="mb-2 text-lg font-semibold text-neutral-900">
                 No products found
-              </h3>
+              </h2>
               <p className="text-sm text-neutral-500">
                 Try adjusting your search or filter to find what you&apos;re looking for.
               </p>

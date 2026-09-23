@@ -78,6 +78,12 @@ export function ProductImageGallery({
             <button
               key={`${img.url}-${i}`}
               onClick={() => setSelected(i)}
+              aria-label={
+                img.alt
+                  ? `${img.alt} (image ${i + 1})`
+                  : `${productName} — image ${i + 1}`
+              }
+              aria-pressed={selected === i}
               className={cn(
                 "relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all",
                 selected === i

@@ -42,9 +42,9 @@ export function CategoryGrid({ categories }: CategoryGridProps) {
 
           {/* Content */}
           <div className="relative z-10 p-6">
-            <h3 className="mb-1 text-xl font-bold text-white">
+            <h2 className="mb-1 text-xl font-bold text-white">
               {category.name}
-            </h3>
+            </h2>
             <p className="mb-3 text-sm text-neutral-300">
               {category.description || ""}
             </p>

@@ -42,6 +42,11 @@ model Product {
   name           String
   slug           String         @unique
   sku            String         @unique
+  /// Global Trade Item Number (GTIN/UPC/EAN). Optional — only set when the
+  /// manufacturer provides one. Never invent GTINs.
+  gtin           String?
+  /// Manufacturer Part Number. Optional — only set when known.
+  mpn            String?
   description    String
   price          Float
   compareAtPrice Float?

@@ -1,9 +1,15 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { CheckCircle, Package, Truck, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { getOrder } from "@/lib/actions";
 import { formatPrice } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: "Order Confirmed",
+  robots: { index: false, follow: false },
+};
 
 interface OrderSuccessPageProps {
   params: Promise<{ orderId: string }>;

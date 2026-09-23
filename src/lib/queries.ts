@@ -101,6 +101,36 @@ export async function getProductBySlug(slug: string) {
   });
 }
 
+/**
+ * Products for SEO landing pages — matches any of the given category slugs
+ * or any of the given tags (OR between criteria). No filter = all products.
+ */
+export async function getLandingProducts(params?: {
+  categorySlugs?: string[];
+  tags?: string[];
+  limit?: number;
+}) {
+  const { categorySlugs, tags, limit = 48 } = params ?? {};
+
+  const clauses: Prisma.ProductWhereInput[] = [];
+  if (categorySlugs && categorySlugs.length > 0) {
+    clauses.push({ category: { slug: { in: categorySlugs } } });
+  }
+  if (tags && tags.length > 0) {
+    clauses.push({ tags: { hasSome: tags } });
+  }
+
+  const where: Prisma.ProductWhereInput =
+    clauses.length === 0 ? {} : clauses.length === 1 ? clauses[0] : { OR: clauses };
+
+  return prisma.product.findMany({
+    where,
+    include: { images: { orderBy: { sortOrder: "asc" } }, category: true },
+    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    take: limit,
+  });
+}
+
 export async function getFeaturedProducts(limit = 5) {
   return prisma.product.findMany({
     where: { featured: true },

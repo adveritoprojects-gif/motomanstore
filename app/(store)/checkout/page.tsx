@@ -20,13 +20,42 @@ import { createOrder } from "@/lib/actions";
 import { Container } from "@/components/ui/container";
 
 const INDIAN_STATES = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
-  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
-  "Delhi", "Jammu and Kashmir", "Ladakh", "Puducherry", "Chandigarh",
-  "Dadra and Nagar Haveli and Daman and Diu", "Lakshadweep", "Andaman and Nicobar Islands",
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+  "Delhi",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Puducherry",
+  "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Lakshadweep",
+  "Andaman and Nicobar Islands",
 ];
 
 export default function CheckoutPage() {
@@ -79,7 +108,7 @@ export default function CheckoutPage() {
           quantity: item.quantity,
           variantId: item.variantId,
           variantName: item.variantName,
-        }))
+        })),
       );
 
       if (!result.success) {
@@ -171,7 +200,7 @@ export default function CheckoutPage() {
                       "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
                       errors.firstName
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                        : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20"
+                        : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
                     )}
                     placeholder="First name"
                   />
@@ -183,7 +212,7 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-neutral-700">
-                    Last Name *
+                    Last Name 
                   </label>
                   <input
                     {...register("lastName")}
@@ -191,7 +220,7 @@ export default function CheckoutPage() {
                       "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
                       errors.lastName
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                        : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20"
+                        : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
                     )}
                     placeholder="Last name"
                   />
@@ -215,7 +244,7 @@ export default function CheckoutPage() {
                     "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
                     errors.email
                       ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                      : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20"
+                      : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
                   )}
                   placeholder="you@example.com"
                 />
@@ -238,7 +267,7 @@ export default function CheckoutPage() {
                     "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
                     errors.phone
                       ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                      : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20"
+                      : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
                   )}
                   placeholder="98765 43210"
                 />
@@ -260,7 +289,7 @@ export default function CheckoutPage() {
                     "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
                     errors.address1
                       ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                      : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20"
+                      : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
                   )}
                   placeholder="Flat / House number"
                 />
@@ -293,7 +322,7 @@ export default function CheckoutPage() {
                       "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
                       errors.city
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                        : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20"
+                        : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
                     )}
                     placeholder="City"
                   />
@@ -313,7 +342,7 @@ export default function CheckoutPage() {
                       "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
                       errors.postalCode
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                        : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20"
+                        : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
                     )}
                     placeholder="6-digit PIN"
                     maxLength={6}
@@ -337,7 +366,7 @@ export default function CheckoutPage() {
                       "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
                       errors.state
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                        : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20"
+                        : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
                     )}
                   >
                     <option value="">Select state</option>

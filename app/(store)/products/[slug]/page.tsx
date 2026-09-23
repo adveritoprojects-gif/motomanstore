@@ -4,7 +4,13 @@ import { Container } from "@/components/ui/container";
 import { getProductBySlug, getRelatedProducts } from "@/lib/queries";
 import { ProductDetail } from "@/components/product/product-detail";
 import { ProductGrid } from "@/components/product/product-grid";
-
+import { JsonLd } from "@/components/seo/json-ld";
+import { productJsonLd, breadcrumbJsonLd } from "@/lib/seo/json-ld";
+import {
+  productSeoTitle,
+  productSeoDescription,
+} from "@/lib/seo/metadata";
+import { absoluteImage, SITE_NAME } from "@/lib/seo/site";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -12,47 +18,40 @@ interface ProductPageProps {
 
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+}: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   try {
     const product = await getProductBySlug(slug);
     if (!product) {
-      return { title: "Product Not Found" };
+      return { title: "Product Not Found", robots: { index: false } };
     }
 
-    const imageUrl =
-      product.images[0]?.url || "/placeholder-product.jpg";
-
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://motoman.in";
+    const title = productSeoTitle(product);
+    const description = productSeoDescription(product);
+    const imageUrl = absoluteImage(product.images[0]?.url);
+    const canonicalPath = `/products/${product.slug}`;
 
     return {
-      title: product.name,
-      description: product.description.slice(0, 160),
-      alternates: {
-        canonical: `/products/${product.slug}`,
-      },
+      // productSeoTitle already leads with the brand — use an absolute title
+      // so the layout template doesn't produce "… | MOTOMAN | MOTOMAN".
+      title: { absolute: title },
+      description,
+      alternates: { canonical: canonicalPath },
       openGraph: {
-        title: product.name,
-        description: product.description.slice(0, 200),
         type: "website",
-        siteName: "MOTOMAN",
-        url: `${baseUrl}/products/${product.slug}`,
-        images: [
-          {
-            url: imageUrl,
-            width: 1200,
-            height: 630,
-            alt: product.name,
-          },
-        ],
+        siteName: SITE_NAME,
+        url: canonicalPath,
+        title,
+        description,
+        ...(imageUrl
+          ? { images: [{ url: imageUrl, alt: product.name }] }
+          : {}),
       },
       twitter: {
         card: "summary_large_image",
-        title: product.name,
-        description: product.description.slice(0, 200),
-        images: [imageUrl],
+        title,
+        description,
+        ...(imageUrl ? { images: [imageUrl] } : {}),
       },
     };
   } catch {
@@ -81,36 +80,32 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://motoman.in";
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
+  const jsonLd = productJsonLd({
+    id: product.id,
     name: product.name,
     description: product.description,
+    slug: product.slug,
     sku: product.sku,
-    brand: product.brand
-      ? { "@type": "Brand", name: product.brand }
-      : undefined,
-    category: product.category.name,
-    image: product.images[0]?.url,
-    offers: {
-      "@type": "Offer",
-      price: product.price,
-      priceCurrency: "INR",
-      availability: product.inStock
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
-      url: `${baseUrl}/products/${product.slug}`,
-    },
-  };
+    gtin: product.gtin,
+    mpn: product.mpn,
+    brand: product.brand,
+    price: product.price,
+    inStock: product.inStock,
+    categoryName: product.category.name,
+    images: product.images,
+  });
+
+  const breadcrumbJsonLdData = breadcrumbJsonLd([
+    { name: "Home", item: "/" },
+    { name: "Shop", item: "/shop" },
+    { name: product.category.name, item: `/categories/${product.category.slug}` },
+    { name: product.name, item: `/products/${product.slug}` },
+  ]);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumbJsonLdData} />
       <Container size="xl" className="py-8 md:py-12">
         <ProductDetail product={product} />
 

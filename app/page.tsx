@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Hero } from "@/components/home/hero";
 import { CategorySection } from "@/components/home/category-section";
 import { BestSellers } from "@/components/home/best-sellers";
@@ -5,24 +6,15 @@ import { BundleBanner } from "@/components/home/bundle-banner";
 import { BenefitsSection } from "@/components/home/benefits-section";
 import { TestimonialSection } from "@/components/home/testimonial-section";
 import { getCategories, getFeaturedProducts } from "@/lib/queries";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://motoman.in";
-
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "MOTOMAN",
-  url: siteUrl,
-  description: "Professional car care products designed for a cleaner, shinier and longer-lasting drive.",
-  email: "hello@motoman.in",
-  telephone: "+91 98765 43210",
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Mumbai",
-    addressRegion: "Maharashtra",
-    addressCountry: "IN",
-  },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Car Care & Detailing Products Online",
+  absoluteTitle: "Car Care & Detailing Products Online | MOTOMAN",
+  description:
+    "Shop premium car care products, detailing supplies, microfiber cloths and car cleaning essentials online at MOTOMAN. Quality products for a cleaner, better-looking car.",
+  path: "/",
+});
 
 export default async function HomePage() {
   let categories = null;
@@ -39,10 +31,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-      />
       <Hero />
       <CategorySection categories={categories ?? undefined} />
       <BestSellers products={featuredProducts ?? undefined} />

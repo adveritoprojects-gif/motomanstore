@@ -335,9 +335,9 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Product Details */}
           <div className="mt-6 border-t border-neutral-200 pt-6">
-            <h3 className="mb-3 text-sm font-semibold text-neutral-900">
+            <h2 className="mb-3 text-sm font-semibold text-neutral-900">
               Product Details
-            </h3>
+            </h2>
             <div className="space-y-2 text-sm text-neutral-600">
               <div className="flex items-center gap-2">
                 <Package className="h-4 w-4 text-neutral-400" aria-hidden="true" />
@@ -377,9 +377,9 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Reviews Placeholder */}
           <div className="mt-6 border-t border-neutral-200 pt-6">
-            <h3 className="mb-4 text-sm font-semibold text-neutral-900">
+            <h2 className="mb-4 text-sm font-semibold text-neutral-900">
               Customer Reviews
-            </h3>
+            </h2>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (

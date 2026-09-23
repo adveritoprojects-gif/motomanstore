@@ -207,6 +207,8 @@ export const FOOTER_LINKS = {
   quickLinks: [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
+    { href: "/car-care-products", label: "Car Care Products" },
+    { href: "/microfiber-cloths", label: "Microfiber Cloths" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
   ],
@@ -215,6 +217,14 @@ export const FOOTER_LINKS = {
     { href: "/categories/microfiber", label: "Microfiber" },
     { href: "/categories/interior-care", label: "Interior Care" },
     { href: "/categories/exterior-care", label: "Exterior Care" },
+    { href: "/categories/accessories", label: "Accessories" },
+  ],
+  legal: [
+    { href: "/shipping-policy", label: "Shipping Policy" },
+    { href: "/return-policy", label: "Returns" },
+    { href: "/refund-policy", label: "Refunds" },
+    { href: "/privacy-policy", label: "Privacy Policy" },
+    { href: "/terms-and-conditions", label: "Terms" },
   ],
   social: [
     { href: "https://instagram.com", label: "Instagram", icon: "instagram" },

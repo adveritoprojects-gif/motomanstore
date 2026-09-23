@@ -5,6 +5,8 @@ import { MobileBottomNav } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { CartDrawerProvider } from "@/components/cart";
 import { Analytics } from "@/components/analytics";
+import { JsonLd } from "@/components/seo/json-ld";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/seo/json-ld";
 import "./globals.css";
 
 const googleSans = Google_Sans({
@@ -22,41 +24,53 @@ const googleSansDisplay = Google_Sans_Flex({
   adjustFontFallback: false,
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://motoman.in";
+const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://motoman.in").replace(/\/$/, "");
+
+const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "MOTOMAN — Premium Car Care",
+    default: "MOTOMAN — Premium Car Care & Detailing Products",
     template: "%s | MOTOMAN",
   },
   description:
-    "Professional car care products designed for a cleaner, shinier and longer-lasting drive. Shop premium shampoos, waxes, microfiber cloths and more.",
-  keywords: ["car care", "car wash", "car shampoo", "microfiber", "car wax", "polish", "premium car care", "MOTOMAN"],
+    "Shop premium car care products, detailing supplies, microfiber cloths and car cleaning essentials online at MOTOMAN. Quality products for a cleaner, better-looking car.",
+  keywords: [
+    "car care products",
+    "car cleaning products",
+    "car detailing products",
+    "car wash products",
+    "car care products online",
+    "microfiber cloth for car",
+    "car detailing supplies",
+    "car care accessories",
+    "MOTOMAN",
+  ],
   authors: [{ name: "MOTOMAN" }],
   creator: "MOTOMAN",
   publisher: "MOTOMAN",
+  // Canonical is intentionally NOT set here — each page sets its own via
+  // generateMetadata/pageMetadata. A root-level canonical would leak the
+  // homepage URL onto checkout, login, admin, etc.
+  verification: googleSiteVerification
+    ? { google: googleSiteVerification }
+    : undefined,
   openGraph: {
     type: "website",
     locale: "en_IN",
     url: siteUrl,
     siteName: "MOTOMAN",
-    title: "MOTOMAN — Premium Car Care",
-    description: "Professional car care products designed for a cleaner, shinier and longer-lasting drive.",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "MOTOMAN Premium Car Care",
-      },
-    ],
+    title: "MOTOMAN — Premium Car Care & Detailing Products",
+    description:
+      "Shop premium car care products, detailing supplies, microfiber cloths and car cleaning essentials online at MOTOMAN.",
+    // Site-wide default OG image comes from app/opengraph-image.tsx
   },
   twitter: {
     card: "summary_large_image",
-    title: "MOTOMAN — Premium Car Care",
-    description: "Professional car care products designed for a cleaner, shinier and longer-lasting drive.",
-    images: ["/og-image.jpg"],
+    title: "MOTOMAN — Premium Car Care & Detailing Products",
+    description:
+      "Shop premium car care products, detailing supplies, microfiber cloths and car cleaning essentials online at MOTOMAN.",
   },
   robots: {
     index: true,
@@ -68,9 +82,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
-  alternates: {
-    canonical: siteUrl,
   },
 };
 
@@ -84,6 +95,10 @@ export default function RootLayout({
       lang="en"
       className={`${googleSans.variable} ${googleSansDisplay.variable} h-full antialiased`}
     >
+      <head>
+        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={websiteJsonLd()} />
+      </head>
       <body className="min-h-full flex flex-col">
         <Analytics />
         <CartDrawerProvider />

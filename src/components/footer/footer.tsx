@@ -93,9 +93,35 @@ export function Footer() {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-12 flex items-center justify-between border-t border-neutral-800 pt-6">
+          <nav
+            aria-label="Legal"
+            className="mt-12 flex flex-wrap gap-x-5 gap-y-2 border-t border-neutral-800 pt-6"
+          >
+            {FOOTER_LINKS.legal.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-xs text-neutral-500 transition-colors hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="mt-4 flex items-center justify-between">
             <p className="text-xs text-neutral-500">
-              &copy; {new Date().getFullYear()} {BRAND.name}. All rights reserved.
+              &copy; {new Date().getFullYear()} {BRAND.name}. All rights
+              reserved.
+            </p>
+            <p className="text-xs text-neutral-500">
+              Designed &amp; Developed with{" "}
+              <a
+                href="https://adveritodigital.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-neutral-300 transition-colors hover:text-white"
+              >
+                Adverito
+              </a>
             </p>
             <p className="text-xs font-medium text-neutral-600">
               {BRAND.slogan}
@@ -154,9 +180,35 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="mt-6 border-t border-neutral-800 pt-6">
+          <nav
+            aria-label="Legal"
+            className="mt-6 flex flex-wrap gap-x-4 gap-y-2 border-t border-neutral-800 pt-6"
+          >
+            {FOOTER_LINKS.legal.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-[11px] text-neutral-500 transition-colors hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="mt-4 flex flex-col gap-2">
             <p className="text-[11px] text-neutral-500">
-              &copy; {new Date().getFullYear()} {BRAND.name}. All rights reserved.
+              &copy; {new Date().getFullYear()} {BRAND.name}. All rights
+              reserved.
+            </p>
+            <p className="text-[11px] text-neutral-500">
+              Designed &amp; Developed with{" "}
+              <a
+                href="https://adveritodigital.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-neutral-300 transition-colors hover:text-white"
+              >
+                Adverito
+              </a>
             </p>
           </div>
         </div>

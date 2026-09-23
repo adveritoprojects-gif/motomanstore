@@ -61,7 +61,11 @@ export function Navbar() {
           <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-6">
             {/* Left: Logo */}
             <Link href="/" className="flex items-center  gap-2">
-              <img className="h-16 w-36" src="/logo.png" alt="logo" />
+              <img
+                className="h-16 w-36"
+                src="/logo.png"
+                alt="MOTOMAN — Premium Car Care"
+              />
             </Link>
 
             {/* Center: Nav Links */}
@@ -133,7 +137,7 @@ export function Navbar() {
               <Menu className="h-5 w-5" />
             </button>
 
-            <img className="h-16 w-36" src="/logo.png" alt="" />
+            <img className="h-16 w-36" src="/logo.png" alt="MOTOMAN" />
 
             <div className="flex items-center gap-1">
               <Link

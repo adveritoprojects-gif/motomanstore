@@ -6,24 +6,25 @@ import { getProducts, getCategories } from "@/lib/queries";
 import { ShopContent } from "@/components/shop/shop-content";
 
 export const metadata: Metadata = {
-  title: "Shop",
+  title: "Shop Car Care & Detailing Products",
   description:
-    "Browse our complete range of premium car care products. From shampoos to waxes, find everything you need for a showroom finish.",
+    "Shop car care products, car cleaning supplies, detailing essentials and microfiber cloths online at MOTOMAN. Find everything you need for a showroom finish.",
   alternates: {
     canonical: "/shop",
   },
   openGraph: {
-    title: "Shop | MOTOMAN",
+    title: "Shop Car Care & Detailing Products | MOTOMAN",
     description:
-      "Browse our complete range of premium car care products. From shampoos to waxes, find everything you need for a showroom finish.",
+      "Shop car care products, car cleaning supplies, detailing essentials and microfiber cloths online at MOTOMAN.",
     type: "website",
     siteName: "MOTOMAN",
+    url: "/shop",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shop | MOTOMAN",
+    title: "Shop Car Care & Detailing Products | MOTOMAN",
     description:
-      "Browse our complete range of premium car care products.",
+      "Shop car care products, car cleaning supplies and microfiber cloths online at MOTOMAN.",
   },
 };
 
@@ -62,8 +63,8 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     total = productsResult.total;
     totalPages = productsResult.totalPages;
     categories = categoriesResult;
-  } catch {
-    // Database not available
+  } catch (error) {
+    console.error("Failed to load shop products:", error);
   }
 
   return (
@@ -74,7 +75,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           Our Products
         </Typography>
         <Typography variant="h1" className="mb-2">
-          Shop
+          Car Care &amp; Detailing Products
         </Typography>
         <Typography variant="body" className="text-neutral-500">
           {total > 0

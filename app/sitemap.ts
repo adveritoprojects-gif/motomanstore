@@ -1,7 +1,11 @@
 import type { MetadataRoute } from "next";
 import { getProducts, getCategories, getCollections } from "@/lib/queries";
+import { LANDING_PAGE_KEYS, LANDING_PAGES } from "@/lib/seo/landing-pages";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://motoman.in";
+const BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || "https://motoman.in").replace(
+  /\/$/,
+  ""
+);
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -19,6 +23,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    // SEO landing pages (keyword routes)
+    ...LANDING_PAGE_KEYS.map((key) => ({
+      url: `${BASE_URL}${LANDING_PAGES[key].path}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: key === "car-care-products" ? 0.9 : 0.8,
+    })),
     {
       url: `${BASE_URL}/collections`,
       lastModified: now,
@@ -43,6 +54,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    // Trust / legal pages
+    {
+      url: `${BASE_URL}/shipping-policy`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/return-policy`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/refund-policy`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/privacy-policy`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/terms-and-conditions`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
   ];
 
   try {
@@ -60,9 +102,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const categoryPages: MetadataRoute.Sitemap = categories.map(
       (category) => ({
         url: `${BASE_URL}/categories/${category.slug}`,
-        lastModified: now,
+        lastModified: category.updatedAt || now,
         changeFrequency: "weekly" as const,
-        priority: 0.6,
+        priority: 0.7,
       })
     );
 
@@ -77,7 +119,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
 
     return [...staticPages, ...productPages, ...categoryPages, ...collectionPages];
-  } catch {
+  } catch (error) {
+    console.error("Sitemap DB query failed, serving static pages only:", error);
     return staticPages;
   }
 }

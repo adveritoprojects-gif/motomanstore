@@ -19,7 +19,7 @@ export function Hero() {
         {/* Background Image - Full Width */}
         <Image
           src="/hero image.png"
-          alt="MOTOMAN premium car care"
+          alt=""
           fill
           className="object-cover object-center"
           priority
@@ -86,7 +86,7 @@ export function Hero() {
           {/* Background Image */}
           <Image
             src="/hero image.png"
-            alt="MOTOMAN premium car care"
+            alt=""
             fill
             className="object-cover object-center"
             priority
@@ -98,14 +98,16 @@ export function Hero() {
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-orange-500">
               Drive Cleaner. Drive Better.
             </p>
-            <h1 className="mb-4 text-3xl font-bold leading-[1.1] tracking-tight text-white">
+            {/* Mobile variant of the hero heading — a <p> so the page keeps
+               exactly one <h1> (the desktop one above) in the DOM. */}
+            <p className="mb-4 text-3xl font-bold leading-[1.1] tracking-tight text-white">
               Premium
               <br />
               Car Care
               <br />
               For a Better{" "}
               <span className="text-orange-500">Drive.</span>
-            </h1>
+            </p>
             <p className="mb-6 max-w-sm text-sm leading-relaxed text-neutral-400">
               {BRAND.description}
             </p>

@@ -392,7 +392,7 @@ async function main() {
       tags: ["drying", "towel", "microfiber", "large"],
       images: {
         create: [
-          { url: "/products/drying-towel.jpg", alt: "Microfibre Drying Towel", sortOrder: 0 },
+          { url: "/products/p6.jpeg", alt: "Microfibre Drying Towel", sortOrder: 0 },
         ],
       },
       variants: {

@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
 import { Google_Sans, Google_Sans_Flex } from "next/font/google";
-import { Navbar } from "@/components/navbar";
-import { MobileBottomNav } from "@/components/navbar";
-import { Footer } from "@/components/footer";
-import { CartDrawerProvider } from "@/components/cart";
 import { Analytics } from "@/components/analytics";
 import { JsonLd } from "@/components/seo/json-ld";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo/json-ld";
@@ -101,11 +97,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <Analytics />
-        <CartDrawerProvider />
-        <Navbar />
-        <main className="flex-1 pb-16 lg:pb-0">{children}</main>
-        <Footer />
-        <MobileBottomNav />
+        {children}
       </body>
     </html>
   );

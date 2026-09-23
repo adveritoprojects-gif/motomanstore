@@ -84,8 +84,15 @@ export async function setupAdminAction(
 
     await createSession(user);
     return { success: true };
-  } catch {
-    return { success: false, error: "Setup failed. Please try again." };
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[setupAdminAction] Setup failed:", error);
+    }
+
+    return {
+      success: false,
+      error: "Setup failed. Please try again.",
+    };
   }
 }
 

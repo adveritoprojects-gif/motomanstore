@@ -62,7 +62,7 @@ export function Navbar() {
             {/* Left: Logo */}
             <Link href="/" className="flex items-center  gap-2">
               <img
-                className="h-16 w-36"
+                className="h-14 w-36"
                 src="/logo.png"
                 alt="MOTOMAN — Premium Car Care"
               />
@@ -137,7 +137,7 @@ export function Navbar() {
               <Menu className="h-5 w-5" />
             </button>
 
-            <img className="h-16 w-36" src="/logo.png" alt="MOTOMAN" />
+            <img className="h-14 w-36" src="/logo.png" alt="MOTOMAN" />
 
             <div className="flex items-center gap-1">
               <Link

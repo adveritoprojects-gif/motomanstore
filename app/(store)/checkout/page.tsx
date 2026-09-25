@@ -138,8 +138,8 @@ export default function CheckoutPage() {
           router.push(`/order-success/${result.orderId}`);
         },
         prefill: {
-          name: `${data.firstName} ${data.lastName}`,
-          email: data.email,
+          name: [data.firstName, data.lastName].filter(Boolean).join(" "),
+          email: data.email || undefined,
           contact: data.phone,
         },
         notes: {
@@ -212,7 +212,7 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-neutral-700">
-                    Last Name 
+                    Last Name (optional)
                   </label>
                   <input
                     {...register("lastName")}
@@ -235,7 +235,7 @@ export default function CheckoutPage() {
               {/* Email */}
               <div className="mb-4">
                 <label className="mb-1.5 block text-sm font-medium text-neutral-700">
-                  Email Address *
+                  Email Address (optional)
                 </label>
                 <input
                   {...register("email")}

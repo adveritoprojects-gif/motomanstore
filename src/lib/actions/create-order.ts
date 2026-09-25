@@ -127,8 +127,10 @@ export async function createOrder(
         shippingCost,
         total,
         shippingAddress: validatedCheckout.data,
-        customerEmail: validatedCheckout.data.email,
-        customerName: `${validatedCheckout.data.firstName} ${validatedCheckout.data.lastName}`,
+        customerEmail: validatedCheckout.data.email ?? "",
+        customerName: [validatedCheckout.data.firstName, validatedCheckout.data.lastName]
+          .filter(Boolean)
+          .join(" "),
         customerPhone: validatedCheckout.data.phone,
         notes: validatedCheckout.data.notes,
         items: { create: orderItems },

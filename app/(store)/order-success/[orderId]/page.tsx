@@ -39,7 +39,9 @@ export default async function OrderSuccessPage({ params }: OrderSuccessPageProps
             Order Confirmed!
           </h1>
           <p className="text-neutral-500">
-            Thank you for your purchase. We&apos;ll send you an email with the order details.
+            {order.customerEmail
+              ? "Thank you for your purchase. We'll send you an email with the order details."
+              : "Thank you for your purchase."}
           </p>
         </div>
 
@@ -176,12 +178,14 @@ export default async function OrderSuccessPage({ params }: OrderSuccessPageProps
           </div>
 
           {/* Contact */}
-          <p className="mt-4 text-center text-xs text-neutral-400">
-            A confirmation email has been sent to{" "}
-            <span className="font-medium text-neutral-600">
-              {order.customerEmail}
-            </span>
-          </p>
+          {order.customerEmail && (
+            <p className="mt-4 text-center text-xs text-neutral-400">
+              A confirmation email has been sent to{" "}
+              <span className="font-medium text-neutral-600">
+                {order.customerEmail}
+              </span>
+            </p>
+          )}
         </div>
 
         {/* Continue Shopping */}

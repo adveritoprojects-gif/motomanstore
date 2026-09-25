@@ -47,27 +47,29 @@ export async function verifyPayment(
     });
 
     const shippingAddress = order.shippingAddress as Record<string, string>;
-    sendOrderConfirmationEmail({
-      orderNumber: order.orderNumber,
-      customerName: order.customerName,
-      customerEmail: order.customerEmail,
-      items: order.items.map((item) => ({
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-      subtotal: order.subtotal,
-      shippingCost: order.shippingCost,
-      total: order.total,
-      shippingAddress: {
-        address1: shippingAddress.address1 || "",
-        address2: shippingAddress.address2,
-        city: shippingAddress.city || "",
-        state: shippingAddress.state || "",
-        postalCode: shippingAddress.postalCode || "",
-        country: shippingAddress.country || "India",
-      },
-    });
+    if (order.customerEmail) {
+      sendOrderConfirmationEmail({
+        orderNumber: order.orderNumber,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        items: order.items.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subtotal: order.subtotal,
+        shippingCost: order.shippingCost,
+        total: order.total,
+        shippingAddress: {
+          address1: shippingAddress.address1 || "",
+          address2: shippingAddress.address2,
+          city: shippingAddress.city || "",
+          state: shippingAddress.state || "",
+          postalCode: shippingAddress.postalCode || "",
+          country: shippingAddress.country || "India",
+        },
+      });
+    }
 
     return { success: true, orderId: order.id };
   } catch {

@@ -3,9 +3,15 @@ import { z } from "zod";
 // ─── Checkout ───────────────────────────────────────────
 
 export const checkoutSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z
+    .string()
+    .trim()
+    .refine((v) => v === "" || z.string().email().safeParse(v).success, {
+      message: "Please enter a valid email address",
+    })
+    .optional(),
   firstName: z.string().min(1, "First name is required").max(100),
-  lastName: z.string().min(1, "Last name is required").max(100),
+  lastName: z.string().trim().max(100).optional(),
   phone: z
     .string()
     .min(10, "Phone number must be at least 10 digits")

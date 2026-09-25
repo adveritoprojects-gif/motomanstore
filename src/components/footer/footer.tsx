@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { BRAND, FOOTER_LINKS } from "@/lib/data";
 
@@ -11,9 +12,13 @@ export function Footer() {
             {/* Brand */}
             <div>
               <Link href="/" className="inline-block">
-                <span className="text-xl font-bold tracking-wider text-white">
-                  {BRAND.name}
-                </span>
+                <Image
+                  src="/logo.png"
+                  alt="MOTOMAN"
+                  width={217}
+                  height={72}
+                  className="h-9 w-auto"
+                />
               </Link>
               <p className="mt-3 text-xs leading-relaxed text-neutral-400">
                 {BRAND.tagline}
@@ -132,9 +137,15 @@ export function Footer() {
         {/* Mobile */}
         <div className="py-8 lg:hidden">
           <div className="mb-6">
-            <span className="text-lg font-bold tracking-wider text-white">
-              {BRAND.name}
-            </span>
+            <Link href="/" className="inline-block">
+              <Image
+                src="/logo.png"
+                alt="MOTOMAN"
+                width={217}
+                height={72}
+                className="h-8 w-auto"
+              />
+            </Link>
             <p className="mt-2 text-xs text-neutral-400">{BRAND.tagline}</p>
           </div>
 

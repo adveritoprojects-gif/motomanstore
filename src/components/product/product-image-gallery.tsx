@@ -92,7 +92,17 @@ export function ProductImageGallery({
               )}
             >
               <div className="flex h-full w-full items-center justify-center bg-neutral-50">
-                <ShoppingBag className="h-4 w-4 text-neutral-300" />
+                {img.url ? (
+                  <Image
+                    src={img.url}
+                    alt={img.alt || `${productName} — image ${i + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="64px"
+                  />
+                ) : (
+                  <ShoppingBag className="h-4 w-4 text-neutral-300" />
+                )}
               </div>
             </button>
           ))}
@@ -106,13 +116,7 @@ export function ProductImageGallery({
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          {images[selected]?.url?.startsWith("/") ? (
-            <div className="flex h-full w-full items-center justify-center">
-              <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-neutral-100">
-                <ShoppingBag className="h-16 w-16 text-neutral-300" />
-              </div>
-            </div>
-          ) : (
+          {images[selected]?.url ? (
             <Image
               src={images[selected].url}
               alt={images[selected].alt || productName}
@@ -121,6 +125,12 @@ export function ProductImageGallery({
               priority={selected === 0}
               sizes="(max-width: 768px) 100vw, 50vw"
             />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-neutral-100">
+                <ShoppingBag className="h-16 w-16 text-neutral-300" />
+              </div>
+            </div>
           )}
         </div>
 

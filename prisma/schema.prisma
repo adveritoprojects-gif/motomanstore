@@ -50,6 +50,10 @@ model Product {
   description    String
   price          Float
   compareAtPrice Float?
+  /// SEO — optional per-product overrides. When empty the storefront falls
+  /// back to the generated title/description derived from name/description.
+  metaTitle       String?
+  metaDescription String?
   categoryId     String
   category       Category       @relation(fields: [categoryId], references: [id])
   collectionId   String?

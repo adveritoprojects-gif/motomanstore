@@ -65,6 +65,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const badge = getBadge(product);
   const imageSrc = getImageSrc(product.images);
+  const hasImage = Boolean(imageSrc) && imageSrc !== "/placeholder-product.jpg";
   const imageAlt = getImageAlt(product.images, product.name);
   const categoryName = getCategoryName(product.category);
 
@@ -116,22 +117,22 @@ export function ProductCard({ product, className }: ProductCardProps) {
           </span>
         )}
 
-        {/* Product image */}
-        <div className="flex h-full w-full items-center justify-center">
-          {imageSrc.startsWith("/") ? (
-            <div className="flex h-24 w-24 items-center justify-center rounded-xl bg-neutral-100">
-              <ShoppingBag className="h-10 w-10 text-neutral-300" />
-            </div>
-          ) : (
-            <Image
-              src={imageSrc}
-              alt={imageAlt}
-              fill
-              className="object-contain transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-            />
-          )}
-        </div>
+          {/* Product image */}
+          <div className="flex h-full w-full items-center justify-center">
+            {hasImage ? (
+              <Image
+                src={imageSrc}
+                alt={imageAlt}
+                fill
+                className="object-contain transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+              />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-xl bg-neutral-100">
+                <ShoppingBag className="h-10 w-10 text-neutral-300" />
+              </div>
+            )}
+          </div>
       </Link>
 
       {/* Info */}

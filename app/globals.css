@@ -211,6 +211,14 @@ body {
 }
 
 /* ═══ Utility Classes ═══ */
+
+/* Shop search has its own clear (X) button — hide the browser's native one
+   so only a single X is shown. */
+#shop-search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

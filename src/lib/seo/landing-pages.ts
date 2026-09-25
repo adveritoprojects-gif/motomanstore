@@ -37,7 +37,7 @@ export const LANDING_PAGES: Record<string, SeoLandingPage> = {
     h1: "Car Care Products Online",
     overline: "Shop",
     intro: [
-      "Find everything you need to keep your car looking its best. MOTOMAN car care products cover washing, drying, polishing and interior care — whether you're doing a quick weekend wash or a full detail.",
+      "Find everything you need to keep your car looking its best. MOTOMAN car care products cover washing, drying, polishing and paint protection — whether you're doing a quick weekend wash or a full detail.",
       "Browse by category or explore the full range below. Every product is priced clearly, with sizes and pack options available on the product page.",
     ],
     productsHeading: "Shop All Car Care Products",
@@ -58,7 +58,7 @@ export const LANDING_PAGES: Record<string, SeoLandingPage> = {
     overline: "Cleaning",
     intro: [
       "A good wash is the foundation of car care. MOTOMAN car cleaning products — pH-neutral shampoos, foam sprayers and soft wash tools — lift dirt safely without scratching your paint.",
-      "Pair your wash products with microfiber cloths and drying towels for a streak-free finish, then browse interior and exterior care for the rest of your routine.",
+      "Pair your wash products with microfiber cloths and drying towels for a streak-free finish, then browse exterior care for the rest of your routine.",
     ],
     productsHeading: "Shop Car Cleaning Products",
     categorySlugs: ["car-wash"],
@@ -73,20 +73,20 @@ export const LANDING_PAGES: Record<string, SeoLandingPage> = {
     path: "/car-detailing-products",
     title: "Car Detailing Products & Supplies Online",
     description:
-      "Shop car detailing products online — waxes, sealants, interior conditioners, brushes and microfiber towels for a professional finish at MOTOMAN.",
+      "Shop car detailing products online — waxes, sealants, brushes and microfiber towels for a professional finish at MOTOMAN.",
     h1: "Car Detailing Products",
     overline: "Detailing",
     intro: [
-      "Detailing is where a clean car becomes a great-looking one. MOTOMAN detailing supplies include paint protection, interior conditioners and precision brushes for vents, seams and trim.",
+      "Detailing is where a clean car becomes a great-looking one. MOTOMAN detailing supplies include paint protection and precision brushes for vents, seams and trim.",
       "Use microfiber towels for polishing and buffing, and finish with a wax or sealant for lasting shine and protection.",
     ],
     productsHeading: "Shop Detailing Supplies",
-    categorySlugs: ["exterior-care", "interior-care", "accessories"],
+    categorySlugs: ["exterior-care", "accessories"],
     related: [
       { href: "/exterior-car-cleaning", label: "Exterior Car Cleaning" },
-      { href: "/interior-car-cleaning", label: "Interior Car Cleaning" },
       { href: "/microfiber-cloths", label: "Microfiber Cloths" },
       { href: "/car-care-products", label: "All Car Care Products" },
+      { href: "/shop", label: "All Products" },
     ],
   },
   "microfiber-cloths": {
@@ -127,27 +127,6 @@ export const LANDING_PAGES: Record<string, SeoLandingPage> = {
       { href: "/car-cleaning-products", label: "Car Cleaning Products" },
       { href: "/categories/microfiber", label: "Microfiber Category" },
       { href: "/shop", label: "All Products" },
-    ],
-  },
-  "interior-car-cleaning": {
-    path: "/interior-car-cleaning",
-    title: "Interior Car Cleaning Products",
-    description:
-      "Shop interior car cleaning products — dashboard restorers, leather conditioners and detailing brushes for a spotless cabin at MOTOMAN.",
-    h1: "Interior Car Cleaning Products",
-    overline: "Interior",
-    intro: [
-      "A clean interior makes every drive better. MOTOMAN interior products care for dashboards, trim and leather — restoring finish, conditioning surfaces and keeping dust under control.",
-      "Detailing brushes reach vents, badges and seams that cloths can't, so the whole cabin gets the same attention as the paint outside.",
-    ],
-    productsHeading: "Shop Interior Cleaning Products",
-    categorySlugs: ["interior-care"],
-    tags: ["interior"],
-    related: [
-      { href: "/car-detailing-products", label: "Car Detailing Products" },
-      { href: "/categories/interior-care", label: "Interior Care Category" },
-      { href: "/microfiber-cloths", label: "Microfiber Cloths" },
-      { href: "/car-care-products", label: "All Car Care Products" },
     ],
   },
   "exterior-car-cleaning": {

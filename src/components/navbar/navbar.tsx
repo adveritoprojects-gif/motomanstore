@@ -2,16 +2,16 @@
 
 import { useState, useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Menu,
   X,
   Search,
-  User,
   ShoppingBag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BRAND, NAV_LINKS } from "@/lib/data";
+import { NAV_LINKS } from "@/lib/data";
 import { useCartStore } from "@/store/cart-store";
 
 export function Navbar() {
@@ -24,6 +24,7 @@ export function Navbar() {
     () => false,
   );
   const pathname = usePathname();
+  const router = useRouter();
   const totalItems = useCartStore((state) => state.getTotalItems());
 
   useEffect(() => {
@@ -92,7 +93,15 @@ export function Navbar() {
 
             {/* Right: Search + Actions */}
             <div className="flex items-center gap-3">
-              <div className="relative">
+              <form
+                role="search"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const q = searchValue.trim();
+                  router.push(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
+                }}
+                className="relative"
+              >
                 <label htmlFor="navbar-search" className="sr-only">Search products</label>
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" aria-hidden="true" />
                 <input
@@ -103,14 +112,7 @@ export function Navbar() {
                   onChange={(e) => setSearchValue(e.target.value)}
                   className="h-9 w-[200px] rounded-lg border border-neutral-700 bg-neutral-900 pl-9 pr-3 text-sm text-white placeholder-neutral-500 outline-none transition-colors focus:border-orange-500"
                 />
-              </div>
-              <Link
-                href="/account"
-                className="flex h-9 w-9 items-center justify-center text-neutral-300 transition-colors hover:text-white"
-                aria-label="Account"
-              >
-                <User className="h-5 w-5" />
-              </Link>
+              </form>
               <Link
                 href="/cart"
                 className="relative flex h-9 w-9 items-center justify-center text-neutral-300 transition-colors hover:text-white"
@@ -174,9 +176,15 @@ export function Navbar() {
           <div className="fixed inset-y-0 left-0 w-[280px] bg-neutral-950 animate-slide-in-right">
             <div className="flex h-full flex-col">
               <div className="flex h-16 items-center justify-between border-b border-neutral-800 px-4">
-                <span className="text-lg font-bold tracking-wider text-white">
-                  {BRAND.name}
-                </span>
+                <Link href="/" onClick={closeMenu} className="inline-block">
+                  <Image
+                    src="/logo.png"
+                    alt="MOTOMAN"
+                    width={217}
+                    height={72}
+                    className="h-9 w-auto"
+                  />
+                </Link>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="flex h-10 w-10 items-center justify-center text-white"
@@ -204,13 +212,6 @@ export function Navbar() {
                   </Link>
                 ))}
               </nav>
-
-              <div className="border-t border-neutral-800 p-6">
-                <div className="flex items-center gap-3 text-sm text-neutral-400">
-                  <User className="h-4 w-4" />
-                  <span>Account</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>

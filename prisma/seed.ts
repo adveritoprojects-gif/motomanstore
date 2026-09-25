@@ -37,33 +37,23 @@ async function main() {
     },
   });
 
-  const interiorCare = await prisma.category.create({
-    data: {
-      name: "Interior Care",
-      slug: "interior-care",
-      description: "Dashboard, seat & trim care products",
-      image: "/categories/interior.jpg",
-      sortOrder: 3,
-    },
-  });
-
-  const exteriorCare = await prisma.category.create({
+  await prisma.category.create({
     data: {
       name: "Exterior Care",
       slug: "exterior-care",
       description: "Polish, wax & paint protection",
       image: "/categories/exterior.jpg",
-      sortOrder: 4,
+      sortOrder: 3,
     },
   });
 
-  const accessories = await prisma.category.create({
+  await prisma.category.create({
     data: {
       name: "Accessories",
       slug: "accessories",
       description: "Buckets, brushes & detailing tools",
       image: "/categories/accessories.jpg",
-      sortOrder: 5,
+      sortOrder: 4,
     },
   });
 
@@ -71,7 +61,7 @@ async function main() {
 
   // ─── Collections ────────────────────────────────────
 
-  const starterKit = await prisma.collection.create({
+  await prisma.collection.create({
     data: {
       name: "Starter Kit",
       slug: "starter-kit",
@@ -80,7 +70,7 @@ async function main() {
     },
   });
 
-  const proSeries = await prisma.collection.create({
+  await prisma.collection.create({
     data: {
       name: "Pro Series",
       slug: "pro-series",
@@ -89,7 +79,7 @@ async function main() {
     },
   });
 
-  const essentials = await prisma.collection.create({
+  await prisma.collection.create({
     data: {
       name: "Essentials",
       slug: "essentials",
@@ -104,301 +94,269 @@ async function main() {
 
   const products = [
     {
-      name: "Foam Sprayer Bottle",
-      slug: "foam-sprayer-bottle",
-      sku: "MTM-WS-001",
-      description:
-        "High-density foam sprayer for even soap distribution. Produces thick, clinging foam that lifts dirt safely. Built with chemical-resistant seals and a precision nozzle for consistent coverage. Ideal for pre-wash and snow foam applications.",
-      price: 799,
-      categoryId: carWash.id,
-      featured: true,
-      isNew: false,
-      brand: "MOTOMAN",
-      tags: ["foam", "sprayer", "pre-wash", "snow-foam"],
-      images: {
-        create: [
-          { url: "/products/foam-sprayer.jpg", alt: "Foam Sprayer Bottle", sortOrder: 0 },
-          { url: "/products/foam-sprayer-2.jpg", alt: "Foam Sprayer Bottle - Side View", sortOrder: 1 },
-        ],
-      },
-      variants: {
-        create: [
-          { name: "1L", sku: "MTM-WS-001-1L", price: 799, stock: 50, size: "1L" },
-          { name: "2L", sku: "MTM-WS-001-2L", price: 1199, stock: 35, size: "2L" },
-        ],
-      },
-    },
-    {
-      name: "Car Shampoo",
-      slug: "car-shampoo",
+      name: "Motoman Premium Car Shampoo",
+      slug: "motoman-premium-car-shampoo-500ml",
       sku: "MTM-WS-002",
       description:
-        "pH-neutral car shampoo for a scratch-free wash. Rich-lathering formula that encapsulates dirt particles for safe removal. Concentrated formula — a little goes a long way. Safe on all paint finishes including ceramic coatings.",
-      price: 399,
-      compareAtPrice: 499,
+        "Premium car shampoo designed for effective vehicle cleaning while being gentle on automotive surfaces. 500 ml bottle for cars, bikes and scooters.",
+      price: 340,
+      compareAtPrice: 420,
+      metaTitle: "Motoman Premium Car Shampoo 500ml | Car Wash Shampoo",
+      metaDescription:
+        "Buy Motoman Premium Car Shampoo 500ml at ₹340. Premium car wash shampoo for effective cleaning and a fresh finish on cars, bikes and scooters.",
       categoryId: carWash.id,
       featured: true,
       isNew: false,
       brand: "MOTOMAN",
-      tags: ["shampoo", "wash", "ph-neutral", "scratch-free"],
+      tags: [
+        "car shampoo",
+        "car wash shampoo",
+        "premium car shampoo",
+        "car cleaning shampoo",
+        "car shampoo 500ml",
+        "automotive shampoo",
+        "car cleaning products",
+        "bike wash shampoo",
+        "car care products",
+      ],
       images: {
         create: [
-          { url: "/products/car-shampoo.jpg", alt: "Car Shampoo 500ml", sortOrder: 0 },
-          { url: "/products/car-shampoo-2.jpg", alt: "Car Shampoo - Lather Detail", sortOrder: 1 },
+          { url: "/products/shampoo-1.jpg", alt: "Motoman Premium Car Shampoo 500ml bottle", sortOrder: 0 },
+          { url: "/products/shampoo-2.jpg", alt: "Motoman Premium Car Shampoo bottle label close-up", sortOrder: 1 },
+          { url: "/products/shampoo-3.jpg", alt: "Motoman Premium Car Shampoo with foam sprayer on a car bonnet", sortOrder: 2 },
+          { url: "/products/shampoo-4.jpg", alt: "Motoman Premium Car Shampoo bottle close-up", sortOrder: 3 },
         ],
       },
       variants: {
         create: [
-          { name: "250ml", sku: "MTM-WS-002-250", price: 249, stock: 80, size: "250ml" },
-          { name: "500ml", sku: "MTM-WS-002-500", price: 399, stock: 120, size: "500ml" },
-          { name: "1L", sku: "MTM-WS-002-1L", price: 699, stock: 60, size: "1L" },
+          { name: "500 ml", sku: "MTM-WS-002-500", price: 340, stock: 120, size: "500 ml" },
         ],
       },
     },
     {
-      name: "Microfiber Cloth Pack",
-      slug: "microfiber-cloth-pack",
+      name: "Motoman Foam Sprayer",
+      slug: "motoman-foam-sprayer",
+      sku: "MTM-WS-001",
+      description:
+        "Handheld foam sprayer designed for convenient car and bike cleaning.",
+      price: 599,
+      metaTitle: "Motoman Foam Sprayer | Car Wash Foam Sprayer",
+      metaDescription:
+        "Buy Motoman Foam Sprayer for convenient car and bike cleaning. Durable handheld foam sprayer designed for easy automotive washing.",
+      categoryId: carWash.id,
+      featured: true,
+      isNew: false,
+      brand: "MOTOMAN",
+      tags: [
+        "foam sprayer",
+        "car foam sprayer",
+        "car wash sprayer",
+        "manual foam sprayer",
+        "car cleaning sprayer",
+        "bike wash sprayer",
+        "automotive cleaning accessories",
+      ],
+      images: {
+        create: [
+          { url: "/products/sprayer-1.jpg", alt: "Motoman Foam Sprayer on a car bonnet", sortOrder: 0 },
+          { url: "/products/sprayer-2.jpg", alt: "Motoman Foam Sprayer with car shampoo on a car bonnet", sortOrder: 1 },
+          { url: "/products/sprayer-3.jpg", alt: "Motoman Foam Sprayer in use, handheld", sortOrder: 2 },
+          { url: "/products/sprayer-4.jpg", alt: "Motoman Foam Sprayer nozzle close-up", sortOrder: 3 },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "1 unit", sku: "MTM-WS-001-1", price: 599, stock: 50 },
+        ],
+      },
+    },
+    {
+      name: "Motoman 1200 GSM Premium Microfiber Cloth",
+      slug: "motoman-1200-gsm-microfiber-cloth",
       sku: "MTM-MF-001",
       description:
-        "Ultra-absorbent microfiber cloths for streak-free drying. 300GSM premium microfiber with a dual-pile design — one side for drying, one side for polishing. Lint-free and safe on all surfaces including glass and chrome.",
+        "Ultra-premium high GSM microfiber cloth designed for high-absorbency drying, detailing and automotive care. Available as a single cloth or a pack of 2.",
       price: 499,
+      metaTitle: "1200 GSM Microfiber Cloth for Car | Motoman Premium",
+      metaDescription:
+        "Shop Motoman 1200 GSM microfiber cloth for car detailing, drying and automotive cleaning. Available in single and pack of 2 options.",
       categoryId: microfiber.id,
       featured: true,
       isNew: false,
       brand: "MOTOMAN",
-      tags: ["microfiber", "cloth", "drying", "polishing"],
+      tags: [
+        "1200 gsm microfiber cloth",
+        "1200 gsm car microfiber cloth",
+        "premium microfiber cloth",
+        "car drying towel",
+        "car detailing microfiber",
+        "high gsm microfiber",
+        "car cleaning cloth",
+        "microfiber towel for car",
+      ],
       images: {
         create: [
-          { url: "/products/microfiber-cloth.jpg", alt: "Microfiber Cloth 3 Pack", sortOrder: 0 },
+          { url: "/products/mf1200-1.jpg", alt: "Motoman 1200 GSM premium microfiber cloth folded", sortOrder: 0 },
+          { url: "/products/mf1200-2.jpg", alt: "Motoman 1200 GSM microfiber cloth texture close-up", sortOrder: 1 },
+          { url: "/products/mf1200-3.jpg", alt: "Motoman 1200 GSM microfiber cloth on a marble surface", sortOrder: 2 },
+          { url: "/products/mf1200-4.jpg", alt: "Motoman 1200 GSM microfiber cloth pack presentation", sortOrder: 3 },
         ],
       },
       variants: {
         create: [
-          { name: "3 Pack", sku: "MTM-MF-001-3P", price: 499, stock: 100, size: "3 Pack" },
-          { name: "6 Pack", sku: "MTM-MF-001-6P", price: 899, stock: 60, size: "6 Pack" },
+          { name: "Pack of 1", sku: "MTM-MF-001-1", price: 499, stock: 100, size: "Pack of 1" },
+          { name: "Pack of 2", sku: "MTM-MF-001-2P", price: 799, stock: 60, size: "Pack of 2" },
         ],
       },
     },
     {
-      name: "Microfiber Wash Mitt",
-      slug: "microfiber-wash-mitt",
-      sku: "MTM-MF-002",
+      name: "Motoman 680 GSM Microfiber Cloth",
+      slug: "motoman-680-gsm-microfiber-cloth",
+      sku: "MTM-MF-004",
       description:
-        "Soft microfiber mitt that traps dirt safely within its deep pile fibers. Elastic cuff ensures a secure fit. Machine washable and durable for hundreds of washes. The safe alternative to traditional sponge washing.",
+        "Premium 680 GSM microfiber cloth suitable for car cleaning, detailing, polishing and general automotive care. Available as a single cloth, a pack of 2 or a pack of 4.",
+      price: 180,
+      compareAtPrice: 290,
+      metaTitle: "680 GSM Microfiber Cloth for Car | Motoman",
+      metaDescription:
+        "Buy Motoman 680 GSM microfiber cloth for car cleaning and detailing. Choose single, pack of 2 or pack of 4 options.",
+      categoryId: microfiber.id,
+      featured: true,
+      isNew: true,
+      brand: "MOTOMAN",
+      tags: [
+        "680 gsm microfiber cloth",
+        "680 gsm car cloth",
+        "microfiber cloth for car",
+        "car detailing cloth",
+        "car polishing cloth",
+        "premium car microfiber",
+        "automotive microfiber towel",
+      ],
+      images: {
+        create: [
+          { url: "/products/mf680-1.jpg", alt: "Motoman 680 GSM microfiber cloth", sortOrder: 0 },
+          { url: "/products/mf680-2.jpg", alt: "Motoman 680 GSM microfiber cloth texture close-up", sortOrder: 1 },
+          { url: "/products/mf680-3.jpg", alt: "Motoman 680 GSM microfiber cloth in use on a car", sortOrder: 2 },
+          { url: "/products/mf680-4.jpg", alt: "Motoman 680 GSM microfiber cloth pack of 4", sortOrder: 3 },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "Single", sku: "MTM-MF-004-1", price: 180, stock: 120, size: "Single" },
+          { name: "Pack of 2", sku: "MTM-MF-004-2P", price: 290, stock: 80, size: "Pack of 2" },
+          { name: "Pack of 4", sku: "MTM-MF-004-4P", price: 480, stock: 50, size: "Pack of 4" },
+        ],
+      },
+    },
+    {
+      name: "Motoman 350 GSM Microfiber Cloth",
+      slug: "motoman-350-gsm-microfiber-cloth-pack-4",
+      sku: "MTM-MF-005",
+      description:
+        "Everyday microfiber cleaning cloth suitable for automotive cleaning, interior cleaning and general detailing. Pack of 4.",
+      price: 320,
+      metaTitle: "350 GSM Microfiber Cloth Pack of 4 | Motoman",
+      metaDescription:
+        "Shop Motoman 350 GSM microfiber cloth pack of 4 for car cleaning, interior detailing and everyday automotive care.",
+      categoryId: microfiber.id,
+      featured: false,
+      isNew: true,
+      brand: "MOTOMAN",
+      tags: [
+        "350 gsm microfiber cloth",
+        "microfiber cloth pack of 4",
+        "car cleaning cloth",
+        "car microfiber cloth",
+        "automotive cleaning cloth",
+        "microfiber cloth for detailing",
+      ],
+      images: {
+        create: [
+          { url: "/products/mf350-1.jpg", alt: "Motoman 350 GSM microfiber cloth", sortOrder: 0 },
+          { url: "/products/mf350-2.jpg", alt: "Motoman 350 GSM microfiber cloth texture close-up", sortOrder: 1 },
+          { url: "/products/mf350-3.jpg", alt: "Motoman 350 GSM microfiber cloth in use", sortOrder: 2 },
+          { url: "/products/mf350-4.jpg", alt: "Motoman 350 GSM microfiber cloth pack of 4", sortOrder: 3 },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "Pack of 4", sku: "MTM-MF-005-4P", price: 320, stock: 90, size: "Pack of 4" },
+        ],
+      },
+    },
+    {
+      name: "Motoman Microfiber Cleaning Gloves",
+      slug: "motoman-microfiber-cleaning-gloves",
+      sku: "MTM-AC-002",
+      description:
+        "Soft microfiber cleaning gloves designed for convenient car and bike cleaning, detailing and surface care. Available in Pack of 1 and Pack of 2 options.",
+      price: 189,
+      metaTitle: "Microfiber Cleaning Gloves for Car | Motoman",
+      metaDescription:
+        "Buy Motoman microfiber cleaning gloves for car and bike detailing. Soft, reusable cleaning gloves available in single and pack of 2 options.",
+      categoryId: microfiber.id,
+      featured: false,
+      isNew: true,
+      brand: "MOTOMAN",
+      tags: [
+        "microfiber cleaning gloves",
+        "car cleaning gloves",
+        "car wash gloves",
+        "microfiber car wash glove",
+        "car detailing gloves",
+        "bike cleaning gloves",
+        "automotive cleaning gloves",
+      ],
+      images: {
+        create: [
+          { url: "/products/gloves-1.jpg", alt: "Motoman microfiber cleaning glove in use", sortOrder: 0 },
+          { url: "/products/gloves-2.jpg", alt: "Motoman microfiber cleaning gloves holding a foam sprayer", sortOrder: 1 },
+          { url: "/products/gloves-3.jpg", alt: "Motoman microfiber cleaning glove texture close-up", sortOrder: 2 },
+          { url: "/products/gloves-4.jpg", alt: "Motoman microfiber cleaning gloves pack of 2", sortOrder: 3 },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "Pack of 1", sku: "MTM-AC-002-1", price: 189, stock: 110, size: "Pack of 1" },
+          { name: "Pack of 2", sku: "MTM-AC-002-2P", price: 340, stock: 70, size: "Pack of 2" },
+        ],
+      },
+    },
+    {
+      name: "Motoman Glass Cleaning Microfiber Cloth",
+      slug: "motoman-glass-cleaning-microfiber-cloth",
+      sku: "MTM-MF-006",
+      description:
+        "Specialized microfiber cloth designed for streak-free glass and windshield cleaning. Set of 4.",
       price: 399,
+      metaTitle: "Glass Cleaning Microfiber Cloth Set of 4 | Motoman",
+      metaDescription:
+        "Buy Motoman glass cleaning microfiber cloth set of 4 for streak-free windshield, car glass and mirror cleaning.",
       categoryId: microfiber.id,
-      featured: true,
-      isNew: false,
-      brand: "MOTOMAN",
-      tags: ["wash-mitt", "microfiber", "safe-wash"],
-      images: {
-        create: [
-          { url: "/products/wash-mitt.jpg", alt: "Microfiber Wash Mitt", sortOrder: 0 },
-        ],
-      },
-      variants: {
-        create: [
-          { name: "Grey", sku: "MTM-MF-002-GR", price: 399, stock: 70, color: "Grey" },
-          { name: "Orange", sku: "MTM-MF-002-OR", price: 399, stock: 70, color: "Orange" },
-        ],
-      },
-    },
-    {
-      name: "Complete Car Care Kit",
-      slug: "complete-car-care-kit",
-      sku: "MTM-KIT-001",
-      description:
-        "Everything you need for a showroom finish in one kit. Includes car shampoo, foam sprayer, microfiber cloths, wash mitt, interior cleaner, and a detailing brush set. Perfect as a gift or for those starting their car care journey.",
-      price: 1299,
-      compareAtPrice: 1599,
-      categoryId: carWash.id,
-      collectionId: starterKit.id,
-      featured: true,
-      isNew: false,
-      brand: "MOTOMAN",
-      tags: ["kit", "bundle", "gift", "starter"],
-      images: {
-        create: [
-          { url: "/products/care-kit.jpg", alt: "Complete Car Care Kit", sortOrder: 0 },
-          { url: "/products/care-kit-2.jpg", alt: "Kit Contents", sortOrder: 1 },
-        ],
-      },
-      variants: {
-        create: [
-          { name: "Standard", sku: "MTM-KIT-001-STD", price: 1299, stock: 40 },
-          { name: "Pro", sku: "MTM-KIT-001-PRO", price: 1999, stock: 25 },
-        ],
-      },
-    },
-    {
-      name: "Dashboard & Trim Restorer",
-      slug: "dashboard-trim-restorer",
-      sku: "MTM-IC-001",
-      description:
-        "Restores faded dashboards and trim to a like-new finish. UV-resistant formula provides long-lasting protection against cracking and discoloration. Non-greasy matte finish that doesn't attract dust.",
-      price: 549,
-      categoryId: interiorCare.id,
       featured: false,
       isNew: true,
       brand: "MOTOMAN",
-      tags: ["interior", "dashboard", "trim", "uv-protection"],
+      tags: [
+        "glass cleaning microfiber cloth",
+        "glass cleaning cloth",
+        "windshield cleaning cloth",
+        "car glass cleaning cloth",
+        "streak free glass cloth",
+        "microfiber glass cloth",
+        "car windshield cloth",
+      ],
       images: {
         create: [
-          { url: "/products/trim-restorer.jpg", alt: "Dashboard & Trim Restorer", sortOrder: 0 },
+          { url: "/products/glass-1.jpg", alt: "Motoman glass cleaning microfiber cloth", sortOrder: 0 },
+          { url: "/products/glass-2.jpg", alt: "Motoman glass cleaning microfiber cloth texture close-up", sortOrder: 1 },
+          { url: "/products/glass-3.jpg", alt: "Motoman glass cleaning microfiber cloth cleaning a car windshield", sortOrder: 2 },
+          { url: "/products/glass-4.jpg", alt: "Motoman glass cleaning microfiber cloth set of 4", sortOrder: 3 },
         ],
       },
       variants: {
         create: [
-          { name: "250ml", sku: "MTM-IC-001-250", price: 549, stock: 45, size: "250ml" },
-          { name: "500ml", sku: "MTM-IC-001-500", price: 899, stock: 30, size: "500ml" },
-        ],
-      },
-    },
-    {
-      name: "Leather Conditioner",
-      slug: "leather-conditioner",
-      sku: "MTM-IC-002",
-      description:
-        "Premium leather conditioner that nourishes and protects. Prevents cracking, fading, and premature aging. Infused with natural oils for a soft, supple feel. Works on all leather types including aniline and semi-aniline.",
-      price: 699,
-      categoryId: interiorCare.id,
-      collectionId: essentials.id,
-      featured: false,
-      isNew: false,
-      brand: "MOTOMAN",
-      tags: ["leather", "conditioner", "interior", "protection"],
-      images: {
-        create: [
-          { url: "/products/leather-conditioner.jpg", alt: "Leather Conditioner", sortOrder: 0 },
-        ],
-      },
-      variants: {
-        create: [
-          { name: "200ml", sku: "MTM-IC-002-200", price: 699, stock: 55, size: "200ml" },
-        ],
-      },
-    },
-    {
-      name: "Carnauba Wax",
-      slug: "carnauba-wax",
-      sku: "MTM-EC-001",
-      description:
-        "Brazilian carnauba wax for a deep, warm glow. Provides 3-6 months of hydrophobic protection. Hand-burnished formula for easy application and effortless buffing. The gold standard in paint protection.",
-      price: 899,
-      compareAtPrice: 1099,
-      categoryId: exteriorCare.id,
-      collectionId: proSeries.id,
-      featured: true,
-      isNew: false,
-      brand: "MOTOMAN",
-      tags: ["wax", "carnauba", "paint-protection", "shine"],
-      images: {
-        create: [
-          { url: "/products/carnauba-wax.jpg", alt: "Carnauba Wax", sortOrder: 0 },
-          { url: "/products/carnauba-wax-2.jpg", alt: "Wax Application", sortOrder: 1 },
-        ],
-      },
-      variants: {
-        create: [
-          { name: "200g", sku: "MTM-EC-001-200", price: 899, stock: 40, size: "200g" },
-          { name: "400g", sku: "MTM-EC-001-400", price: 1499, stock: 20, size: "400g" },
-        ],
-      },
-    },
-    {
-      name: "Paint Sealant",
-      slug: "paint-sealant",
-      sku: "MTM-EC-002",
-      description:
-        "Synthetic paint sealant for extended protection. Lasts up to 12 months with proper maintenance. Creates a sacrificial barrier against UV rays, acid rain, and industrial fallout. Easy wipe-on, buff-off application.",
-      price: 749,
-      categoryId: exteriorCare.id,
-      featured: false,
-      isNew: true,
-      brand: "MOTOMAN",
-      tags: ["sealant", "paint-protection", "long-lasting"],
-      images: {
-        create: [
-          { url: "/products/paint-sealant.jpg", alt: "Paint Sealant", sortOrder: 0 },
-        ],
-      },
-      variants: {
-        create: [
-          { name: "250ml", sku: "MTM-EC-002-250", price: 749, stock: 50, size: "250ml" },
-        ],
-      },
-    },
-    {
-      name: "Wheel & Tyre Cleaner",
-      slug: "wheel-tyre-cleaner",
-      sku: "MTM-EC-003",
-      description:
-        "Heavy-duty wheel and tyre cleaner that dissolves brake dust, road grime, and stubborn deposits. Colour-changing formula indicates when it's working. Safe on all wheel finishes including chrome, alloy, and painted.",
-      price: 449,
-      categoryId: exteriorCare.id,
-      collectionId: essentials.id,
-      featured: false,
-      isNew: false,
-      brand: "MOTOMAN",
-      tags: ["wheel", "tyre", "cleaner", "brake-dust"],
-      images: {
-        create: [
-          { url: "/products/wheel-cleaner.jpg", alt: "Wheel & Tyre Cleaner", sortOrder: 0 },
-        ],
-      },
-      variants: {
-        create: [
-          { name: "500ml", sku: "MTM-EC-003-500", price: 449, stock: 65, size: "500ml" },
-          { name: "1L", sku: "MTM-EC-003-1L", price: 749, stock: 40, size: "1L" },
-        ],
-      },
-    },
-    {
-      name: "Detailing Brush Set",
-      slug: "detailing-brush-set",
-      sku: "MTM-AC-001",
-      description:
-        "Professional detailing brush set for intricate cleaning. Includes 5 brushes in varying sizes for vents, badges, seams, and tight spaces. Soft boar's bristle tips won't scratch surfaces. Ergonomic handles for extended use.",
-      price: 599,
-      categoryId: accessories.id,
-      collectionId: starterKit.id,
-      featured: false,
-      isNew: false,
-      brand: "MOTOMAN",
-      tags: ["brushes", "detailing", "interior", "accessories"],
-      images: {
-        create: [
-          { url: "/products/brush-set.jpg", alt: "Detailing Brush Set", sortOrder: 0 },
-        ],
-      },
-      variants: {
-        create: [
-          { name: "5 Piece Set", sku: "MTM-AC-001-5P", price: 599, stock: 55 },
-        ],
-      },
-    },
-    {
-      name: "Microfibre Drying Towel",
-      slug: "microfibre-drying-towel",
-      sku: "MTM-MF-003",
-      description:
-        "Giant 90x60cm microfibre drying towel with twisted-loop technology. Absorbs up to 10x its weight in water. Eliminates water spots and reduces drying time by half. Edged with soft piping to prevent scratches.",
-      price: 699,
-      categoryId: microfiber.id,
-      collectionId: essentials.id,
-      featured: true,
-      isNew: false,
-      brand: "MOTOMAN",
-      tags: ["drying", "towel", "microfiber", "large"],
-      images: {
-        create: [
-          { url: "/products/p6.jpeg", alt: "Microfibre Drying Towel", sortOrder: 0 },
-        ],
-      },
-      variants: {
-        create: [
-          { name: "Grey", sku: "MTM-MF-003-GR", price: 699, stock: 45, color: "Grey" },
-          { name: "Orange", sku: "MTM-MF-003-OR", price: 699, stock: 45, color: "Orange" },
+          { name: "Set of 4", sku: "MTM-MF-006-4S", price: 399, stock: 75, size: "Set of 4" },
         ],
       },
     },

@@ -86,6 +86,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
       <Suspense fallback={<div className="text-neutral-500">Loading products...</div>}>
         <ShopContent
+          key={`search-${params.q ?? ""}`}
           products={products ?? []}
           categories={categories ?? []}
           total={total}

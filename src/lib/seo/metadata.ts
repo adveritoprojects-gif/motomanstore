@@ -75,7 +75,6 @@ export function pageMetadata({
 const USE_PHRASE_BY_CATEGORY: Record<string, string> = {
   "car-wash": "Car Washing",
   microfiber: "Car Cleaning & Detailing",
-  "interior-care": "Interior Car Cleaning",
   "exterior-care": "Exterior Car Care",
   accessories: "Car Detailing",
 };

@@ -5,7 +5,7 @@ import { BestSellers } from "@/components/home/best-sellers";
 import { BundleBanner } from "@/components/home/bundle-banner";
 import { BenefitsSection } from "@/components/home/benefits-section";
 import { TestimonialSection } from "@/components/home/testimonial-section";
-import { getCategories, getFeaturedProducts } from "@/lib/queries";
+import { getBestSellers, getCategories } from "@/lib/queries";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = pageMetadata({
@@ -18,12 +18,12 @@ export const metadata: Metadata = pageMetadata({
 
 export default async function HomePage() {
   let categories = null;
-  let featuredProducts = null;
+  let bestSellers = null;
 
   try {
-    [categories, featuredProducts] = await Promise.all([
+    [categories, bestSellers] = await Promise.all([
       getCategories(),
-      getFeaturedProducts(5),
+      getBestSellers(5),
     ]);
   } catch {
     // Database not available
@@ -33,7 +33,7 @@ export default async function HomePage() {
     <>
       <Hero />
       <CategorySection categories={categories ?? undefined} />
-      <BestSellers products={featuredProducts ?? undefined} />
+      <BestSellers products={bestSellers ?? undefined} />
       <BundleBanner />
       <BenefitsSection />
       <TestimonialSection />

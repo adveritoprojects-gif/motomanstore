@@ -95,7 +95,9 @@ export async function getProductBySlug(slug: string) {
     include: {
       images: { orderBy: { sortOrder: "asc" } },
       category: true,
-      variants: true,
+      // Cheapest variant first — it matches the product's base price and is
+      // the default selection on the product page.
+      variants: { orderBy: { price: "asc" } },
       collection: true,
     },
   });
@@ -138,6 +140,64 @@ export async function getFeaturedProducts(limit = 5) {
     orderBy: { createdAt: "desc" },
     take: limit,
   });
+}
+
+/**
+ * Best sellers — ranked by total units sold across non-cancelled orders.
+ * Falls back to featured (then newest) products to fill any remaining slots
+ * so the homepage section always renders a full row.
+ */
+export async function getBestSellers(limit = 5) {
+  const sold = await prisma.orderItem.groupBy({
+    by: ["productId"],
+    _sum: { quantity: true },
+    where: { order: { status: { notIn: ["cancelled", "refunded"] } } },
+  });
+
+  const soldByProduct = new Map(
+    sold.map((row) => [row.productId, row._sum.quantity ?? 0])
+  );
+  const rankedIds = [...soldByProduct.entries()]
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, limit)
+    .map(([id]) => id);
+
+  const include = { images: { orderBy: { sortOrder: "asc" as const } }, category: true } as const;
+
+  const soldProducts = rankedIds.length
+    ? await prisma.product.findMany({
+        where: { id: { in: rankedIds }, inStock: true },
+        include,
+      })
+    : [];
+
+  const rank = new Map(rankedIds.map((id, index) => [id, index]));
+  soldProducts.sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0));
+
+  const products = [...soldProducts];
+  const pickedIds = () => products.map((p) => p.id);
+
+  if (products.length < limit) {
+    const fill = await prisma.product.findMany({
+      where: { id: { notIn: pickedIds() }, inStock: true, featured: true },
+      include,
+      orderBy: { createdAt: "desc" },
+      take: limit - products.length,
+    });
+    products.push(...fill);
+  }
+
+  if (products.length < limit) {
+    const fill = await prisma.product.findMany({
+      where: { id: { notIn: pickedIds() }, inStock: true },
+      include,
+      orderBy: { createdAt: "desc" },
+      take: limit - products.length,
+    });
+    products.push(...fill);
+  }
+
+  return products;
 }
 
 export async function getNewProducts(limit = 5) {

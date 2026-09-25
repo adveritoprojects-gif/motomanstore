@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Save, Trash2 } from "lucide-react";
+import Image from "next/image";
+import { Loader2, Plus, Save, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   updateProduct,
   deleteProduct,
   updateProductVariant,
+  addProductImage,
+  deleteProductImage,
 } from "@/lib/actions/admin-products";
 
 interface ProductEditFormProps {
@@ -19,6 +22,8 @@ interface ProductEditFormProps {
     description: string;
     price: number;
     compareAtPrice: number | null;
+    metaTitle: string | null;
+    metaDescription: string | null;
     categoryId: string;
     inStock: boolean;
     featured: boolean;
@@ -54,6 +59,8 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
     description: product.description,
     price: product.price,
     compareAtPrice: product.compareAtPrice ?? "",
+    metaTitle: product.metaTitle ?? "",
+    metaDescription: product.metaDescription ?? "",
     inStock: product.inStock,
     featured: product.featured,
     isNew: product.isNew,
@@ -65,6 +72,44 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
   const [variants, setVariants] = useState(
     product.variants.map((v) => ({ ...v }))
   );
+
+  const [images, setImages] = useState(
+    product.images.map((img) => ({ ...img }))
+  );
+  const [newImageUrl, setNewImageUrl] = useState("");
+  const [newImageAlt, setNewImageAlt] = useState("");
+  const [isImageBusy, setIsImageBusy] = useState(false);
+
+  const handleAddImage = async () => {
+    const url = newImageUrl.trim();
+    if (!url || isImageBusy) return;
+    setIsImageBusy(true);
+    try {
+      const created = await addProductImage(
+        product.id,
+        url,
+        newImageAlt.trim() || product.name
+      );
+      setImages((prev) => [...prev, { ...created, alt: created.alt || "" }]);
+      setNewImageUrl("");
+      setNewImageAlt("");
+    } catch {
+      setMessage({ type: "error", text: "Failed to add image" });
+    }
+    setIsImageBusy(false);
+  };
+
+  const handleDeleteImage = async (imageId: string) => {
+    if (isImageBusy) return;
+    setIsImageBusy(true);
+    try {
+      await deleteProductImage(imageId);
+      setImages((prev) => prev.filter((img) => img.id !== imageId));
+    } catch {
+      setMessage({ type: "error", text: "Failed to delete image" });
+    }
+    setIsImageBusy(false);
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -79,6 +124,8 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
         compareAtPrice: form.compareAtPrice
           ? Number(form.compareAtPrice)
           : null,
+        metaTitle: form.metaTitle.trim() || null,
+        metaDescription: form.metaDescription.trim() || null,
         inStock: form.inStock,
         featured: form.featured,
         isNew: form.isNew,
@@ -346,22 +393,135 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
 
       <div className="rounded-xl border border-neutral-200 bg-white p-6">
         <h2 className="mb-4 text-lg font-semibold text-neutral-950">
-          Images ({product.images.length})
+          Search Preview (SEO)
+        </h2>
+        <div className="mb-4 grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-neutral-700">
+              SEO Title
+            </label>
+            <input
+              value={form.metaTitle}
+              onChange={(e) =>
+                setForm({ ...form, metaTitle: e.target.value })
+              }
+              className={inputClass}
+              placeholder="Leave blank to generate from the product name"
+            />
+            <p className="mt-1 text-xs text-neutral-400">
+              {form.metaTitle.length}/60 characters recommended
+            </p>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-neutral-700">
+              Meta Description
+            </label>
+            <textarea
+              value={form.metaDescription}
+              onChange={(e) =>
+                setForm({ ...form, metaDescription: e.target.value })
+              }
+              rows={3}
+              className={cn(inputClass, "resize-none")}
+              placeholder="Leave blank to generate from the product description"
+            />
+            <p className="mt-1 text-xs text-neutral-400">
+              {form.metaDescription.length}/160 characters recommended
+            </p>
+          </div>
+        </div>
+
+        {/* Search result preview */}
+        <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+          <p className="mb-1 truncate text-lg text-blue-700">
+            {form.metaTitle.trim() || form.name}
+          </p>
+          <p className="mb-1 text-xs text-green-700">
+            motomanstore.com › products › {form.slug}
+          </p>
+          <p className="text-sm text-neutral-600 line-clamp-2">
+            {form.metaDescription.trim() || form.description}
+          </p>
+        </div>
+        <p className="mt-3 text-xs text-neutral-400">
+          Keywords come from Tags — they are published as the page keywords and
+          used by storefront search.
+        </p>
+      </div>
+
+      <div className="rounded-xl border border-neutral-200 bg-white p-6">
+        <h2 className="mb-4 text-lg font-semibold text-neutral-950">
+          Images ({images.length})
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {product.images.map((img) => (
+          {images.map((img, i) => (
             <div
               key={img.id}
-              className="relative aspect-square overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100"
+              className="group relative aspect-square overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100"
             >
-              <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
-                Image
-              </div>
+              <Image
+                src={img.url}
+                alt={img.alt || `${product.name} — image ${i + 1}`}
+                fill
+                sizes="(max-width: 640px) 50vw, 25vw"
+                className="object-contain"
+              />
+              <span className="absolute left-1 top-1 rounded bg-neutral-900/70 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                {i === 0 ? "Hero" : i + 1}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleDeleteImage(img.id)}
+                disabled={isImageBusy}
+                className="absolute right-1 top-1 hidden h-6 w-6 items-center justify-center rounded bg-red-600/90 text-white transition-colors hover:bg-red-700 group-hover:flex disabled:opacity-50"
+                aria-label={`Delete image ${i + 1}`}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
             </div>
           ))}
         </div>
+
+        <div className="mt-4 flex flex-wrap items-end gap-2">
+          <div className="min-w-[240px] flex-1">
+            <label className="mb-1 block text-xs text-neutral-500">
+              Image path or URL
+            </label>
+            <input
+              value={newImageUrl}
+              onChange={(e) => setNewImageUrl(e.target.value)}
+              className={cn(inputClass, "text-xs")}
+              placeholder="/products/my-image.jpg"
+            />
+          </div>
+          <div className="min-w-[180px] flex-1">
+            <label className="mb-1 block text-xs text-neutral-500">
+              Alt text (optional)
+            </label>
+            <input
+              value={newImageAlt}
+              onChange={(e) => setNewImageAlt(e.target.value)}
+              className={cn(inputClass, "text-xs")}
+              placeholder={product.name}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleAddImage}
+            disabled={isImageBusy || !newImageUrl.trim()}
+            className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 px-3 py-2 text-xs font-medium text-neutral-700 transition-colors hover:border-orange-500 hover:text-orange-600 disabled:opacity-50"
+          >
+            {isImageBusy ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Plus className="h-3.5 w-3.5" />
+            )}
+            Add image
+          </button>
+        </div>
         <p className="mt-3 text-xs text-neutral-400">
-          Image upload via Cloudinary integration coming soon.
+          Images are stored under <code>public/</code> and served from the same
+          origin. The first image is always the hero image.
         </p>
       </div>
 

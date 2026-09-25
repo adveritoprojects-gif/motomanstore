@@ -52,7 +52,7 @@ export function BundleBanner() {
               </div>
 
               <Link
-                href="/shop?product=complete-car-care-kit"
+                href="/shop"
                 className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-7 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-500/20"
               >
                 Shop Now
@@ -117,7 +117,7 @@ export function BundleBanner() {
             </div>
 
             <Link
-              href="/shop?product=complete-car-care-kit"
+              href="/shop"
               className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-orange-600"
             >
               Shop Now

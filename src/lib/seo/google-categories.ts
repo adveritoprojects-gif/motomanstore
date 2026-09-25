@@ -15,15 +15,12 @@ export const GOOGLE_TAXONOMY = {
     "Vehicles & Parts > Vehicle Parts & Accessories > Vehicle Maintenance, Care & Decor > Vehicle Cleaning > Vehicle Waxes, Polishes & Protectants",
   vehicleMaintenanceCareDecor:
     "Vehicles & Parts > Vehicle Parts & Accessories > Vehicle Maintenance, Care & Decor",
-  motorVehicleInteriorFittings:
-    "Vehicles & Parts > Vehicle Parts & Accessories > Motor Vehicle Parts > Motor Vehicle Interior Fittings",
 } as const;
 
 /** Default Google product category per store category slug. */
 const CATEGORY_TO_GOOGLE: Record<string, string> = {
   "car-wash": GOOGLE_TAXONOMY.carWashSolutions,
   microfiber: GOOGLE_TAXONOMY.vehicleCleaning,
-  "interior-care": GOOGLE_TAXONOMY.vehicleCleaning,
   "exterior-care": GOOGLE_TAXONOMY.waxesPolishesProtectants,
   accessories: GOOGLE_TAXONOMY.carWashBrushes,
 };
@@ -55,12 +52,6 @@ export function mapProductToGoogleCategory(product: {
   }
   if (tags.includes("shampoo") || tags.includes("foam") || tags.includes("pre-wash")) {
     return GOOGLE_TAXONOMY.carWashSolutions;
-  }
-  if (
-    product.category.slug === "interior-care" &&
-    (tags.includes("interior") || tags.includes("leather") || tags.includes("dashboard"))
-  ) {
-    return GOOGLE_TAXONOMY.vehicleCleaning;
   }
 
   return CATEGORY_TO_GOOGLE[product.category.slug] ?? FALLBACK;

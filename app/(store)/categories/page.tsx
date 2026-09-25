@@ -7,14 +7,14 @@ import { CategoryGrid } from "@/components/shop/category-grid";
 export const metadata: Metadata = {
   title: "Car Care Product Categories",
   description:
-    "Browse MOTOMAN car care categories — car wash, microfiber, interior care, exterior care and detailing accessories for every part of your vehicle.",
+    "Browse MOTOMAN car care categories — car wash, microfiber, exterior care and detailing accessories for every part of your vehicle.",
   alternates: {
     canonical: "/categories",
   },
   openGraph: {
     title: "Car Care Product Categories | MOTOMAN",
     description:
-      "Browse MOTOMAN car care categories — car wash, microfiber, interior care, exterior care and accessories.",
+      "Browse MOTOMAN car care categories — car wash, microfiber, exterior care and accessories.",
     type: "website",
     siteName: "MOTOMAN",
     url: "/categories",

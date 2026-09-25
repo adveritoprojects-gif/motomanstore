@@ -26,16 +26,20 @@ export async function generateMetadata({
       return { title: "Product Not Found", robots: { index: false } };
     }
 
-    const title = productSeoTitle(product);
-    const description = productSeoDescription(product);
+    // Per-product SEO overrides win over the generated fallbacks.
+    const title = product.metaTitle?.trim() || productSeoTitle(product);
+    const description =
+      product.metaDescription?.trim() || productSeoDescription(product);
     const imageUrl = absoluteImage(product.images[0]?.url);
     const canonicalPath = `/products/${product.slug}`;
+    const keywords = product.tags.length > 0 ? product.tags : undefined;
 
     return {
       // productSeoTitle already leads with the brand — use an absolute title
       // so the layout template doesn't produce "… | MOTOMAN | MOTOMAN".
       title: { absolute: title },
       description,
+      ...(keywords ? { keywords } : {}),
       alternates: { canonical: canonicalPath },
       openGraph: {
         type: "website",

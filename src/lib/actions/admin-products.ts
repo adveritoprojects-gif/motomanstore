@@ -61,6 +61,8 @@ export async function createProduct(data: {
   description: string;
   price: number;
   compareAtPrice?: number | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
   categoryId: string;
   collectionId?: string | null;
   inStock?: boolean;
@@ -89,6 +91,8 @@ export async function createProduct(data: {
       description: data.description,
       price: data.price,
       compareAtPrice: data.compareAtPrice ?? null,
+      metaTitle: data.metaTitle || null,
+      metaDescription: data.metaDescription || null,
       categoryId: data.categoryId,
       collectionId: data.collectionId ?? null,
       inStock: data.inStock ?? true,
@@ -136,6 +140,8 @@ export async function updateProduct(
     description?: string;
     price?: number;
     compareAtPrice?: number | null;
+    metaTitle?: string | null;
+    metaDescription?: string | null;
     categoryId?: string;
     collectionId?: string | null;
     inStock?: boolean;

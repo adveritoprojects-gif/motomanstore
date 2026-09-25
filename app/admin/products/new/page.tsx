@@ -22,6 +22,8 @@ export default function NewProductPage() {
     description: "",
     price: "",
     compareAtPrice: "",
+    metaTitle: "",
+    metaDescription: "",
     categoryId: "",
     brand: "MOTOMAN",
     weight: "",
@@ -64,6 +66,8 @@ export default function NewProductPage() {
         compareAtPrice: form.compareAtPrice
           ? Number(form.compareAtPrice)
           : null,
+        metaTitle: form.metaTitle.trim() || null,
+        metaDescription: form.metaDescription.trim() || null,
         categoryId: form.categoryId,
         brand: form.brand || null,
         weight: form.weight ? Number(form.weight) : null,
@@ -365,6 +369,41 @@ export default function NewProductPage() {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-neutral-200 bg-white p-6">
+          <h2 className="mb-4 text-lg font-semibold text-neutral-950">
+            Search Preview (SEO)
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-neutral-700">
+                SEO Title
+              </label>
+              <input
+                value={form.metaTitle}
+                onChange={(e) =>
+                  setForm({ ...form, metaTitle: e.target.value })
+                }
+                className={inputClass}
+                placeholder="Leave blank to generate from the product name"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-neutral-700">
+                Meta Description
+              </label>
+              <textarea
+                value={form.metaDescription}
+                onChange={(e) =>
+                  setForm({ ...form, metaDescription: e.target.value })
+                }
+                rows={3}
+                className={cn(inputClass, "resize-none")}
+                placeholder="Leave blank to generate from the product description"
+              />
+            </div>
           </div>
         </div>
 

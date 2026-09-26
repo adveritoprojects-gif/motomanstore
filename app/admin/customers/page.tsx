@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { getCustomers } from "@/lib/actions/admin-customers";
-import { AdminDataTable, AdminPagination } from "@/components/admin";
+import {
+  AdminDataTable,
+  AdminPagination,
+  AdminListSkeleton,
+} from "@/components/admin";
 
 type Customer = {
   id: string;
@@ -104,33 +108,32 @@ export default function AdminCustomersPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-neutral-950">Customers</h1>
+      <div className="mb-5">
+        <h1 className="text-xl font-bold text-neutral-950 sm:text-2xl">Customers</h1>
         <p className="text-sm text-neutral-500">
           {total} customer{total !== 1 ? "s" : ""} total
         </p>
       </div>
 
-      <div className="mb-4">
-        <div className="relative max-w-sm">
+      {/* Search */}
+      <div className="sticky top-[calc(4rem_+_env(safe-area-inset-top))] z-10 -mx-4 mb-4 bg-neutral-50/95 px-4 pb-2 pt-1 backdrop-blur md:-mx-6 md:px-6 lg:static lg:mx-0 lg:bg-transparent lg:px-0 lg:pb-0 lg:pt-0 lg:backdrop-blur-0">
+        <div className="relative w-full lg:max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
           <input
-            type="text"
+            type="search"
             placeholder="Search customers..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="w-full rounded-lg border border-neutral-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-orange-500"
+            className="min-h-11 w-full rounded-lg border border-neutral-200 bg-white py-2.5 pl-10 pr-4 text-base outline-none transition-colors focus:border-orange-500 md:py-2 md:text-sm"
           />
         </div>
       </div>
 
       {loading ? (
-        <div className="rounded-xl border border-neutral-200 bg-white p-12 text-center">
-          <p className="text-sm text-neutral-500">Loading...</p>
-        </div>
+        <AdminListSkeleton rows={5} />
       ) : (
         <>
           <AdminDataTable
@@ -138,6 +141,58 @@ export default function AdminCustomersPage() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             data={customers as any}
             emptyMessage="No customers found"
+            renderMobile={(item: Customer) => (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-orange-100 text-base font-bold text-orange-600">
+                    {(item.name?.[0] || item.email[0]).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-neutral-900">
+                      {item.name || "No name"}
+                    </p>
+                    <p className="truncate text-xs text-neutral-400">
+                      {item.email}
+                    </p>
+                    {item.phone && (
+                      <p className="truncate text-xs text-neutral-400">
+                        {item.phone}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-3 grid grid-cols-3 gap-2 border-t border-neutral-100 pt-3 text-center">
+                  <div>
+                    <p className="text-sm font-semibold text-neutral-900">
+                      {item.orderCount}
+                    </p>
+                    <p className="text-[11px] uppercase tracking-wide text-neutral-400">
+                      Orders
+                    </p>
+                  </div>
+                  <div className="border-x border-neutral-100">
+                    <p className="truncate text-sm font-semibold text-neutral-900">
+                      {formatPrice(item.totalSpent)}
+                    </p>
+                    <p className="text-[11px] uppercase tracking-wide text-neutral-400">
+                      Spent
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-neutral-900">
+                      {new Date(item.createdAt).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                      })}
+                    </p>
+                    <p className="text-[11px] uppercase tracking-wide text-neutral-400">
+                      Joined
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
           />
           <div className="mt-4">
             <AdminPagination

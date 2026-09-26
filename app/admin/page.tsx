@@ -6,6 +6,7 @@ import {
   Users,
   Package,
   AlertTriangle,
+  Plus,
 } from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
@@ -17,22 +18,24 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-neutral-950">Dashboard</h1>
+      <div className="mb-6">
+        <h1 className="text-xl font-bold text-neutral-950 sm:text-2xl">Dashboard</h1>
         <p className="text-sm text-neutral-500">
           Welcome back. Here&apos;s your store overview.
         </p>
       </div>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="Total Sales"
-          value={formatPrice(stats.totalSales)}
-          icon={<DollarSign className="h-5 w-5" />}
-        />
+      <div className="mb-4 grid grid-cols-1 gap-3 min-[360px]:grid-cols-2 sm:gap-4 lg:mb-6 lg:grid-cols-4">
         <StatCard
           label="Today's Sales"
           value={formatPrice(stats.todaySales)}
+          change={`${stats.todayOrders} order${stats.todayOrders === 1 ? "" : "s"} today`}
+          changeType={stats.todayOrders > 0 ? "positive" : "neutral"}
+          icon={<DollarSign className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Total Sales"
+          value={formatPrice(stats.totalSales)}
           icon={<DollarSign className="h-5 w-5" />}
         />
         <StatCard
@@ -48,7 +51,7 @@ export default async function AdminDashboardPage() {
         />
       </div>
 
-      <div className="mb-8 grid gap-4 lg:grid-cols-2">
+      <div className="mb-6 grid grid-cols-1 gap-3 min-[360px]:grid-cols-2 sm:gap-4 lg:mb-8 lg:grid-cols-2">
         <StatCard
           label="Products"
           value={stats.totalProducts}
@@ -63,7 +66,7 @@ export default async function AdminDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:gap-6 lg:grid-cols-2">
         {/* Recent Orders */}
         <div className="rounded-xl border border-neutral-200 bg-white">
           <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
@@ -171,6 +174,41 @@ export default async function AdminDashboardPage() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mt-4 lg:mt-6">
+        <h2 className="mb-3 font-semibold text-neutral-950">Quick Actions</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Link
+            href="/admin/products/new"
+            className="flex min-h-12 items-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+          >
+            <Plus className="h-4 w-4 shrink-0" />
+            Add Product
+          </Link>
+          <Link
+            href="/admin/orders"
+            className="flex min-h-12 items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:border-orange-200 hover:text-orange-600"
+          >
+            <ShoppingCart className="h-4 w-4 shrink-0" />
+            View Orders
+          </Link>
+          <Link
+            href="/admin/products"
+            className="flex min-h-12 items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:border-orange-200 hover:text-orange-600"
+          >
+            <Package className="h-4 w-4 shrink-0" />
+            Manage Products
+          </Link>
+          <Link
+            href="/admin/customers"
+            className="flex min-h-12 items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:border-orange-200 hover:text-orange-600"
+          >
+            <Users className="h-4 w-4 shrink-0" />
+            View Customers
+          </Link>
+        </div>
       </div>
     </div>
   );

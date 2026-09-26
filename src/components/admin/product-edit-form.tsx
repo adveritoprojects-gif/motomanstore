@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Loader2, Plus, Save, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ConfirmDialog, FormToast } from "@/components/admin";
 import {
   updateProduct,
   deleteProduct,
@@ -51,6 +52,7 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const [form, setForm] = useState({
     name: product.name,
@@ -154,7 +156,6 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this product? This cannot be undone.")) return;
     setIsDeleting(true);
     try {
       await deleteProduct(product.id);
@@ -162,29 +163,19 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
     } catch {
       setMessage({ type: "error", text: "Failed to delete product" });
       setIsDeleting(false);
+      setConfirmDelete(false);
     }
   };
 
   const inputClass =
-    "w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none transition-colors focus:border-orange-500";
+    "w-full min-h-11 rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-base outline-none transition-colors focus:border-orange-500 md:py-2 md:text-sm";
 
   return (
     <div className="space-y-6">
-      {message && (
-        <div
-          className={cn(
-            "rounded-lg p-3 text-sm",
-            message.type === "success"
-              ? "bg-green-50 text-green-600"
-              : "bg-red-50 text-red-600"
-          )}
-        >
-          {message.text}
-        </div>
-      )}
+      {message && <FormToast type={message.type} text={message.text} />}
 
-      <div className="rounded-xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-neutral-950">
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6">
+        <h2 className="mb-4 text-base font-semibold text-neutral-950 sm:text-lg">
           Basic Information
         </h2>
         <div className="grid gap-4 md:grid-cols-2">
@@ -255,8 +246,8 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-neutral-950">Pricing</h2>
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6">
+        <h2 className="mb-4 text-base font-semibold text-neutral-950 sm:text-lg">Pricing</h2>
         <div className="grid gap-4 md:grid-cols-3">
           <div>
             <label className="mb-1 block text-sm font-medium text-neutral-700">
@@ -298,8 +289,8 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-neutral-950">
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6">
+        <h2 className="mb-4 text-base font-semibold text-neutral-950 sm:text-lg">
           Variants & Stock
         </h2>
         {variants.length === 0 ? (
@@ -309,55 +300,77 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
             {variants.map((v, i) => (
               <div
                 key={v.id}
-                className="flex flex-wrap items-center gap-3 rounded-lg border border-neutral-200 p-3"
+                className="grid grid-cols-2 gap-3 rounded-lg border border-neutral-200 p-3 sm:flex sm:flex-wrap sm:items-center"
               >
-                <input
-                  value={v.name}
-                  onChange={(e) => {
-                    const newVariants = [...variants];
-                    newVariants[i].name = e.target.value;
-                    setVariants(newVariants);
-                  }}
-                  className="w-28 rounded border border-neutral-200 px-2 py-1 text-sm outline-none focus:border-orange-500"
-                  placeholder="Name"
-                />
-                <input
-                  value={v.sku}
-                  onChange={(e) => {
-                    const newVariants = [...variants];
-                    newVariants[i].sku = e.target.value;
-                    setVariants(newVariants);
-                  }}
-                  className="w-36 rounded border border-neutral-200 px-2 py-1 text-xs outline-none focus:border-orange-500"
-                  placeholder="SKU"
-                />
-                <input
-                  type="number"
-                  value={v.price ?? ""}
-                  onChange={(e) => {
-                    const newVariants = [...variants];
-                    newVariants[i].price = e.target.value
-                      ? Number(e.target.value)
-                      : null;
-                    setVariants(newVariants);
-                  }}
-                  className="w-24 rounded border border-neutral-200 px-2 py-1 text-sm outline-none focus:border-orange-500"
-                  placeholder="Price"
-                />
-                <input
-                  type="number"
-                  value={v.stock}
-                  onChange={(e) => {
-                    const newVariants = [...variants];
-                    newVariants[i].stock = Number(e.target.value);
-                    setVariants(newVariants);
-                  }}
-                  className="w-20 rounded border border-neutral-200 px-2 py-1 text-sm outline-none focus:border-orange-500"
-                  placeholder="Stock"
-                />
+                <div className="col-span-2 sm:col-span-1 sm:w-28">
+                  <label className="mb-1 block text-xs text-neutral-500 sm:sr-only">
+                    Variant name
+                  </label>
+                  <input
+                    value={v.name}
+                    onChange={(e) => {
+                      const newVariants = [...variants];
+                      newVariants[i].name = e.target.value;
+                      setVariants(newVariants);
+                    }}
+                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 sm:py-1 sm:text-sm"
+                    placeholder="Name"
+                  />
+                </div>
+                <div className="col-span-2 sm:col-span-1 sm:w-36">
+                  <label className="mb-1 block text-xs text-neutral-500 sm:sr-only">
+                    SKU
+                  </label>
+                  <input
+                    value={v.sku}
+                    onChange={(e) => {
+                      const newVariants = [...variants];
+                      newVariants[i].sku = e.target.value;
+                      setVariants(newVariants);
+                    }}
+                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 sm:py-1 sm:text-sm"
+                    placeholder="SKU"
+                  />
+                </div>
+                <div className="sm:w-24">
+                  <label className="mb-1 block text-xs text-neutral-500 sm:sr-only">
+                    Price
+                  </label>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={v.price ?? ""}
+                    onChange={(e) => {
+                      const newVariants = [...variants];
+                      newVariants[i].price = e.target.value
+                        ? Number(e.target.value)
+                        : null;
+                      setVariants(newVariants);
+                    }}
+                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 sm:py-1 sm:text-sm"
+                    placeholder="Price"
+                  />
+                </div>
+                <div className="sm:w-24">
+                  <label className="mb-1 block text-xs text-neutral-500 sm:sr-only">
+                    Stock
+                  </label>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    value={v.stock}
+                    onChange={(e) => {
+                      const newVariants = [...variants];
+                      newVariants[i].stock = Number(e.target.value);
+                      setVariants(newVariants);
+                    }}
+                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 sm:py-1 sm:text-sm"
+                    placeholder="Stock"
+                  />
+                </div>
                 <span
                   className={cn(
-                    "text-xs font-medium",
+                    "self-center text-xs font-medium sm:self-auto",
                     v.stock <= 5 ? "text-red-600" : "text-green-600"
                   )}
                 >
@@ -369,10 +382,10 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
         )}
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-neutral-950">Options</h2>
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6">
+        <h2 className="mb-4 text-base font-semibold text-neutral-950 sm:text-lg">Options</h2>
         <div className="flex flex-wrap gap-6">
-          <label className="flex items-center gap-2">
+          <label className="flex min-h-11 items-center gap-2 sm:min-h-0">
             <input
               type="checkbox"
               checked={form.inStock}
@@ -383,7 +396,7 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
             />
             <span className="text-sm text-neutral-700">In Stock</span>
           </label>
-          <label className="flex items-center gap-2">
+          <label className="flex min-h-11 items-center gap-2 sm:min-h-0">
             <input
               type="checkbox"
               checked={form.featured}
@@ -394,7 +407,7 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
             />
             <span className="text-sm text-neutral-700">Featured</span>
           </label>
-          <label className="flex items-center gap-2">
+          <label className="flex min-h-11 items-center gap-2 sm:min-h-0">
             <input
               type="checkbox"
               checked={form.isNew}
@@ -408,8 +421,8 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-neutral-950">
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6">
+        <h2 className="mb-4 text-base font-semibold text-neutral-950 sm:text-lg">
           Search Preview (SEO)
         </h2>
         <div className="mb-4 grid gap-4 md:grid-cols-2">
@@ -466,11 +479,11 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
         </p>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-neutral-950">
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6">
+        <h2 className="mb-4 text-base font-semibold text-neutral-950 sm:text-lg">
           Images ({images.length})
         </h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {images.map((img, i) => (
             <div
               key={img.id}
@@ -490,35 +503,37 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
                 type="button"
                 onClick={() => handleDeleteImage(img.id)}
                 disabled={isImageBusy}
-                className="absolute right-1 top-1 hidden h-6 w-6 items-center justify-center rounded bg-red-600/90 text-white transition-colors hover:bg-red-700 group-hover:flex disabled:opacity-50"
+                className="absolute right-1 top-1 flex h-8 w-8 items-center justify-center rounded bg-red-600/90 text-white transition-colors hover:bg-red-700 lg:h-6 lg:w-6 lg:opacity-0 lg:group-hover:opacity-100 disabled:opacity-50"
                 aria-label={`Delete image ${i + 1}`}
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2 className="h-4 w-4 lg:h-3.5 lg:w-3.5" />
               </button>
             </div>
           ))}
         </div>
 
-        <div className="mt-4 flex flex-wrap items-end gap-2">
-          <div className="min-w-[240px] flex-1">
-            <label className="mb-1 block text-xs text-neutral-500">
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+          <div className="flex-1 sm:min-w-[240px]">
+            <label className="mb-1 block text-xs font-medium text-neutral-500">
               Image path or URL
             </label>
             <input
               value={newImageUrl}
               onChange={(e) => setNewImageUrl(e.target.value)}
-              className={cn(inputClass, "text-xs")}
+              className={cn(inputClass, "text-sm")}
               placeholder="/products/my-image.jpg"
+              autoCapitalize="none"
+              autoCorrect="off"
             />
           </div>
-          <div className="min-w-[180px] flex-1">
-            <label className="mb-1 block text-xs text-neutral-500">
+          <div className="flex-1 sm:min-w-[180px]">
+            <label className="mb-1 block text-xs font-medium text-neutral-500">
               Alt text (optional)
             </label>
             <input
               value={newImageAlt}
               onChange={(e) => setNewImageAlt(e.target.value)}
-              className={cn(inputClass, "text-xs")}
+              className={cn(inputClass, "text-sm")}
               placeholder={product.name}
             />
           </div>
@@ -526,12 +541,12 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
             type="button"
             onClick={handleAddImage}
             disabled={isImageBusy || !newImageUrl.trim()}
-            className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 px-3 py-2 text-xs font-medium text-neutral-700 transition-colors hover:border-orange-500 hover:text-orange-600 disabled:opacity-50"
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:border-orange-500 hover:text-orange-600 disabled:opacity-50 sm:px-3 sm:py-2 sm:text-xs"
           >
             {isImageBusy ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-4 w-4" />
             )}
             Add image
           </button>
@@ -542,19 +557,21 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
         </p>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="sticky bottom-[calc(4.5rem_+_env(safe-area-inset-bottom))] z-10 -mx-4 flex flex-col gap-3 border-t border-neutral-200 bg-neutral-50/95 px-4 py-3 backdrop-blur sm:mx-0 sm:flex-row sm:items-center sm:justify-between sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-0 lg:static">
         <button
-          onClick={handleDelete}
+          type="button"
+          onClick={() => setConfirmDelete(true)}
           disabled={isDeleting}
-          className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
         >
           <Trash2 className="h-4 w-4" />
           {isDeleting ? "Deleting..." : "Delete Product"}
         </button>
         <button
+          type="button"
           onClick={handleSave}
           disabled={isSaving}
-          className="inline-flex items-center gap-2 rounded-lg bg-orange-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
         >
           {isSaving ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -564,6 +581,17 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
           {isSaving ? "Saving..." : "Save Changes"}
         </button>
       </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete product?"
+        message={`"${product.name}" will be permanently removed. This action cannot be undone.`}
+        confirmLabel="Delete"
+        destructive
+        busy={isDeleting}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }

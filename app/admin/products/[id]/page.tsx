@@ -20,15 +20,15 @@ export default async function ProductEditPage({ params }: Props) {
     <div>
       <Link
         href="/admin/products"
-        className="mb-6 inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-700"
+        className="mb-5 inline-flex min-h-11 items-center gap-2 text-sm text-neutral-500 hover:text-neutral-700"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to products
       </Link>
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-neutral-950">Edit Product</h1>
-        <p className="text-sm text-neutral-500">
+      <div className="mb-5">
+        <h1 className="text-xl font-bold text-neutral-950 sm:text-2xl">Edit Product</h1>
+        <p className="break-words text-sm text-neutral-500">
           {product.name} &middot; {formatPrice(product.price)}
         </p>
       </div>

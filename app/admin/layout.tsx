@@ -1,12 +1,20 @@
 import { redirect } from "next/navigation";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { getSession } from "@/lib/auth";
-import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { AdminTopbar } from "@/components/admin/admin-topbar";
+import { AdminShell } from "@/components/admin/admin-shell";
 
 export const metadata: Metadata = {
   title: "Admin",
   robots: { index: false, follow: false },
+};
+
+// Safe-area aware viewport so the fixed mobile header / bottom navigation
+// never sit under the notch or the iOS home indicator.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
 };
 
 export default async function AdminLayout({
@@ -19,13 +27,5 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  return (
-    <div className="flex min-h-screen bg-neutral-50">
-      <AdminSidebar user={session} />
-      <div className="flex-1 flex flex-col lg:ml-64">
-        <AdminTopbar />
-        <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
-      </div>
-    </div>
-  );
+  return <AdminShell user={session}>{children}</AdminShell>;
 }

@@ -57,7 +57,7 @@ export const LANDING_PAGES: Record<string, SeoLandingPage> = {
     h1: "Car Cleaning Products",
     overline: "Cleaning",
     intro: [
-      "A good wash is the foundation of car care. MOTOMAN car cleaning products — pH-neutral shampoos, foam sprayers and soft wash tools — lift dirt safely without scratching your paint.",
+      "A good wash is the foundation of car care. MOTOMAN car cleaning products — car shampoos, foam sprayers and soft wash tools — lift dirt safely without scratching your paint.",
       "Pair your wash products with microfiber cloths and drying towels for a streak-free finish, then browse exterior care for the rest of your routine.",
     ],
     productsHeading: "Shop Car Cleaning Products",

@@ -96,14 +96,14 @@ async function main() {
     {
       name: "Motoman Premium Car Shampoo",
       slug: "motoman-premium-car-shampoo-500ml",
-      sku: "MTM-WS-002",
+      sku: "MOTO-CS-500",
       description:
-        "Premium car shampoo designed for effective vehicle cleaning while being gentle on automotive surfaces. 500 ml bottle for cars, bikes and scooters.",
+        "Motoman Premium Car Shampoo 500ml is designed for effective vehicle cleaning with a rich cleaning formula suitable for regular automotive care.\n\nSuitable for:\n- Cars\n- Bikes\n- Scooters",
       price: 340,
       compareAtPrice: 420,
       metaTitle: "Motoman Premium Car Shampoo 500ml | Car Wash Shampoo",
       metaDescription:
-        "Buy Motoman Premium Car Shampoo 500ml at ₹340. Premium car wash shampoo for effective cleaning and a fresh finish on cars, bikes and scooters.",
+        "Buy Motoman Premium Car Shampoo 500ml at ₹340. Premium car wash shampoo for cars, bikes and scooters.",
       categoryId: carWash.id,
       featured: true,
       isNew: false,
@@ -129,20 +129,21 @@ async function main() {
       },
       variants: {
         create: [
-          { name: "500 ml", sku: "MTM-WS-002-500", price: 340, stock: 120, size: "500 ml" },
+          { name: "500 ml", sku: "MOTO-CS-500", price: 340, stock: 120, size: "500 ml" },
         ],
       },
     },
     {
       name: "Motoman Foam Sprayer",
       slug: "motoman-foam-sprayer",
-      sku: "MTM-WS-001",
+      sku: "MOTO-FS-001",
       description:
         "Handheld foam sprayer designed for convenient car and bike cleaning.",
       price: 599,
-      metaTitle: "Motoman Foam Sprayer | Car Wash Foam Sprayer",
+      compareAtPrice: 699,
+      metaTitle: "Motoman Foam Sprayer | Car Wash Foam Can",
       metaDescription:
-        "Buy Motoman Foam Sprayer for convenient car and bike cleaning. Durable handheld foam sprayer designed for easy automotive washing.",
+        "Buy Motoman Foam Sprayer at ₹599. Easy-to-use foam can for car and bike washing.",
       categoryId: carWash.id,
       featured: true,
       isNew: false,
@@ -166,20 +167,21 @@ async function main() {
       },
       variants: {
         create: [
-          { name: "1 unit", sku: "MTM-WS-001-1", price: 599, stock: 50 },
+          { name: "1 Unit", sku: "MOTO-FS-001", price: 599, stock: 50 },
         ],
       },
     },
     {
       name: "Motoman 1200 GSM Premium Microfiber Cloth",
       slug: "motoman-1200-gsm-microfiber-cloth",
-      sku: "MTM-MF-001",
+      sku: "MOTO-MF-1200-1",
       description:
-        "Ultra-premium high GSM microfiber cloth designed for high-absorbency drying, detailing and automotive care. Available as a single cloth or a pack of 2.",
+        "Motoman 1200 GSM Premium Microfiber Cloth designed for drying, detailing and everyday automotive care. Available as a single cloth or a pack of 2.",
       price: 499,
-      metaTitle: "1200 GSM Microfiber Cloth for Car | Motoman Premium",
+      compareAtPrice: 599,
+      metaTitle: "Motoman 1200 GSM Microfiber Cloth | Car Detailing Towel",
       metaDescription:
-        "Shop Motoman 1200 GSM microfiber cloth for car detailing, drying and automotive cleaning. Available in single and pack of 2 options.",
+        "Shop Motoman 1200 GSM microfiber cloth for car cleaning, drying and detailing. Available in single and pack of 2 options.",
       categoryId: microfiber.id,
       featured: true,
       isNew: false,
@@ -204,22 +206,22 @@ async function main() {
       },
       variants: {
         create: [
-          { name: "Pack of 1", sku: "MTM-MF-001-1", price: 499, stock: 100, size: "Pack of 1" },
-          { name: "Pack of 2", sku: "MTM-MF-001-2P", price: 799, stock: 60, size: "Pack of 2" },
+          { name: "Pack of 1", sku: "MOTO-MF-1200-1", price: 499, stock: 100, size: "Pack of 1" },
+          { name: "Pack of 2", sku: "MOTO-MF-1200-2", price: 799, stock: 60, size: "Pack of 2" },
         ],
       },
     },
     {
       name: "Motoman 680 GSM Microfiber Cloth",
       slug: "motoman-680-gsm-microfiber-cloth",
-      sku: "MTM-MF-004",
+      sku: "MOTO-MF-680-1",
       description:
-        "Premium 680 GSM microfiber cloth suitable for car cleaning, detailing, polishing and general automotive care. Available as a single cloth, a pack of 2 or a pack of 4.",
+        "Premium 680 GSM microfiber cloth suitable for car cleaning, detailing, polishing and general automotive care. Available as a single cloth, a set of 2 or a pack of 4.",
       price: 180,
       compareAtPrice: 290,
-      metaTitle: "680 GSM Microfiber Cloth for Car | Motoman",
+      metaTitle: "Motoman 680 GSM Microfiber Cloth | Car Cleaning Cloth",
       metaDescription:
-        "Buy Motoman 680 GSM microfiber cloth for car cleaning and detailing. Choose single, pack of 2 or pack of 4 options.",
+        "Buy Motoman 680 GSM microfiber cloth for car cleaning and detailing. Available as single, set of 2 and pack of 4.",
       categoryId: microfiber.id,
       featured: true,
       isNew: true,
@@ -243,22 +245,22 @@ async function main() {
       },
       variants: {
         create: [
-          { name: "Single", sku: "MTM-MF-004-1", price: 180, stock: 120, size: "Single" },
-          { name: "Pack of 2", sku: "MTM-MF-004-2P", price: 290, stock: 80, size: "Pack of 2" },
-          { name: "Pack of 4", sku: "MTM-MF-004-4P", price: 480, stock: 50, size: "Pack of 4" },
+          { name: "Single", sku: "MOTO-MF-680-1", price: 180, stock: 120, size: "Single" },
+          { name: "Set of 2", sku: "MOTO-MF-680-2", price: 290, stock: 80, size: "Set of 2" },
+          { name: "Pack of 4", sku: "MOTO-MF-680-4", price: 480, stock: 50, size: "Pack of 4" },
         ],
       },
     },
     {
       name: "Motoman 350 GSM Microfiber Cloth",
       slug: "motoman-350-gsm-microfiber-cloth-pack-4",
-      sku: "MTM-MF-005",
+      sku: "MOTO-MF-350-4",
       description:
         "Everyday microfiber cleaning cloth suitable for automotive cleaning, interior cleaning and general detailing. Pack of 4.",
       price: 320,
-      metaTitle: "350 GSM Microfiber Cloth Pack of 4 | Motoman",
+      metaTitle: "Motoman 350 GSM Microfiber Cloth Pack of 4",
       metaDescription:
-        "Shop Motoman 350 GSM microfiber cloth pack of 4 for car cleaning, interior detailing and everyday automotive care.",
+        "Buy Motoman 350 GSM microfiber cloth pack of 4 for car cleaning, detailing and everyday automotive care.",
       categoryId: microfiber.id,
       featured: false,
       isNew: true,
@@ -281,20 +283,21 @@ async function main() {
       },
       variants: {
         create: [
-          { name: "Pack of 4", sku: "MTM-MF-005-4P", price: 320, stock: 90, size: "Pack of 4" },
+          { name: "Pack of 4", sku: "MOTO-MF-350-4", price: 320, stock: 90, size: "Pack of 4" },
         ],
       },
     },
     {
       name: "Motoman Microfiber Cleaning Gloves",
       slug: "motoman-microfiber-cleaning-gloves",
-      sku: "MTM-AC-002",
+      sku: "MOTO-MFG-1",
       description:
         "Soft microfiber cleaning gloves designed for convenient car and bike cleaning, detailing and surface care. Available in Pack of 1 and Pack of 2 options.",
       price: 189,
-      metaTitle: "Microfiber Cleaning Gloves for Car | Motoman",
+      compareAtPrice: 220,
+      metaTitle: "Motoman Microfiber Cleaning Gloves | Car Wash Gloves",
       metaDescription:
-        "Buy Motoman microfiber cleaning gloves for car and bike detailing. Soft, reusable cleaning gloves available in single and pack of 2 options.",
+        "Buy Motoman microfiber cleaning gloves for car and bike cleaning. Available in pack of 1 and pack of 2.",
       categoryId: microfiber.id,
       featured: false,
       isNew: true,
@@ -318,21 +321,21 @@ async function main() {
       },
       variants: {
         create: [
-          { name: "Pack of 1", sku: "MTM-AC-002-1", price: 189, stock: 110, size: "Pack of 1" },
-          { name: "Pack of 2", sku: "MTM-AC-002-2P", price: 340, stock: 70, size: "Pack of 2" },
+          { name: "Pack of 1", sku: "MOTO-MFG-1", price: 189, stock: 110, size: "Pack of 1" },
+          { name: "Pack of 2", sku: "MOTO-MFG-2", price: 340, stock: 70, size: "Pack of 2" },
         ],
       },
     },
     {
       name: "Motoman Glass Cleaning Microfiber Cloth",
       slug: "motoman-glass-cleaning-microfiber-cloth",
-      sku: "MTM-MF-006",
+      sku: "MOTO-GLASS-MF-4",
       description:
         "Specialized microfiber cloth designed for streak-free glass and windshield cleaning. Set of 4.",
       price: 399,
-      metaTitle: "Glass Cleaning Microfiber Cloth Set of 4 | Motoman",
+      metaTitle: "Motoman Glass Cleaning Microfiber Cloth Set of 4",
       metaDescription:
-        "Buy Motoman glass cleaning microfiber cloth set of 4 for streak-free windshield, car glass and mirror cleaning.",
+        "Buy Motoman glass cleaning microfiber cloth set of 4 for car windshield, glass and mirror cleaning.",
       categoryId: microfiber.id,
       featured: false,
       isNew: true,
@@ -356,7 +359,7 @@ async function main() {
       },
       variants: {
         create: [
-          { name: "Set of 4", sku: "MTM-MF-006-4S", price: 399, stock: 75, size: "Set of 4" },
+          { name: "Set of 4", sku: "MOTO-GLASS-MF-4", price: 399, stock: 75, size: "Set of 4" },
         ],
       },
     },

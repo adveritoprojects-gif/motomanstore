@@ -208,7 +208,7 @@ export async function deleteProductImage(imageId: string) {
 
 export async function updateProductVariant(
   variantId: string,
-  data: { price?: number | null; stock?: number; name?: string }
+  data: { price?: number | null; stock?: number; name?: string; sku?: string }
 ) {
   await requireAdmin();
 

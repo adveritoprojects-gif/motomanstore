@@ -142,6 +142,7 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
           price: variant.price,
           stock: variant.stock,
           name: variant.name,
+          sku: variant.sku,
         });
       }
 
@@ -310,10 +311,26 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
                 key={v.id}
                 className="flex flex-wrap items-center gap-3 rounded-lg border border-neutral-200 p-3"
               >
-                <span className="text-sm font-medium text-neutral-700 min-w-[120px]">
-                  {v.name}
-                </span>
-                <span className="text-xs text-neutral-400">{v.sku}</span>
+                <input
+                  value={v.name}
+                  onChange={(e) => {
+                    const newVariants = [...variants];
+                    newVariants[i].name = e.target.value;
+                    setVariants(newVariants);
+                  }}
+                  className="w-28 rounded border border-neutral-200 px-2 py-1 text-sm outline-none focus:border-orange-500"
+                  placeholder="Name"
+                />
+                <input
+                  value={v.sku}
+                  onChange={(e) => {
+                    const newVariants = [...variants];
+                    newVariants[i].sku = e.target.value;
+                    setVariants(newVariants);
+                  }}
+                  className="w-36 rounded border border-neutral-200 px-2 py-1 text-xs outline-none focus:border-orange-500"
+                  placeholder="SKU"
+                />
                 <input
                   type="number"
                   value={v.price ?? ""}

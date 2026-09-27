@@ -59,6 +59,30 @@ const expected: Record<
     prices: ["399"],
     skus: ["MOTO-GLASS-MF-4"],
   },
+  "microfiber-gloves-combo-2": {
+    images: ["gloves-1.jpg", "gloves-2.jpg"],
+    title: "Microfiber Gloves × 2 | Motoman Combo Offer",
+    description:
+      "Buy the Motoman Microfiber Gloves 2 piece combo at ₹320 (MRP ₹460). Save ₹140 on two microfiber cleaning gloves.",
+    prices: ["460", "320"],
+    skus: ["MOTO-CMB-GLV-2"],
+  },
+  "680-gsm-microfiber-cloth-combo-2": {
+    images: ["mf680-1.jpg", "mf680-3.jpg"],
+    title: "680 GSM Microfiber Cloth × 2 | Motoman Combo Offer",
+    description:
+      "Buy the Motoman 680 GSM Microfiber Cloth 2 piece combo at ₹240. Two premium microfiber cloths for cleaning and detailing.",
+    prices: ["240"],
+    skus: ["MOTO-CMB-MF680-2"],
+  },
+  "680-gsm-microfiber-cloth-combo-3": {
+    images: ["mf680-4.jpg", "mf680-2.jpg"],
+    title: "680 GSM Microfiber Cloth × 3 | Motoman Combo Offer",
+    description:
+      "Buy the Motoman 680 GSM Microfiber Cloth 3 piece combo at ₹310. Three premium microfiber cloths for cleaning and detailing.",
+    prices: ["310"],
+    skus: ["MOTO-CMB-MF680-3"],
+  },
 };
 
 const errors: string[] = [];
@@ -165,8 +189,8 @@ async function main() {
   const feed = await fetch(`${BASE}/api/google-merchant-feed`, { cache: "no-store" });
   const feedXml = await feed.text();
   const items = (feedXml.match(/<item>/g) || []).length;
-  if (items !== 7) fail(`merchant feed has ${items} items != 7`);
-  for (const sku of ["MOTO-CS-500", "MOTO-MFG-1", "MOTO-MF-1200-1", "MOTO-GLASS-MF-4"]) {
+  if (items < 7) fail(`merchant feed has ${items} items < 7`);
+  for (const sku of ["MOTO-CS-500", "MOTO-MFG-1", "MOTO-MF-1200-1", "MOTO-GLASS-MF-4", "MOTO-CMB-GLV-2"]) {
     if (!feedXml.includes(sku)) fail(`merchant feed missing sku ${sku}`);
   }
 

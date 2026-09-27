@@ -107,6 +107,58 @@ export const PRODUCTS: LegacyProduct[] = [
   },
 ];
 
+export interface ComboProduct {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  compareAtPrice?: number | null;
+  image: string;
+  tags: string[];
+  variants: { name: string; size: string }[];
+}
+
+/**
+ * Static fallback for the homepage "Combo Offers" section when the database
+ * is unavailable. The live section reads the same products from the catalog.
+ */
+export const COMBO_PRODUCTS: ComboProduct[] = [
+  {
+    id: "combo-gloves-2",
+    name: "Microfiber Gloves × 2",
+    slug: "microfiber-gloves-combo-2",
+    description: "Two soft microfiber cleaning gloves for car and bike detailing.",
+    price: 320,
+    compareAtPrice: 460,
+    image: "/products/gloves-1.jpg",
+    tags: ["combo"],
+    variants: [{ name: "2 Pieces", size: "2 Pieces" }],
+  },
+  {
+    id: "combo-mf680-2",
+    name: "680 GSM Microfiber Cloth × 2",
+    slug: "680-gsm-microfiber-cloth-combo-2",
+    description: "Two premium 680 GSM microfiber cloths for everyday cleaning and detailing.",
+    price: 240,
+    compareAtPrice: null,
+    image: "/products/mf680-1.jpg",
+    tags: ["combo"],
+    variants: [{ name: "2 Pieces", size: "2 Pieces" }],
+  },
+  {
+    id: "combo-mf680-3",
+    name: "680 GSM Microfiber Cloth × 3",
+    slug: "680-gsm-microfiber-cloth-combo-3",
+    description: "Three premium 680 GSM microfiber cloths for cleaning, polishing and drying.",
+    price: 310,
+    compareAtPrice: null,
+    image: "/products/mf680-4.jpg",
+    tags: ["combo"],
+    variants: [{ name: "3 Pieces", size: "3 Pieces" }],
+  },
+];
+
 export interface LegacyCategory {
   id: string;
   name: string;

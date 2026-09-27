@@ -364,6 +364,115 @@ async function main() {
         ],
       },
     },
+    {
+      name: "Microfiber Gloves × 2",
+      slug: "microfiber-gloves-combo-2",
+      sku: "MOTO-CMB-GLV-2",
+      description:
+        "Two Motoman microfiber cleaning gloves for convenient car and bike cleaning and detailing. 2 piece combo pack.",
+      price: 320,
+      compareAtPrice: 460,
+      metaTitle: "Microfiber Gloves × 2 | Motoman Combo Offer",
+      metaDescription:
+        "Buy the Motoman Microfiber Gloves 2 piece combo at ₹320 (MRP ₹460). Save ₹140 on two microfiber cleaning gloves.",
+      categoryId: microfiber.id,
+      featured: false,
+      isNew: false,
+      brand: "MOTOMAN",
+      tags: [
+        "combo",
+        "combo offer",
+        "2 piece combo",
+        "microfiber cleaning gloves",
+        "car cleaning gloves",
+        "car wash gloves",
+        "car detailing gloves",
+        "microfiber gloves combo",
+      ],
+      images: {
+        create: [
+          { url: "/products/gloves-1.jpg", alt: "Microfiber Gloves × 2 combo pack", sortOrder: 0 },
+          { url: "/products/gloves-2.jpg", alt: "Microfiber cleaning gloves close-up", sortOrder: 1 },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "2 Pieces", sku: "MOTO-CMB-GLV-2", price: 320, stock: 50, size: "2 Pieces" },
+        ],
+      },
+    },
+    {
+      name: "680 GSM Microfiber Cloth × 2",
+      slug: "680-gsm-microfiber-cloth-combo-2",
+      sku: "MOTO-CMB-MF680-2",
+      description:
+        "Two Motoman 680 GSM microfiber cloths for car cleaning, polishing and everyday detailing. 2 piece combo pack.",
+      price: 240,
+      compareAtPrice: null,
+      metaTitle: "680 GSM Microfiber Cloth × 2 | Motoman Combo Offer",
+      metaDescription:
+        "Buy the Motoman 680 GSM Microfiber Cloth 2 piece combo at ₹240. Two premium microfiber cloths for cleaning and detailing.",
+      categoryId: microfiber.id,
+      featured: false,
+      isNew: false,
+      brand: "MOTOMAN",
+      tags: [
+        "combo",
+        "combo offer",
+        "2 piece combo",
+        "680 gsm microfiber cloth",
+        "car cleaning cloth",
+        "microfiber cloth combo",
+        "car detailing cloth",
+      ],
+      images: {
+        create: [
+          { url: "/products/mf680-1.jpg", alt: "680 GSM Microfiber Cloth × 2 combo pack", sortOrder: 0 },
+          { url: "/products/mf680-3.jpg", alt: "680 GSM microfiber cloth texture close-up", sortOrder: 1 },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "2 Pieces", sku: "MOTO-CMB-MF680-2", price: 240, stock: 50, size: "2 Pieces" },
+        ],
+      },
+    },
+    {
+      name: "680 GSM Microfiber Cloth × 3",
+      slug: "680-gsm-microfiber-cloth-combo-3",
+      sku: "MOTO-CMB-MF680-3",
+      description:
+        "Three Motoman 680 GSM microfiber cloths for car cleaning, polishing and drying. 3 piece combo pack.",
+      price: 310,
+      compareAtPrice: null,
+      metaTitle: "680 GSM Microfiber Cloth × 3 | Motoman Combo Offer",
+      metaDescription:
+        "Buy the Motoman 680 GSM Microfiber Cloth 3 piece combo at ₹310. Three premium microfiber cloths for cleaning and detailing.",
+      categoryId: microfiber.id,
+      featured: false,
+      isNew: false,
+      brand: "MOTOMAN",
+      tags: [
+        "combo",
+        "combo offer",
+        "3 piece combo",
+        "680 gsm microfiber cloth",
+        "car cleaning cloth",
+        "microfiber cloth combo",
+        "car detailing cloth",
+      ],
+      images: {
+        create: [
+          { url: "/products/mf680-4.jpg", alt: "680 GSM Microfiber Cloth × 3 combo pack", sortOrder: 0 },
+          { url: "/products/mf680-2.jpg", alt: "680 GSM microfiber cloth detail", sortOrder: 1 },
+        ],
+      },
+      variants: {
+        create: [
+          { name: "3 Pieces", sku: "MOTO-CMB-MF680-3", price: 310, stock: 50, size: "3 Pieces" },
+        ],
+      },
+    },
   ];
 
   for (const productData of products) {

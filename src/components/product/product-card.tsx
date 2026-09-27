@@ -20,6 +20,8 @@ interface ProductCardProduct {
   featured?: boolean;
   category?: { name: string; slug: string } | string | null;
   badge?: string;
+  tags?: string[];
+  variants?: { name: string; size?: string | null; stock?: number }[];
 }
 
 interface ProductCardProps {
@@ -55,9 +57,25 @@ function getCategoryName(
 
 function getBadge(product: ProductCardProduct): string | null {
   if (product.badge) return product.badge;
+  if (product.tags?.includes("combo")) return "Combo";
   if (product.isNew) return "New";
   if (product.compareAtPrice) return "Sale";
   return null;
+}
+
+/** Pack size shown on bundle products, e.g. "2 Pieces". */
+function getQuantityLabel(product: ProductCardProduct): string | null {
+  const variant = product.variants?.[0];
+  if (!variant) return null;
+  return variant.size || variant.name || null;
+}
+
+/** "₹140 OFF" when the product is actually discounted. */
+function getDiscountLabel(product: ProductCardProduct): string | null {
+  if (!product.compareAtPrice || product.compareAtPrice <= product.price) {
+    return null;
+  }
+  return `${formatPrice(product.compareAtPrice - product.price)} OFF`;
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
@@ -68,6 +86,8 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const hasImage = Boolean(imageSrc) && imageSrc !== "/placeholder-product.jpg";
   const imageAlt = getImageAlt(product.images, product.name);
   const categoryName = getCategoryName(product.category);
+  const quantityLabel = getQuantityLabel(product);
+  const discountLabel = getDiscountLabel(product);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -147,18 +167,28 @@ export function ProductCard({ product, className }: ProductCardProps) {
             {product.name}
           </h3>
         </Link>
+        {quantityLabel && (
+          <span className="mb-1.5 inline-flex w-fit items-center rounded border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-neutral-600">
+            {quantityLabel}
+          </span>
+        )}
         <p className="mb-3 text-xs text-neutral-500 line-clamp-2">
           {product.description}
         </p>
 
         <div className="mt-auto">
-          <div className="mb-3 flex items-baseline gap-2">
-            <span className="text-base font-bold text-neutral-950">
+          <div className="mb-3 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <span className="text-lg font-extrabold tracking-tight text-neutral-950">
               {formatPrice(product.price)}
             </span>
             {product.compareAtPrice && (
               <span className="text-xs text-neutral-400 line-through">
                 {formatPrice(product.compareAtPrice)}
+              </span>
+            )}
+            {discountLabel && (
+              <span className="rounded bg-orange-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-orange-600">
+                {discountLabel}
               </span>
             )}
           </div>

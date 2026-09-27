@@ -148,6 +148,10 @@ export async function getFeaturedProducts(limit = 5) {
  * so the homepage section always renders a full row.
  */
 export async function getBestSellers(limit = 5) {
+  // Combo bundles get their own homepage section — never mix them into
+  // Best Sellers, including when the list has to be back-filled.
+  const excludeCombos: Prisma.ProductWhereInput = { NOT: { tags: { has: "combo" } } };
+
   const sold = await prisma.orderItem.groupBy({
     by: ["productId"],
     _sum: { quantity: true },
@@ -166,7 +170,7 @@ export async function getBestSellers(limit = 5) {
 
   const soldProducts = rankedIds.length
     ? await prisma.product.findMany({
-        where: { id: { in: rankedIds }, inStock: true },
+        where: { id: { in: rankedIds }, inStock: true, ...excludeCombos },
         include,
       })
     : [];
@@ -179,7 +183,12 @@ export async function getBestSellers(limit = 5) {
 
   if (products.length < limit) {
     const fill = await prisma.product.findMany({
-      where: { id: { notIn: pickedIds() }, inStock: true, featured: true },
+      where: {
+        id: { notIn: pickedIds() },
+        inStock: true,
+        featured: true,
+        ...excludeCombos,
+      },
       include,
       orderBy: { createdAt: "desc" },
       take: limit - products.length,
@@ -189,7 +198,7 @@ export async function getBestSellers(limit = 5) {
 
   if (products.length < limit) {
     const fill = await prisma.product.findMany({
-      where: { id: { notIn: pickedIds() }, inStock: true },
+      where: { id: { notIn: pickedIds() }, inStock: true, ...excludeCombos },
       include,
       orderBy: { createdAt: "desc" },
       take: limit - products.length,
@@ -198,6 +207,24 @@ export async function getBestSellers(limit = 5) {
   }
 
   return products;
+}
+
+/**
+ * Combo offers — bundle products tagged "combo" in the catalog. Like every
+ * other product they are full catalog rows, so they are priced, stocked and
+ * edited from the admin panel.
+ */
+export async function getComboOffers(limit = 4) {
+  return prisma.product.findMany({
+    where: { tags: { has: "combo" }, inStock: true },
+    include: {
+      images: { orderBy: { sortOrder: "asc" as const } },
+      category: true,
+      variants: { orderBy: { price: "asc" as const } },
+    },
+    orderBy: [{ featured: "desc" }, { createdAt: "asc" }],
+    take: limit,
+  });
 }
 
 export async function getNewProducts(limit = 5) {

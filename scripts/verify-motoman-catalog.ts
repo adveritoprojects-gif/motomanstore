@@ -84,6 +84,37 @@ const SPEC: {
   },
 ];
 
+/** Homepage "Combo Offers" products — full catalog rows tagged "combo". */
+const COMBO_SPEC: {
+  slug: string;
+  price: number;
+  compareAtPrice: number | null;
+  variantSku: string;
+  pieces: string;
+}[] = [
+  {
+    slug: "microfiber-gloves-combo-2",
+    price: 320,
+    compareAtPrice: 460,
+    variantSku: "MOTO-CMB-GLV-2",
+    pieces: "2 Pieces",
+  },
+  {
+    slug: "680-gsm-microfiber-cloth-combo-2",
+    price: 240,
+    compareAtPrice: null,
+    variantSku: "MOTO-CMB-MF680-2",
+    pieces: "2 Pieces",
+  },
+  {
+    slug: "680-gsm-microfiber-cloth-combo-3",
+    price: 310,
+    compareAtPrice: null,
+    variantSku: "MOTO-CMB-MF680-3",
+    pieces: "3 Pieces",
+  },
+];
+
 const errors: string[] = [];
 const check = (ok: boolean, msg: string) => {
   if (!ok) errors.push(msg);
@@ -94,7 +125,26 @@ async function main() {
     include: { images: true, variants: true, category: true },
   });
 
-  check(products.length === 7, `expected 7 products, got ${products.length}`);
+  check(products.length >= 7, `expected at least 7 products, got ${products.length}`);
+
+  for (const spec of COMBO_SPEC) {
+    const p = products.find((x) => x.slug === spec.slug);
+    if (!p) {
+      errors.push(`missing combo product: ${spec.slug}`);
+      continue;
+    }
+    check(p.price === spec.price, `${spec.slug}: price ${p.price} != ${spec.price}`);
+    check(
+      (p.compareAtPrice ?? null) === spec.compareAtPrice,
+      `${spec.slug}: compareAtPrice ${p.compareAtPrice} != ${spec.compareAtPrice}`
+    );
+    check(p.tags.includes("combo"), `${spec.slug}: missing "combo" tag`);
+    check(p.inStock, `${spec.slug}: not in stock`);
+    const v = p.variants.find((x) => x.sku === spec.variantSku);
+    check(Boolean(v), `${spec.slug}: missing variant ${spec.variantSku}`);
+    check(v?.size === spec.pieces, `${spec.slug}: variant size ${v?.size} != ${spec.pieces}`);
+    check((v?.stock ?? 0) > 0, `${spec.slug}: variant out of stock`);
+  }
 
   for (const spec of SPEC) {
     const p = products.find((x) => x.slug === spec.slug);
@@ -140,9 +190,13 @@ async function main() {
     for (const v of p.variants) {
       const effective = v.price ?? p.price;
       const showCompare = (p.compareAtPrice ?? 0) > effective;
-      const shouldCompare =
-        p.compareAtPrice !== null &&
-        specCompareFor(SPEC.find((s) => s.slug === p.slug)!, v.sku) !== undefined;
+      const core = SPEC.find((s) => s.slug === p.slug);
+      const combo = COMBO_SPEC.find((s) => s.slug === p.slug);
+      const shouldCompare = combo
+        ? (combo.compareAtPrice ?? 0) > effective
+        : core !== undefined &&
+          p.compareAtPrice !== null &&
+          specCompareFor(core, v.sku) !== undefined;
       check(
         showCompare === shouldCompare,
         `${p.slug}/${v.sku}: compare display ${showCompare} != expected ${shouldCompare} (compare=${p.compareAtPrice}, price=${effective})`

@@ -1,12 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 
 /**
- * Non-destructive catalog sync for the 7 Motoman products.
+ * Non-destructive catalog sync for the Motoman products (core catalog +
+ * combo offers).
  *
  * Applies the canonical product data (name, SKU, price, compare-at price,
  * description, SEO fields, categories, variants, images) to an existing
  * database WITHOUT deleting anything — safe to run against live data.
- * Products are matched by slug; variants are matched by their current SKU.
+ * Products are matched by slug (missing ones are created); variants are
+ * matched by their current SKU.
  */
 
 const prisma = new PrismaClient();
@@ -275,6 +277,100 @@ const PRODUCTS: SpecProduct[] = [
       { previousSkus: ["MTM-MF-006-4S"], name: "Set of 4", sku: "MOTO-GLASS-MF-4", price: 399, size: "Set of 4", stock: 75 },
     ],
   },
+  {
+    slug: "microfiber-gloves-combo-2",
+    name: "Microfiber Gloves × 2",
+    sku: "MOTO-CMB-GLV-2",
+    description:
+      "Two Motoman microfiber cleaning gloves for convenient car and bike cleaning and detailing. 2 piece combo pack.",
+    price: 320,
+    compareAtPrice: 460,
+    metaTitle: "Microfiber Gloves × 2 | Motoman Combo Offer",
+    metaDescription:
+      "Buy the Motoman Microfiber Gloves 2 piece combo at ₹320 (MRP ₹460). Save ₹140 on two microfiber cleaning gloves.",
+    categorySlug: "microfiber",
+    featured: false,
+    isNew: false,
+    tags: [
+      "combo",
+      "combo offer",
+      "2 piece combo",
+      "microfiber cleaning gloves",
+      "car cleaning gloves",
+      "car wash gloves",
+      "car detailing gloves",
+      "microfiber gloves combo",
+    ],
+    images: [
+      { url: "/products/gloves-1.jpg", alt: "Microfiber Gloves × 2 combo pack" },
+      { url: "/products/gloves-2.jpg", alt: "Microfiber cleaning gloves close-up" },
+    ],
+    variants: [
+      { previousSkus: [], name: "2 Pieces", sku: "MOTO-CMB-GLV-2", price: 320, size: "2 Pieces", stock: 50 },
+    ],
+  },
+  {
+    slug: "680-gsm-microfiber-cloth-combo-2",
+    name: "680 GSM Microfiber Cloth × 2",
+    sku: "MOTO-CMB-MF680-2",
+    description:
+      "Two Motoman 680 GSM microfiber cloths for car cleaning, polishing and everyday detailing. 2 piece combo pack.",
+    price: 240,
+    compareAtPrice: null,
+    metaTitle: "680 GSM Microfiber Cloth × 2 | Motoman Combo Offer",
+    metaDescription:
+      "Buy the Motoman 680 GSM Microfiber Cloth 2 piece combo at ₹240. Two premium microfiber cloths for cleaning and detailing.",
+    categorySlug: "microfiber",
+    featured: false,
+    isNew: false,
+    tags: [
+      "combo",
+      "combo offer",
+      "2 piece combo",
+      "680 gsm microfiber cloth",
+      "car cleaning cloth",
+      "microfiber cloth combo",
+      "car detailing cloth",
+    ],
+    images: [
+      { url: "/products/mf680-1.jpg", alt: "680 GSM Microfiber Cloth × 2 combo pack" },
+      { url: "/products/mf680-3.jpg", alt: "680 GSM microfiber cloth texture close-up" },
+    ],
+    variants: [
+      { previousSkus: [], name: "2 Pieces", sku: "MOTO-CMB-MF680-2", price: 240, size: "2 Pieces", stock: 50 },
+    ],
+  },
+  {
+    slug: "680-gsm-microfiber-cloth-combo-3",
+    name: "680 GSM Microfiber Cloth × 3",
+    sku: "MOTO-CMB-MF680-3",
+    description:
+      "Three Motoman 680 GSM microfiber cloths for car cleaning, polishing and drying. 3 piece combo pack.",
+    price: 310,
+    compareAtPrice: null,
+    metaTitle: "680 GSM Microfiber Cloth × 3 | Motoman Combo Offer",
+    metaDescription:
+      "Buy the Motoman 680 GSM Microfiber Cloth 3 piece combo at ₹310. Three premium microfiber cloths for cleaning and detailing.",
+    categorySlug: "microfiber",
+    featured: false,
+    isNew: false,
+    tags: [
+      "combo",
+      "combo offer",
+      "3 piece combo",
+      "680 gsm microfiber cloth",
+      "car cleaning cloth",
+      "microfiber cloth combo",
+      "car detailing cloth",
+    ],
+    images: [
+      { url: "/products/mf680-4.jpg", alt: "680 GSM Microfiber Cloth × 3 combo pack" },
+      { url: "/products/mf680-2.jpg", alt: "680 GSM microfiber cloth detail" },
+    ],
+    variants: [
+      { previousSkus: [], name: "3 Pieces", sku: "MOTO-CMB-MF680-3", price: 310, size: "3 Pieces", stock: 50 },
+    ],
+  },
 ];
 
 async function sync() {
@@ -289,10 +385,31 @@ async function sync() {
       where: { slug: spec.slug },
       include: { images: true, variants: true },
     });
-    if (!existing) throw new Error(`Product not found: ${spec.slug}`);
+
+    const product =
+      existing ??
+      (await prisma.product.create({
+        data: {
+          slug: spec.slug,
+          name: spec.name,
+          sku: spec.sku,
+          description: spec.description,
+          price: spec.price,
+          compareAtPrice: spec.compareAtPrice,
+          metaTitle: spec.metaTitle,
+          metaDescription: spec.metaDescription,
+          categoryId: category.id,
+          featured: spec.featured,
+          isNew: spec.isNew,
+          brand: "MOTOMAN",
+          tags: spec.tags,
+          inStock: true,
+        },
+        include: { images: true, variants: true },
+      }));
 
     await prisma.product.update({
-      where: { id: existing.id },
+      where: { id: product.id },
       data: {
         name: spec.name,
         sku: spec.sku,
@@ -311,7 +428,7 @@ async function sync() {
     });
 
     // Images — upsert by URL, keep exactly the spec images in order.
-    const existingImages = [...existing.images].sort((a, b) => a.sortOrder - b.sortOrder);
+    const existingImages = [...product.images].sort((a, b) => a.sortOrder - b.sortOrder);
     for (let i = 0; i < spec.images.length; i++) {
       const img = spec.images[i];
       const match = existingImages.find((e) => e.url === img.url);
@@ -322,7 +439,7 @@ async function sync() {
         });
       } else {
         await prisma.productImage.create({
-          data: { productId: existing.id, url: img.url, alt: img.alt, sortOrder: i },
+          data: { productId: product.id, url: img.url, alt: img.alt, sortOrder: i },
         });
       }
     }
@@ -337,7 +454,7 @@ async function sync() {
     for (const v of spec.variants) {
       const current = await prisma.productVariant.findFirst({
         where: {
-          productId: existing.id,
+          productId: product.id,
           sku: { in: [v.sku, ...v.previousSkus] },
         },
       });
@@ -348,13 +465,13 @@ async function sync() {
         });
       } else {
         await prisma.productVariant.create({
-          data: { productId: existing.id, name: v.name, sku: v.sku, price: v.price, size: v.size, stock: v.stock },
+          data: { productId: product.id, name: v.name, sku: v.sku, price: v.price, size: v.size, stock: v.stock },
         });
       }
     }
     // Remove variants that belong to this product but are not in the spec.
     const wanted = new Set(spec.variants.flatMap((v) => [v.sku, ...v.previousSkus]));
-    for (const v of existing.variants) {
+    for (const v of product.variants) {
       if (!wanted.has(v.sku)) {
         await prisma.productVariant.delete({ where: { id: v.id } });
       }

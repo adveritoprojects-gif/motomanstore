@@ -207,21 +207,6 @@ export async function deleteProductImage(imageId: string) {
   revalidatePath("/admin/products");
 }
 
-export async function updateProductVariant(
-  variantId: string,
-  data: { price?: number | null; stock?: number; name?: string; sku?: string }
-) {
-  await requireAdmin();
-
-  const variant = await prisma.productVariant.update({
-    where: { id: variantId },
-    data,
-  });
-
-  revalidatePath("/admin/products");
-  return variant;
-}
-
 export type VariantInput = {
   id?: string;
   name: string;

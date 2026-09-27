@@ -95,15 +95,3 @@ export async function setupAdminAction(
     };
   }
 }
-
-export async function getAdminUser() {
-  const session = await getSession();
-  if (!session || session.role !== "admin") return null;
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: { id: true, email: true, name: true, role: true },
-  });
-
-  return user;
-}

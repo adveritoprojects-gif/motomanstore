@@ -57,10 +57,6 @@ export function mapProductToGoogleCategory(product: {
   return CATEGORY_TO_GOOGLE[product.category.slug] ?? FALLBACK;
 }
 
-export function mapCategorySlugToGoogleCategory(slug: string): string {
-  return CATEGORY_TO_GOOGLE[slug] ?? FALLBACK;
-}
-
 /** Store-facing product_type for the feed, e.g. "Car Wash > Car Shampoo". */
 export function productTypeLabel(product: {
   category: { name: string };

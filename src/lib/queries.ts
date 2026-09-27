@@ -133,15 +133,6 @@ export async function getLandingProducts(params?: {
   });
 }
 
-export async function getFeaturedProducts(limit = 5) {
-  return prisma.product.findMany({
-    where: { featured: true },
-    include: { images: true, category: true },
-    orderBy: { createdAt: "desc" },
-    take: limit,
-  });
-}
-
 /**
  * Best sellers — ranked by total units sold across non-cancelled orders.
  * Falls back to featured (then newest) products to fill any remaining slots
@@ -227,15 +218,6 @@ export async function getComboOffers(limit = 4) {
   });
 }
 
-export async function getNewProducts(limit = 5) {
-  return prisma.product.findMany({
-    where: { isNew: true },
-    include: { images: true, category: true },
-    orderBy: { createdAt: "desc" },
-    take: limit,
-  });
-}
-
 export async function getRelatedProducts(productId: string, categorySlug: string, limit = 4) {
   return prisma.product.findMany({
     where: {
@@ -248,10 +230,6 @@ export async function getRelatedProducts(productId: string, categorySlug: string
 }
 
 // ─── Category Queries ───────────────────────────────────
-
-export type CategoryWithCount = Prisma.CategoryGetPayload<{
-  include: { _count: { select: { products: true } } };
-}>;
 
 export async function getCategories() {
   return prisma.category.findMany({
@@ -283,27 +261,5 @@ export async function getCollectionBySlug(slug: string) {
       products: { include: { images: true, category: true } },
       _count: { select: { products: true } },
     },
-  });
-}
-
-// ─── Search ─────────────────────────────────────────────
-
-export async function searchProducts(query: string) {
-  const trimmed = query.trim();
-  if (!trimmed) return [];
-
-  return prisma.product.findMany({
-    where: {
-      OR: [
-        { name: { contains: trimmed, mode: "insensitive" } },
-        { description: { contains: trimmed, mode: "insensitive" } },
-        { sku: { contains: trimmed, mode: "insensitive" } },
-        { tags: { has: trimmed.toLowerCase() } },
-        { category: { name: { contains: trimmed, mode: "insensitive" } } },
-        { brand: { contains: trimmed, mode: "insensitive" } },
-      ],
-    },
-    include: { images: true, category: true },
-    take: 20,
   });
 }

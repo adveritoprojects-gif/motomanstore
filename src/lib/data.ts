@@ -4,9 +4,9 @@ export const BRAND = {
   tagline: "PREMIUM CAR CARE",
   slogan: "Drive Cleaner. Drive Better.",
   description: "Professional car care products designed for a cleaner, shinier and longer-lasting drive.",
-  email: "hello@motoman.in",
-  phone: "+91 98765 43210",
-  address: "Mumbai, Maharashtra, India",
+  email: "motoman@gmail.com",
+  phone: "+91 89431 76189",
+  address: "Payyannur, Kannur, Kerala , India",
 } as const;
 
 export const NAV_LINKS = [

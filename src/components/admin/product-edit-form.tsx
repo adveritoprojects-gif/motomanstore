@@ -9,10 +9,19 @@ import { ConfirmDialog, FormToast } from "@/components/admin";
 import {
   updateProduct,
   deleteProduct,
-  updateProductVariant,
+  saveProductVariants,
   addProductImage,
   deleteProductImage,
 } from "@/lib/actions/admin-products";
+
+type EditableVariant = {
+  key: string;
+  id?: string;
+  name: string;
+  sku: string;
+  price: number | null;
+  stock: number;
+};
 
 interface ProductEditFormProps {
   product: {
@@ -71,9 +80,12 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
     tags: product.tags.join(", "),
   });
 
-  const [variants, setVariants] = useState(
-    product.variants.map((v) => ({ ...v }))
+  const [variants, setVariants] = useState<EditableVariant[]>(
+    product.variants.map((v) => ({ key: v.id, ...v }))
   );
+  const [pendingVariantDelete, setPendingVariantDelete] = useState<
+    string | null
+  >(null);
 
   const [images, setImages] = useState(
     product.images.map((img) => ({ ...img }))
@@ -113,6 +125,33 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
     setIsImageBusy(false);
   };
 
+  const updateVariant = (key: string, patch: Partial<EditableVariant>) => {
+    setVariants((prev) =>
+      prev.map((v) => (v.key === key ? { ...v, ...patch } : v))
+    );
+  };
+
+  const handleAddVariant = () => {
+    setVariants((prev) => [
+      ...prev,
+      {
+        key: `new-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: "",
+        sku: "",
+        price: null,
+        stock: 0,
+      },
+    ]);
+  };
+
+  const handleDeleteVariant = () => {
+    if (!pendingVariantDelete) return;
+    setVariants((prev) =>
+      prev.filter((v) => v.key !== pendingVariantDelete)
+    );
+    setPendingVariantDelete(null);
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     setMessage(null);
@@ -139,14 +178,24 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
           .filter(Boolean),
       });
 
-      for (const variant of variants) {
-        await updateProductVariant(variant.id, {
-          price: variant.price,
-          stock: variant.stock,
-          name: variant.name,
-          sku: variant.sku,
-        });
+      const result = await saveProductVariants(
+        product.id,
+        variants.map((v) => ({
+          id: v.id,
+          name: v.name,
+          sku: v.sku,
+          price: v.price,
+          stock: v.stock,
+        }))
+      );
+      if (!result.ok) {
+        setMessage({ type: "error", text: result.error });
+        setIsSaving(false);
+        return;
       }
+      setVariants((prev) =>
+        prev.map((row, i) => ({ ...row, id: result.variants[i].id }))
+      );
 
       setMessage({ type: "success", text: "Product updated successfully" });
     } catch {
@@ -290,16 +339,33 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
       </div>
 
       <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6">
-        <h2 className="mb-4 text-base font-semibold text-neutral-950 sm:text-lg">
-          Variants & Stock
-        </h2>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-base font-semibold text-neutral-950 sm:text-lg">
+            Variants &amp; Stock{" "}
+            <span className="font-normal text-neutral-400">
+              ({variants.length})
+            </span>
+          </h2>
+          <button
+            type="button"
+            onClick={handleAddVariant}
+            disabled={isSaving}
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:border-orange-500 hover:text-orange-600 disabled:opacity-50 sm:px-3 sm:py-2 sm:text-xs"
+          >
+            <Plus className="h-4 w-4" />
+            Add Variant
+          </button>
+        </div>
         {variants.length === 0 ? (
-          <p className="text-sm text-neutral-500">No variants for this product.</p>
+          <p className="text-sm text-neutral-500">
+            No variants yet. Add one to sell this product in different sizes or
+            packs.
+          </p>
         ) : (
           <div className="space-y-3">
-            {variants.map((v, i) => (
+            {variants.map((v) => (
               <div
-                key={v.id}
+                key={v.key}
                 className="grid grid-cols-2 gap-3 rounded-lg border border-neutral-200 p-3 sm:flex sm:flex-wrap sm:items-center"
               >
                 <div className="col-span-2 sm:col-span-1 sm:w-28">
@@ -308,12 +374,9 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
                   </label>
                   <input
                     value={v.name}
-                    onChange={(e) => {
-                      const newVariants = [...variants];
-                      newVariants[i].name = e.target.value;
-                      setVariants(newVariants);
-                    }}
-                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 sm:py-1 sm:text-sm"
+                    onChange={(e) => updateVariant(v.key, { name: e.target.value })}
+                    disabled={isSaving}
+                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 disabled:opacity-60 sm:py-1 sm:text-sm"
                     placeholder="Name"
                   />
                 </div>
@@ -323,12 +386,9 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
                   </label>
                   <input
                     value={v.sku}
-                    onChange={(e) => {
-                      const newVariants = [...variants];
-                      newVariants[i].sku = e.target.value;
-                      setVariants(newVariants);
-                    }}
-                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 sm:py-1 sm:text-sm"
+                    onChange={(e) => updateVariant(v.key, { sku: e.target.value })}
+                    disabled={isSaving}
+                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 disabled:opacity-60 sm:py-1 sm:text-sm"
                     placeholder="SKU"
                   />
                 </div>
@@ -339,15 +399,15 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
                   <input
                     type="number"
                     inputMode="decimal"
+                    min="0"
                     value={v.price ?? ""}
-                    onChange={(e) => {
-                      const newVariants = [...variants];
-                      newVariants[i].price = e.target.value
-                        ? Number(e.target.value)
-                        : null;
-                      setVariants(newVariants);
-                    }}
-                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 sm:py-1 sm:text-sm"
+                    onChange={(e) =>
+                      updateVariant(v.key, {
+                        price: e.target.value ? Number(e.target.value) : null,
+                      })
+                    }
+                    disabled={isSaving}
+                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 disabled:opacity-60 sm:py-1 sm:text-sm"
                     placeholder="Price"
                   />
                 </div>
@@ -358,13 +418,13 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
                   <input
                     type="number"
                     inputMode="numeric"
+                    min="0"
                     value={v.stock}
-                    onChange={(e) => {
-                      const newVariants = [...variants];
-                      newVariants[i].stock = Number(e.target.value);
-                      setVariants(newVariants);
-                    }}
-                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 sm:py-1 sm:text-sm"
+                    onChange={(e) =>
+                      updateVariant(v.key, { stock: Number(e.target.value) })
+                    }
+                    disabled={isSaving}
+                    className="min-h-11 w-full rounded border border-neutral-200 bg-white px-2 py-2 text-base outline-none focus:border-orange-500 disabled:opacity-60 sm:py-1 sm:text-sm"
                     placeholder="Stock"
                   />
                 </div>
@@ -376,10 +436,24 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
                 >
                   {v.stock <= 5 ? "Low" : "OK"}
                 </span>
+                <button
+                  type="button"
+                  onClick={() => setPendingVariantDelete(v.key)}
+                  disabled={isSaving}
+                  aria-label={`Delete variant ${v.name || v.sku || ""}`.trim()}
+                  className="col-span-2 inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50 sm:col-span-1 sm:ml-auto sm:min-h-9"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </button>
               </div>
             ))}
           </div>
         )}
+        <p className="mt-3 text-xs text-neutral-400">
+          Added and removed variants are applied when you press Save Changes.
+          Leave Price empty to fall back to the product price.
+        </p>
       </div>
 
       <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6">
@@ -591,6 +665,24 @@ export function ProductEditForm({ product }: ProductEditFormProps) {
         busy={isDeleting}
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
+      />
+
+      <ConfirmDialog
+        open={pendingVariantDelete !== null}
+        title="Delete variant?"
+        message={
+          pendingVariantDelete
+            ? `"${
+                variants.find((v) => v.key === pendingVariantDelete)?.name ||
+                variants.find((v) => v.key === pendingVariantDelete)?.sku ||
+                "This variant"
+              }" will be removed. Press Save Changes to apply.`
+            : ""
+        }
+        confirmLabel="Delete"
+        destructive
+        onConfirm={handleDeleteVariant}
+        onCancel={() => setPendingVariantDelete(null)}
       />
     </div>
   );

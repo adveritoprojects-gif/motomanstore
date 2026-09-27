@@ -10,6 +10,8 @@ const SPEC: {
   compareAtPrice: number | null;
   sku: string;
   metaTitle: string;
+  imageCount?: number;
+  hero?: string;
   variants: { name: string; sku: string; price: number; compare?: number }[];
 }[] = [
   {
@@ -37,6 +39,8 @@ const SPEC: {
     compareAtPrice: 699,
     sku: "MOTO-FS-001",
     metaTitle: "Motoman Foam Sprayer | Car Wash Foam Can",
+    imageCount: 5,
+    hero: "/products/form-spray.jpeg",
     variants: [{ name: "1 Unit", sku: "MOTO-FS-001", price: 599, compare: 699 }],
   },
   {
@@ -106,7 +110,12 @@ async function main() {
     check(p.sku === spec.sku, `${spec.slug}: sku ${p.sku} != ${spec.sku}`);
     check(p.metaTitle === spec.metaTitle, `${spec.slug}: metaTitle mismatch`);
     check(Boolean(p.metaDescription?.trim()), `${spec.slug}: metaDescription empty`);
-    check(p.images.length === 4, `${spec.slug}: ${p.images.length} images != 4`);
+    const expectedImages = spec.imageCount ?? 4;
+    check(p.images.length === expectedImages, `${spec.slug}: ${p.images.length} images != ${expectedImages}`);
+    if (spec.hero) {
+      const hero = [...p.images].sort((a, b) => a.sortOrder - b.sortOrder)[0];
+      check(hero?.url === spec.hero, `${spec.slug}: hero ${hero?.url} != ${spec.hero}`);
+    }
     check(
       p.images.every((i) => i.url.startsWith("/products/")),
       `${spec.slug}: unexpected image url`

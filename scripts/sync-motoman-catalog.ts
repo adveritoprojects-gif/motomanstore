@@ -130,6 +130,7 @@ const PRODUCTS: SpecProduct[] = [
       "automotive cleaning accessories",
     ],
     images: [
+      { url: "/products/form-spray.jpeg", alt: "Motoman Foam Sprayer" },
       { url: "/products/sprayer-1.jpg", alt: "Motoman Foam Sprayer on a car bonnet" },
       { url: "/products/sprayer-2.jpg", alt: "Motoman Foam Sprayer close-up with car shampoo on a car bonnet" },
       { url: "/products/sprayer-3.jpg", alt: "Motoman Foam Sprayer in use, handheld" },
@@ -309,7 +310,7 @@ async function sync() {
       },
     });
 
-    // Images — upsert by URL, keep exactly the 4 spec images in order.
+    // Images — upsert by URL, keep exactly the spec images in order.
     const existingImages = [...existing.images].sort((a, b) => a.sortOrder - b.sortOrder);
     for (let i = 0; i < spec.images.length; i++) {
       const img = spec.images[i];

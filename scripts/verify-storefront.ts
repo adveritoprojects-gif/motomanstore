@@ -21,7 +21,7 @@ const expected: Record<
     skus: ["MOTO-MFG-1", "MOTO-MFG-2"],
   },
   "motoman-foam-sprayer": {
-    images: ["sprayer-1.jpg", "sprayer-2.jpg", "sprayer-3.jpg", "sprayer-4.jpg"],
+    images: ["form-spray.jpeg", "sprayer-1.jpg", "sprayer-2.jpg", "sprayer-3.jpg", "sprayer-4.jpg"],
     title: "Motoman Foam Sprayer | Car Wash Foam Can",
     description: "Buy Motoman Foam Sprayer at ₹599. Easy-to-use foam can for car and bike washing.",
     prices: ["699", "599"],
@@ -124,13 +124,15 @@ async function main() {
         fail(`${slug}: JSON-LD price ${product.offers?.price} unexpected`);
       if (!String(product.offers?.availability).includes("InStock"))
         fail(`${slug}: availability not InStock`);
-      if (!Array.isArray(product.image) || product.image.length !== 4)
-        fail(`${slug}: JSON-LD images ${Array.isArray(product.image) ? product.image.length : 0} != 4`);
+      if (!Array.isArray(product.image) || product.image.length !== spec.images.length)
+        fail(
+          `${slug}: JSON-LD images ${Array.isArray(product.image) ? product.image.length : 0} != ${spec.images.length}`
+        );
       if (!String(product.url).includes(`/products/${slug}`)) fail(`${slug}: JSON-LD url mismatch`);
       if (!product.sku) fail(`${slug}: JSON-LD sku missing`);
     }
 
-    // 4 gallery images render, all local and distinct
+    // gallery images render, all local and distinct
     for (const file of spec.images) {
       if (!html.includes(`products%2F${file}`))
         fail(`${slug}: gallery image ${file} not rendered`);

@@ -49,7 +49,7 @@ export const PRODUCTS: LegacyProduct[] = [
     description: "Handheld foam sprayer designed for convenient car and bike cleaning.",
     price: 599,
     compareAtPrice: 699,
-    image: "/products/sprayer-1.jpg",
+    image: "/products/form-spray.jpeg",
     category: "car-wash",
   },
   {

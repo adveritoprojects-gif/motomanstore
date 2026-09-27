@@ -159,10 +159,11 @@ async function main() {
       ],
       images: {
         create: [
-          { url: "/products/sprayer-1.jpg", alt: "Motoman Foam Sprayer on a car bonnet", sortOrder: 0 },
-          { url: "/products/sprayer-2.jpg", alt: "Motoman Foam Sprayer with car shampoo on a car bonnet", sortOrder: 1 },
-          { url: "/products/sprayer-3.jpg", alt: "Motoman Foam Sprayer in use, handheld", sortOrder: 2 },
-          { url: "/products/sprayer-4.jpg", alt: "Motoman Foam Sprayer nozzle close-up", sortOrder: 3 },
+          { url: "/products/form-spray.jpeg", alt: "Motoman Foam Sprayer", sortOrder: 0 },
+          { url: "/products/sprayer-1.jpg", alt: "Motoman Foam Sprayer on a car bonnet", sortOrder: 1 },
+          { url: "/products/sprayer-2.jpg", alt: "Motoman Foam Sprayer with car shampoo on a car bonnet", sortOrder: 2 },
+          { url: "/products/sprayer-3.jpg", alt: "Motoman Foam Sprayer in use, handheld", sortOrder: 3 },
+          { url: "/products/sprayer-4.jpg", alt: "Motoman Foam Sprayer nozzle close-up", sortOrder: 4 },
         ],
       },
       variants: {

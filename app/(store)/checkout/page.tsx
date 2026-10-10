@@ -68,7 +68,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
 
   const subtotal = getTotalPrice();
-  const shippingCost = subtotal >= 999 ? 0 : 99;
+  const shippingCost = 0;
   const total = subtotal + shippingCost;
 
   const {
@@ -463,19 +463,10 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-neutral-500">Shipping</span>
-                  <span className="text-sm font-medium text-neutral-700">
-                    {shippingCost === 0 ? (
-                      <span className="text-green-600">Free</span>
-                    ) : (
-                      formatPrice(shippingCost)
-                    )}
+                  <span className="text-sm font-medium text-green-600">
+                    Free
                   </span>
                 </div>
-                {shippingCost > 0 && (
-                  <p className="mb-2 text-xs text-neutral-400">
-                    Free shipping on orders above {formatPrice(999)}
-                  </p>
-                )}
                 <div className="flex items-center justify-between border-t border-neutral-200 pt-3">
                   <span className="text-base font-semibold text-neutral-950">
                     Total

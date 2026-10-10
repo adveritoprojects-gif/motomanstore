@@ -5,9 +5,6 @@ import { createRazorpayOrder } from "@/lib/razorpay";
 import { checkoutSchema, cartSchema } from "@/lib/validations";
 import type { CheckoutFormData, CartItemInput } from "@/lib/validations";
 
-const FREE_SHIPPING_THRESHOLD = 999;
-const SHIPPING_COST = 99;
-
 function generateOrderNumber(): string {
   const date = new Date();
   const datePart = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
@@ -115,7 +112,7 @@ export async function createOrder(
       });
     }
 
-    const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+    const shippingCost = 0;
     const total = subtotal + shippingCost;
     const orderNumber = generateOrderNumber();
 

@@ -172,7 +172,7 @@ export function CartDrawer() {
                 </span>
               </div>
               <p className="mb-4 text-xs text-neutral-400">
-                Shipping and taxes calculated at checkout
+                Free shipping on all orders
               </p>
               <Link
                 href="/checkout"

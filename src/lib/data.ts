@@ -220,7 +220,7 @@ export const BENEFITS: Benefit[] = [
   {
     icon: "truck",
     title: "Free Shipping",
-    description: "On orders above ₹999",
+    description: "On all orders",
   },
   {
     icon: "shield-check",

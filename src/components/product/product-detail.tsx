@@ -309,9 +309,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <span className="text-[11px] font-medium text-neutral-600">
                 Free Shipping
               </span>
-              <span className="text-[10px] text-neutral-400">
-                On orders above ₹999
-              </span>
+              <span className="text-[10px] text-neutral-400">On all orders</span>
             </div>
             <div className="flex flex-col items-center gap-1.5 text-center">
               <Shield className="h-5 w-5 text-neutral-600" aria-hidden="true" />

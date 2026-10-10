@@ -8,7 +8,7 @@ import { BRAND } from "@/lib/data";
 export const metadata: Metadata = pageMetadata({
   title: "Shipping Policy",
   description:
-    "Read the MOTOMAN shipping policy — how we pack and dispatch car care orders, plus free shipping details for orders above ₹999.",
+    "Read the MOTOMAN shipping policy — how we pack and dispatch car care orders, plus our free shipping details.",
   path: "/shipping-policy",
 });
 
@@ -31,8 +31,8 @@ export default function ShippingPolicyPage() {
             Free Shipping
           </Typography>
           <Typography variant="body">
-            We offer free shipping on orders above ₹999. Shipping charges for
-            smaller orders are shown at checkout before you pay.
+            We offer free shipping on all orders — no minimum purchase
+            required. Shipping is always shown as free at checkout.
           </Typography>
         </section>
 

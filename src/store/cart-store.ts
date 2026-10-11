@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { cartLineKey, changeQuantity, quantityCap } from "@/lib/cart/quantity";
 
 export interface CartItem {
   id: string;
@@ -18,9 +19,9 @@ interface CartState {
   items: CartItem[];
   isCartOpen: boolean;
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  removeItem: (id: string, variantId?: string) => void;
-  increaseQuantity: (id: string, variantId?: string) => void;
-  decreaseQuantity: (id: string, variantId?: string) => void;
+  removeItem: (id: string, variantId?: string) => boolean;
+  increaseQuantity: (id: string, variantId?: string) => string | null;
+  decreaseQuantity: (id: string, variantId?: string) => string | null;
   updateQuantity: (id: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
   openCart: () => void;
@@ -32,7 +33,7 @@ interface CartState {
 }
 
 function findItemKey(item: { id: string; variantId?: string }) {
-  return `${item.id}-${item.variantId ?? "default"}`;
+  return cartLineKey(item.id, item.variantId);
 }
 
 export const useCartStore = create<CartState>()(
@@ -48,21 +49,22 @@ export const useCartStore = create<CartState>()(
             (i) => findItemKey(i) === key
           );
           if (existing) {
-            const newQty = Math.min(
-              existing.quantity + quantity,
-              existing.maxStock ?? 999
-            );
+            const cap = quantityCap(existing.maxStock ?? item.maxStock);
+            const newQty = Math.min(existing.quantity + quantity, Math.max(cap, 1));
             return {
               items: state.items.map((i) =>
-                findItemKey(i) === key ? { ...i, quantity: newQty } : i
+                findItemKey(i) === key
+                  ? { ...i, ...item, quantity: Math.max(1, newQty) }
+                  : i
               ),
               isCartOpen: true,
             };
           }
+          const cap = quantityCap(item.maxStock);
           return {
             items: [
               ...state.items,
-              { ...item, quantity: Math.min(quantity, item.maxStock ?? 999) },
+              { ...item, quantity: Math.min(Math.max(quantity, 1), Math.max(cap, 1)) },
             ],
             isCartOpen: true,
           };
@@ -70,32 +72,41 @@ export const useCartStore = create<CartState>()(
       },
 
       removeItem: (id, variantId) => {
+        const key = findItemKey({ id, variantId });
+        const hadItem = get().items.some((item) => findItemKey(item) === key);
+        if (!hadItem) return false;
         set((state) => ({
-          items: state.items.filter(
-            (i) => findItemKey(i) !== findItemKey({ id, variantId })
-          ),
+          items: state.items.filter((item) => findItemKey(item) !== key),
         }));
+        return !get().items.some((item) => findItemKey(item) === key);
       },
 
       increaseQuantity: (id, variantId) => {
+        const key = findItemKey({ id, variantId });
+        const current = get().items.find((item) => findItemKey(item) === key);
+        if (!current) return "This item is no longer in your cart.";
+        const next = changeQuantity(current.quantity, "increase", current.maxStock);
+        if (!next.ok) return next.message;
         set((state) => ({
-          items: state.items.map((i) => {
-            if (findItemKey(i) !== findItemKey({ id, variantId })) return i;
-            const max = i.maxStock ?? 999;
-            return { ...i, quantity: Math.min(i.quantity + 1, max) };
-          }),
+          items: state.items.map((item) =>
+            findItemKey(item) === key ? { ...item, quantity: next.quantity } : item
+          ),
         }));
+        return null;
       },
 
       decreaseQuantity: (id, variantId) => {
+        const key = findItemKey({ id, variantId });
+        const current = get().items.find((item) => findItemKey(item) === key);
+        if (!current) return "This item is no longer in your cart.";
+        const next = changeQuantity(current.quantity, "decrease", current.maxStock);
+        if (!next.ok) return next.message;
         set((state) => ({
-          items: state.items
-            .map((i) => {
-              if (findItemKey(i) !== findItemKey({ id, variantId })) return i;
-              return { ...i, quantity: i.quantity - 1 };
-            })
-            .filter((i) => i.quantity > 0),
+          items: state.items.map((item) =>
+            findItemKey(item) === key ? { ...item, quantity: next.quantity } : item
+          ),
         }));
+        return null;
       },
 
       updateQuantity: (id, quantity, variantId) => {
@@ -105,11 +116,11 @@ export const useCartStore = create<CartState>()(
               ? state.items.filter(
                   (i) => findItemKey(i) !== findItemKey({ id, variantId })
                 )
-              : state.items.map((i) =>
-                  findItemKey(i) === findItemKey({ id, variantId })
-                    ? { ...i, quantity }
-                    : i
-                ),
+              : state.items.map((i) => {
+                  if (findItemKey(i) !== findItemKey({ id, variantId })) return i;
+                  const cap = Math.max(quantityCap(i.maxStock), 1);
+                  return { ...i, quantity: Math.min(Math.max(1, quantity), cap) };
+                }),
         }));
       },
 

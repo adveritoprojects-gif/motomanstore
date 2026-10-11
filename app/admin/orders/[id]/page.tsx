@@ -272,8 +272,12 @@ export default function AdminOrderDetailPage() {
                     <div className="min-w-0">
                       <StatusBadge status={p.status} type="payment" />
                       {p.method && (
-                        <span className="ml-2 text-xs text-neutral-400 capitalize">
-                          {p.method}
+                        <span className="ml-2 text-xs text-neutral-500">
+                          {p.method === "cod"
+                            ? "Cash on Delivery"
+                            : p.method === "razorpay"
+                              ? "Razorpay"
+                              : p.method}
                         </span>
                       )}
                     </div>

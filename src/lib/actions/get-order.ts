@@ -1,7 +1,6 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
 
 export type OrderWithItems = {
   id: string;
@@ -16,6 +15,8 @@ export type OrderWithItems = {
   customerPhone: string | null;
   notes: string | null;
   createdAt: Date;
+  paymentMethod: string | null;
+  paymentStatus: string | null;
   items: {
     id: string;
     name: string;
@@ -29,18 +30,17 @@ export async function getOrder(
   orderId: string
 ): Promise<OrderWithItems | null> {
   try {
-    const session = await getSession();
-
     const order = await prisma.order.findUnique({
       where: { id: orderId },
-      include: { items: true },
+      include: {
+        items: true,
+        payments: { orderBy: { createdAt: "desc" }, take: 1 },
+      },
     });
 
     if (!order) return null;
 
-    if (session?.role !== "admin" && order.customerEmail !== session?.email) {
-      return null;
-    }
+    const payment = order.payments[0];
 
     return {
       id: order.id,
@@ -55,6 +55,8 @@ export async function getOrder(
       customerPhone: order.customerPhone,
       notes: order.notes,
       createdAt: order.createdAt,
+      paymentMethod: payment?.method ?? null,
+      paymentStatus: payment?.status ?? null,
       items: order.items.map((item) => ({
         id: item.id,
         name: item.name,

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { releaseHeldInventory } from "@/lib/checkout/inventory";
 
 export async function getOrders(params?: {
   status?: string;
@@ -82,10 +83,15 @@ export async function updateOrderStatus(
     throw new Error("Invalid order status");
   }
 
-  const order = await prisma.order.update({
-    where: { id: orderId },
-    data: { status },
-    include: { items: true },
+  const order = await prisma.$transaction(async (tx) => {
+    if (status === "cancelled" || status === "refunded") {
+      await releaseHeldInventory(tx, orderId);
+    }
+    return tx.order.update({
+      where: { id: orderId },
+      data: { status },
+      include: { items: true },
+    });
   });
 
   revalidatePath("/admin/orders");

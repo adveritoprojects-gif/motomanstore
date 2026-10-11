@@ -5,6 +5,7 @@ import { CheckCircle, Package, Truck, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { getOrder } from "@/lib/actions";
 import { formatPrice } from "@/lib/utils";
+import { paymentMethodLabel } from "@/lib/checkout/price-cart";
 
 export const metadata: Metadata = {
   title: "Order Confirmed",
@@ -24,6 +25,8 @@ export default async function OrderSuccessPage({ params }: OrderSuccessPageProps
   }
 
   const address = order.shippingAddress;
+  const isCod = order.paymentMethod === "cod";
+  const isPaid = order.paymentStatus === "success" || order.status === "paid";
 
   return (
     <Container size="xl" className="py-8 md:py-12">
@@ -36,12 +39,14 @@ export default async function OrderSuccessPage({ params }: OrderSuccessPageProps
             </div>
           </div>
           <h1 className="mb-2 text-2xl font-bold text-neutral-950">
-            Order Confirmed!
+            {isPaid ? "Payment received" : "Order placed"}
           </h1>
           <p className="text-neutral-500">
-            {order.customerEmail
-              ? "Thank you for your purchase. We'll send you an email with the order details."
-              : "Thank you for your purchase."}
+            {isCod
+              ? "Your cash on delivery order is confirmed. Please pay when it arrives."
+              : isPaid
+                ? "Thank you. Your online payment was verified."
+                : "Your order is saved. Payment is not confirmed yet."}
           </p>
         </div>
 
@@ -61,13 +66,13 @@ export default async function OrderSuccessPage({ params }: OrderSuccessPageProps
               <p className="text-[10px] uppercase tracking-wider text-neutral-400">
                 Status
               </p>
-              <p className="mt-1 text-sm font-semibold text-green-600 capitalize">
+              <p className="mt-1 text-sm font-semibold text-neutral-950 capitalize">
                 {order.status}
               </p>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-neutral-400">
-                Amount Paid
+                {isPaid ? "Amount paid" : "Amount due"}
               </p>
               <p className="mt-1 text-sm font-semibold text-neutral-950">
                 {formatPrice(order.total)}
@@ -82,6 +87,11 @@ export default async function OrderSuccessPage({ params }: OrderSuccessPageProps
               </p>
             </div>
           </div>
+
+          <p className="mb-6 text-center text-sm text-neutral-600">
+            Payment: {paymentMethodLabel(order.paymentMethod)}
+            {order.paymentStatus ? ` · ${order.paymentStatus}` : ""}
+          </p>
 
           {/* Items */}
           <div className="mb-6 border-t border-neutral-200 pt-6">

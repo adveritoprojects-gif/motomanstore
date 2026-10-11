@@ -25,7 +25,9 @@ export function Navbar() {
   );
   const pathname = usePathname();
   const router = useRouter();
-  const totalItems = useCartStore((state) => state.getTotalItems());
+  const totalItems = useCartStore((state) =>
+    state.items.reduce((total, item) => total + item.quantity, 0),
+  );
 
   useEffect(() => {
     const handleScroll = () => {

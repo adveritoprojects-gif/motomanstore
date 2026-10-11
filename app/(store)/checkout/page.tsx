@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ShoppingBag,
   CreditCard,
+  Banknote,
   Loader2,
   Shield,
   Truck,
@@ -16,8 +17,20 @@ import { cn, formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cart-store";
 import { checkoutSchema } from "@/lib/validations";
 import type { CheckoutFormData } from "@/lib/validations";
-import { createOrder } from "@/lib/actions";
+import { createOrder, verifyPayment } from "@/lib/actions";
 import { Container } from "@/components/ui/container";
+
+const checkoutLock = { held: false };
+
+function claimCheckout(): boolean {
+  if (checkoutLock.held) return false;
+  checkoutLock.held = true;
+  return true;
+}
+
+function releaseCheckout() {
+  checkoutLock.held = false;
+}
 
 const INDIAN_STATES = [
   "Andhra Pradesh",
@@ -66,6 +79,15 @@ export default function CheckoutPage() {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "razorpay">("cod");
+  const [attemptId, setAttemptId] = useState(() => crypto.randomUUID());
+  const razorpayReady = Boolean(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
+
+  function choosePaymentMethod(method: "cod" | "razorpay") {
+    if (method === paymentMethod || isProcessing) return;
+    setPaymentMethod(method);
+    setAttemptId(crypto.randomUUID());
+  }
 
   const subtotal = getTotalPrice();
   const shippingCost = 0;
@@ -94,12 +116,24 @@ export default function CheckoutPage() {
   }
 
   const onSubmit = async (data: CheckoutFormData) => {
+    if (!claimCheckout()) return;
+    if (paymentMethod === "razorpay" && !razorpayReady) {
+      setError("Online payment is unavailable. Choose cash on delivery.");
+      releaseCheckout();
+      return;
+    }
+
     setIsProcessing(true);
     setError(null);
 
     try {
       const result = await createOrder(
-        data,
+        {
+          ...data,
+          country: data.country || "India",
+          paymentMethod,
+          attemptId,
+        },
         items.map((item) => ({
           id: item.id,
           name: item.name,
@@ -114,28 +148,43 @@ export default function CheckoutPage() {
       if (!result.success) {
         setError(result.error);
         setIsProcessing(false);
+        releaseCheckout();
         return;
       }
 
-      // Open Razorpay checkout
+      if (result.paymentMethod === "cod") {
+        clearCart();
+        releaseCheckout();
+        router.push(`/order-success/${result.orderId}`);
+        return;
+      }
+
       const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-      if (!razorpayKeyId) {
-        setError("Payment system not configured. Please try again later.");
+      if (!razorpayKeyId || typeof window.Razorpay !== "function") {
+        setError("Online payment is unavailable. Choose cash on delivery.");
         setIsProcessing(false);
+        releaseCheckout();
         return;
       }
 
-      const options = {
+      const razorpay = new window.Razorpay({
         key: razorpayKeyId,
         amount: String(Math.round(result.amount * 100)),
         currency: "INR",
         name: "MOTOMAN",
-        description: `Order #${result.orderId.slice(-8).toUpperCase()}`,
+        description: `Order ${result.orderNumber}`,
         order_id: result.razorpayOrderId,
-        handler: () => {
-          // Payment succeeded — redirect to success page
+        handler: async (response) => {
+          const verified = await verifyPayment(response);
+          if (!verified.success) {
+            setError(verified.error || "Payment could not be verified.");
+            setIsProcessing(false);
+            releaseCheckout();
+            return;
+          }
           clearCart();
-          router.push(`/order-success/${result.orderId}`);
+          releaseCheckout();
+          router.push(`/order-success/${verified.orderId}`);
         },
         prefill: {
           name: [data.firstName, data.lastName].filter(Boolean).join(" "),
@@ -151,17 +200,18 @@ export default function CheckoutPage() {
         },
         modal: {
           ondismiss: () => {
+            setError("Payment was cancelled. Your order is saved as unpaid. You can try again.");
             setIsProcessing(false);
+            releaseCheckout();
           },
           escape: false,
         },
-      };
-
-      const razorpay = new window.Razorpay(options);
+      });
       razorpay.open();
     } catch {
       setError("An unexpected error occurred. Please try again.");
       setIsProcessing(false);
+      releaseCheckout();
     }
   };
 
@@ -477,6 +527,69 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              <fieldset className="mt-6 space-y-2">
+                <legend className="mb-2 text-sm font-semibold text-neutral-950">
+                  Payment method
+                </legend>
+                <label
+                  className={cn(
+                    "flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border px-3 py-3",
+                    paymentMethod === "cod"
+                      ? "border-orange-500 bg-orange-50"
+                      : "border-neutral-200",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="cod"
+                    checked={paymentMethod === "cod"}
+                    onChange={() => choosePaymentMethod("cod")}
+                    className="mt-0.5 accent-orange-500"
+                  />
+                  <span>
+                    <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-900">
+                      <Banknote className="h-4 w-4 text-orange-500" />
+                      Cash on Delivery
+                    </span>
+                    <span className="mt-0.5 block text-xs text-neutral-500">
+                      Pay when the order arrives.
+                    </span>
+                  </span>
+                </label>
+                <label
+                  className={cn(
+                    "flex min-h-11 items-start gap-3 rounded-lg border px-3 py-3",
+                    !razorpayReady && "cursor-not-allowed opacity-60",
+                    razorpayReady && "cursor-pointer",
+                    paymentMethod === "razorpay"
+                      ? "border-orange-500 bg-orange-50"
+                      : "border-neutral-200",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="razorpay"
+                    checked={paymentMethod === "razorpay"}
+                    disabled={!razorpayReady}
+                    onChange={() => choosePaymentMethod("razorpay")}
+                    className="mt-0.5 accent-orange-500"
+                  />
+                  <span>
+                    <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-900">
+                      <CreditCard className="h-4 w-4 text-orange-500" />
+                      Pay online
+                    </span>
+                    <span className="mt-0.5 block text-xs text-neutral-500">
+                      {razorpayReady
+                        ? "UPI, cards, net banking, or wallets via Razorpay."
+                        : "Online payment is temporarily unavailable."}
+                    </span>
+                  </span>
+                </label>
+              </fieldset>
+
               {/* Error */}
               {error && (
                 <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
@@ -488,12 +601,17 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isProcessing}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-orange-600 active:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-6 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-orange-600 active:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isProcessing ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Processing...
+                  </>
+                ) : paymentMethod === "cod" ? (
+                  <>
+                    <Banknote className="h-4 w-4" />
+                    Place order · {formatPrice(total)}
                   </>
                 ) : (
                   <>
@@ -510,20 +628,9 @@ export default function CheckoutPage() {
                   <span className="text-[11px]">Secure</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <CreditCard className="h-4 w-4" />
-                  <span className="text-[11px]">Razorpay</span>
-                </div>
-                <div className="flex items-center gap-1.5">
                   <Truck className="h-4 w-4" />
-                  <span className="text-[11px]">Insured</span>
+                  <span className="text-[11px]">Free shipping</span>
                 </div>
-              </div>
-
-              {/* Payment methods */}
-              <div className="mt-4 text-center">
-                <p className="text-[10px] text-neutral-400">
-                  UPI / Cards / NetBanking / Wallets
-                </p>
               </div>
             </div>
           </div>

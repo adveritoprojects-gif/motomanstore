@@ -38,11 +38,6 @@ const nextConfig: NextConfig = {
       // temporary (307) so they can be replaced by real pages later
       // without fighting browser/CDN caches of a permanent redirect.
       {
-        source: "/cart",
-        destination: "/checkout",
-        permanent: false,
-      },
-      {
         source: "/account",
         destination: "/login",
         permanent: false,

@@ -34,9 +34,12 @@ interface OrderEmailData {
     postalCode: string;
     country: string;
   };
+  paymentNote?: string;
 }
 
 export async function sendOrderConfirmationEmail(data: OrderEmailData) {
+  if (!process.env.RESEND_API_KEY) return;
+
   const resend = getResend();
   const fromEmail = process.env.FROM_EMAIL || "orders@motoman.in";
 
@@ -79,6 +82,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
       <div style="padding: 32px 0;">
         <h2 style="color: #16a34a; margin: 0 0 8px;">Order Confirmed!</h2>
         <p style="color: #666; margin: 0 0 24px;">Thank you for your purchase, ${data.customerName}.</p>
+        ${data.paymentNote ? `<p style="color: #333; margin: 0 0 24px;">${data.paymentNote}</p>` : ""}
 
         <div style="background: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
           <p style="margin: 0 0 4px; color: #666; font-size: 14px;">Order Number</p>

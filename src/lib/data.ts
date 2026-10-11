@@ -236,11 +236,27 @@ export const CATEGORIES: LegacyCategory[] = [
 ];
 
 export const BUNDLE_ITEMS = [
-  "Car Shampoo",
-  "Foam Sprayer Bottle",
-  "1200 GSM Microfiber Cloth",
-  "Microfiber Gloves",
-];
+  {
+    name: "Car Shampoo",
+    image: "/products/shampoo-1.jpg",
+    alt: "Motoman Premium Car Shampoo 500 ml bottle",
+  },
+  {
+    name: "Foam Sprayer Bottle",
+    image: "/products/form-spray.jpeg",
+    alt: "Motoman foam sprayer with a black handle and smoky transparent tank",
+  },
+  {
+    name: "1200 GSM Microfiber Cloth",
+    image: "/products/mf1200-1.jpg",
+    alt: "Motoman 1200 GSM premium microfiber cloth",
+  },
+  {
+    name: "Blue Cleaning Glove",
+    image: "/products/gloves-1.jpg",
+    alt: "Motoman blue chenille microfiber cleaning glove",
+  },
+] as const;
 
 export interface Benefit {
   icon: string;

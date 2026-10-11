@@ -17,11 +17,25 @@ type Order = {
   orderNumber: string;
   customerName: string;
   customerEmail: string;
+  customerPhone?: string | null;
   total: number;
   status: string;
   createdAt: string;
   items?: { quantity: number }[];
+  payments?: { method: string | null; status: string }[];
 };
+
+function paymentLabel(order: Order): string {
+  const payment = order.payments?.[0];
+  if (!payment) return "—";
+  const method =
+    payment.method === "cod"
+      ? "COD"
+      : payment.method === "razorpay"
+        ? "Razorpay"
+        : payment.method || "Online";
+  return `${method} · ${payment.status}`;
+}
 
 const STATUS_FILTERS = [
   { value: "all", label: "All" },
@@ -96,6 +110,13 @@ export default function AdminOrdersPage() {
       label: "Amount",
       render: (item: Order) => (
         <span className="font-semibold">{formatPrice(item.total)}</span>
+      ),
+    },
+    {
+      key: "payment",
+      label: "Payment",
+      render: (item: Order) => (
+        <span className="text-xs text-neutral-600">{paymentLabel(item)}</span>
       ),
     },
     {
@@ -176,8 +197,9 @@ export default function AdminOrdersPage() {
                         {item.customerName}
                       </p>
                       <p className="truncate text-xs text-neutral-400">
-                        {item.customerEmail}
+                        {item.customerEmail || item.customerPhone || "No contact"}
                       </p>
+                      <p className="mt-0.5 text-xs text-neutral-500">{paymentLabel(item)}</p>
                     </div>
                     <StatusBadge status={item.status} />
                   </div>

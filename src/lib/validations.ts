@@ -32,6 +32,13 @@ export const checkoutSchema = z.object({
 
 export type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
+export const checkoutRequestSchema = checkoutSchema.extend({
+  paymentMethod: z.enum(["cod", "razorpay"]),
+  attemptId: z.string().uuid("Checkout session is invalid. Please try again."),
+});
+
+export type CheckoutRequestData = z.infer<typeof checkoutRequestSchema>;
+
 // ─── Cart Item (for server-side validation) ─────────────
 
 export const cartItemSchema = z.object({

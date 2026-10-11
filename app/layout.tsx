@@ -10,14 +10,14 @@ const googleSans = Google_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   fallback: ["Arial", "Helvetica Neue", "sans-serif"],
-  adjustFontFallback: false,
+  display: "swap",
 });
 
 const googleSansDisplay = Google_Sans_Flex({
   variable: "--font-google-sans-display",
   subsets: ["latin"],
   fallback: ["Arial", "Helvetica Neue", "sans-serif"],
-  adjustFontFallback: false,
+  display: "swap",
 });
 
 const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://motoman.in").replace(/\/$/, "");

@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import { Prisma } from "@prisma/client";
+import { HOMEPAGE_COMBO_SLUGS } from "@/lib/data";
 
 // ─── Product Queries ────────────────────────────────────
 
@@ -205,16 +206,19 @@ export async function getBestSellers(limit = 5) {
  * other product they are full catalog rows, so they are priced, stocked and
  * edited from the admin panel.
  */
-export async function getComboOffers(limit = 4) {
-  return prisma.product.findMany({
-    where: { tags: { has: "combo" }, inStock: true },
+export async function getComboOffers() {
+  const products = await prisma.product.findMany({
+    where: { slug: { in: [...HOMEPAGE_COMBO_SLUGS] }, inStock: true },
     include: {
       images: { orderBy: { sortOrder: "asc" as const } },
       category: true,
       variants: { orderBy: { price: "asc" as const } },
     },
-    orderBy: [{ featured: "desc" }, { createdAt: "asc" }],
-    take: limit,
+  });
+  const bySlug = new Map(products.map((product) => [product.slug, product]));
+  return HOMEPAGE_COMBO_SLUGS.flatMap((slug) => {
+    const product = bySlug.get(slug);
+    return product ? [product] : [];
   });
 }
 

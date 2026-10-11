@@ -21,7 +21,13 @@ interface ProductCardProduct {
   category?: { name: string; slug: string } | string | null;
   badge?: string;
   tags?: string[];
-  variants?: { name: string; size?: string | null; stock?: number }[];
+  variants?: {
+    id?: string;
+    name: string;
+    size?: string | null;
+    stock?: number;
+    price?: number;
+  }[];
 }
 
 interface ProductCardProps {
@@ -70,12 +76,15 @@ function getQuantityLabel(product: ProductCardProduct): string | null {
   return variant.size || variant.name || null;
 }
 
-/** "₹140 OFF" when the product is actually discounted. */
+/** "32% OFF" when the product is actually discounted. */
 function getDiscountLabel(product: ProductCardProduct): string | null {
   if (!product.compareAtPrice || product.compareAtPrice <= product.price) {
     return null;
   }
-  return `${formatPrice(product.compareAtPrice - product.price)} OFF`;
+  const percent = Math.round(
+    ((product.compareAtPrice - product.price) / product.compareAtPrice) * 100
+  );
+  return `${percent}% OFF`;
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
@@ -92,11 +101,16 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    const variant = product.variants?.[0];
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: variant?.price ?? product.price,
       image: imageSrc,
+      variantId: variant?.id,
+      variantName: variant?.name,
+      size: variant?.size || undefined,
+      maxStock: variant?.stock,
     });
   };
 
@@ -145,7 +159,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
                 alt={imageAlt}
                 fill
                 className="object-contain transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                sizes="(max-width: 1024px) 50vw, 33vw"
               />
             ) : (
               <div className="flex h-24 w-24 items-center justify-center rounded-xl bg-neutral-100">

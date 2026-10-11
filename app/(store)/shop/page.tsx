@@ -5,6 +5,8 @@ import { Typography } from "@/components/ui/typography";
 import { getProducts, getCategories } from "@/lib/queries";
 import { ShopContent } from "@/components/shop/shop-content";
 
+export const revalidate = 120;
+
 export const metadata: Metadata = {
   title: "Shop Car Care & Detailing Products",
   description:

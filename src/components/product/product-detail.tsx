@@ -202,7 +202,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           </div>
 
           {/* Description */}
-          <p className="mb-6 text-sm leading-relaxed text-neutral-600">
+          <p className="mb-6 whitespace-pre-line text-sm leading-relaxed text-neutral-600">
             {product.description}
           </p>
 

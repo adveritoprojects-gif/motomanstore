@@ -12,6 +12,8 @@ import {
 } from "@/lib/seo/metadata";
 import { absoluteImage, SITE_NAME } from "@/lib/seo/site";
 
+export const revalidate = 120;
+
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }

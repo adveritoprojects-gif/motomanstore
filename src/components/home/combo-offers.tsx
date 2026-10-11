@@ -35,16 +35,15 @@ export function ComboOffers({ products: propProducts }: ComboOffersProps) {
         }));
 
   return (
-    <section className="bg-white py-14 md:py-20">
+    <section className="bg-neutral-50 py-14 md:py-20">
       <div className="mx-auto max-w-[1280px] px-5 md:px-6">
-        {/* Header */}
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-neutral-950 md:text-3xl">
               Combo Offers
             </h2>
             <p className="mt-2 text-sm text-neutral-500">
-              Bundle more, pay less — multi-packs priced for every detailer.
+              Washing kits with the products you need in one pack.
             </p>
           </div>
           <Link
@@ -55,19 +54,9 @@ export function ComboOffers({ products: propProducts }: ComboOffersProps) {
           </Link>
         </div>
 
-        {/* Product Grid — the last card spans the full row on small screens
-            so a lone combo never renders as a narrow half-width tile. */}
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-5">
-          {products.map((product, i) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              className={
-                i === products.length - 1 && products.length % 2 === 1
-                  ? "col-span-2 md:col-span-1"
-                  : undefined
-              }
-            />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </div>

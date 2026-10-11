@@ -75,12 +75,39 @@ const SPEC: {
     variants: [{ name: "Pack of 4", sku: "MOTO-MF-350-4", price: 320 }],
   },
   {
-    slug: "motoman-glass-cleaning-microfiber-cloth",
-    price: 399,
-    compareAtPrice: null,
+    slug: "motoman-glass-cleaning-microfiber-cloth-set-of-4",
+    price: 339,
+    compareAtPrice: 500,
     sku: "MOTO-GLASS-MF-4",
-    metaTitle: "Motoman Glass Cleaning Microfiber Cloth Set of 4",
-    variants: [{ name: "Set of 4", sku: "MOTO-GLASS-MF-4", price: 399 }],
+    metaTitle: "Motoman Glass Cleaning Microfiber Cloth Set of 4 | Motoman Store",
+    imageCount: 2,
+    variants: [
+      { name: "Set of 4", sku: "MOTO-GLASS-MF-4", price: 339, compare: 500 },
+    ],
+  },
+  {
+    slug: "motoman-350-gsm-microfiber-cloth-set-of-4",
+    price: 399,
+    compareAtPrice: 499,
+    sku: "MOTO-MF-350-S4",
+    metaTitle: "Motoman 350 GSM Microfiber Cloth Set of 4 | Motoman Store",
+    imageCount: 2,
+    hero: "/products/motoman-350gsm-microfiber-set-4.webp",
+    variants: [
+      { name: "Set of 4", sku: "MOTO-MF-350-S4", price: 399, compare: 499 },
+    ],
+  },
+  {
+    slug: "motoman-microfiber-cleaning-gloves-set-of-2",
+    price: 329,
+    compareAtPrice: 499,
+    sku: "MOTO-MFG-S2",
+    metaTitle: "Motoman Microfiber Cleaning Gloves Set of 2 | Motoman Store",
+    imageCount: 1,
+    hero: "/products/motoman-microfiber-cleaning-gloves-set-2.webp",
+    variants: [
+      { name: "Set of 2", sku: "MOTO-MFG-S2", price: 329, compare: 499 },
+    ],
   },
 ];
 
@@ -112,6 +139,27 @@ const COMBO_SPEC: {
     compareAtPrice: null,
     variantSku: "MOTO-CMB-MF680-3",
     pieces: "3 Pieces",
+  },
+  {
+    slug: "motoman-complete-car-care-combo",
+    price: 1299,
+    compareAtPrice: null,
+    variantSku: "MOTO-CMB-CARE",
+    pieces: "1 Combo",
+  },
+  {
+    slug: "motoman-foam-can-car-shampoo-combo",
+    price: 699,
+    compareAtPrice: null,
+    variantSku: "MOTO-CMB-FOAM",
+    pieces: "1 Combo",
+  },
+  {
+    slug: "motoman-shampoo-microfiber-combo",
+    price: 599,
+    compareAtPrice: null,
+    variantSku: "MOTO-CMB-KIT",
+    pieces: "1 Combo",
   },
 ];
 

@@ -51,13 +51,32 @@ const expected: Record<
     prices: ["320"],
     skus: ["MOTO-MF-350-4"],
   },
-  "motoman-glass-cleaning-microfiber-cloth": {
-    images: ["glass-1.jpg", "glass-2.jpg", "glass-3.jpg", "glass-4.jpg"],
-    title: "Motoman Glass Cleaning Microfiber Cloth Set of 4",
+  "motoman-glass-cleaning-microfiber-cloth-set-of-4": {
+    images: ["glass-cloth-1.jpg", "glass-cloth-2.jpg"],
+    title: "Motoman Glass Cleaning Microfiber Cloth Set of 4 | Motoman Store",
     description:
-      "Buy Motoman glass cleaning microfiber cloth set of 4 for car windshield, glass and mirror cleaning.",
-    prices: ["399"],
+      "Shop Motoman Glass Cleaning Microfiber Cloth Set of 4 for automotive glass care. Get the set for ₹339, reduced from ₹500.",
+    prices: ["500", "339"],
     skus: ["MOTO-GLASS-MF-4"],
+  },
+  "motoman-350-gsm-microfiber-cloth-set-of-4": {
+    images: [
+      "motoman-350gsm-microfiber-set-4.webp",
+      "motoman-350gsm-microfiber-red-cloth.webp",
+    ],
+    title: "Motoman 350 GSM Microfiber Cloth Set of 4 | Motoman Store",
+    description:
+      "Shop the Motoman 350 GSM Microfiber Cloth Set of 4 in red, green, blue and pink. Get four cloths for ₹399, reduced from ₹499.",
+    prices: ["499", "399"],
+    skus: ["MOTO-MF-350-S4"],
+  },
+  "motoman-microfiber-cleaning-gloves-set-of-2": {
+    images: ["motoman-microfiber-cleaning-gloves-set-2.webp"],
+    title: "Motoman Microfiber Cleaning Gloves Set of 2 | Motoman Store",
+    description:
+      "Shop Motoman Microfiber Cleaning Gloves Set of 2 in blue. Two chenille cleaning gloves for ₹329, reduced from ₹499.",
+    prices: ["499", "329"],
+    skus: ["MOTO-MFG-S2"],
   },
   "microfiber-gloves-combo-2": {
     images: ["gloves-1.jpg", "gloves-2.jpg"],
@@ -82,6 +101,30 @@ const expected: Record<
       "Buy the Motoman 680 GSM Microfiber Cloth 3 piece combo at ₹310. Three premium microfiber cloths for cleaning and detailing.",
     prices: ["310"],
     skus: ["MOTO-CMB-MF680-3"],
+  },
+  "motoman-complete-car-care-combo": {
+    images: ["motoman-complete-car-care-combo.webp"],
+    title: "Complete Car Care Combo | Motoman Store",
+    description:
+      "Motoman Complete Car Care Combo at ₹1,299. Includes a foam sprayer, 500 ml shampoo, 1200 GSM microfiber cloth, and a blue cleaning glove.",
+    prices: ["1299"],
+    skus: ["MOTO-CMB-CARE"],
+  },
+  "motoman-foam-can-car-shampoo-combo": {
+    images: ["motoman-foam-can-shampoo-combo.webp"],
+    title: "Foam Can + Car Shampoo Combo | Motoman Store",
+    description:
+      "Motoman Foam Can and Car Shampoo combo at ₹699. Includes a foam sprayer and 500 ml Premium Car Shampoo.",
+    prices: ["699"],
+    skus: ["MOTO-CMB-FOAM"],
+  },
+  "motoman-shampoo-microfiber-combo": {
+    images: ["motoman-shampoo-microfiber-combo.webp"],
+    title: "Car Shampoo + Microfiber Cleaning Kit | Motoman Store",
+    description:
+      "Motoman Car Shampoo and Microfiber Cleaning Kit at ₹599. Includes 500 ml shampoo, a microfiber cloth, and a blue cleaning glove.",
+    prices: ["599"],
+    skus: ["MOTO-CMB-KIT"],
   },
 };
 
@@ -108,6 +151,11 @@ function jsonLdBlocks(html: string): JsonLd[] {
     }
   }
   return out;
+}
+
+/** Match a product URL without treating a longer slug as the shorter one. */
+function linksToProduct(html: string, slug: string): boolean {
+  return new RegExp(`/products/${slug}(?:["'?<#]|$)`).test(html);
 }
 
 async function main() {
@@ -148,10 +196,13 @@ async function main() {
         fail(`${slug}: JSON-LD price ${product.offers?.price} unexpected`);
       if (!String(product.offers?.availability).includes("InStock"))
         fail(`${slug}: availability not InStock`);
-      if (!Array.isArray(product.image) || product.image.length !== spec.images.length)
-        fail(
-          `${slug}: JSON-LD images ${Array.isArray(product.image) ? product.image.length : 0} != ${spec.images.length}`
-        );
+      const jsonLdImages = Array.isArray(product.image)
+        ? product.image
+        : product.image
+          ? [product.image]
+          : [];
+      if (jsonLdImages.length !== spec.images.length)
+        fail(`${slug}: JSON-LD images ${jsonLdImages.length} != ${spec.images.length}`);
       if (!String(product.url).includes(`/products/${slug}`)) fail(`${slug}: JSON-LD url mismatch`);
       if (!product.sku) fail(`${slug}: JSON-LD sku missing`);
     }
@@ -166,15 +217,25 @@ async function main() {
   // Listing pages
   const shop = await fetch(`${BASE}/shop`, { cache: "no-store" });
   const shopHtml = await shop.text();
-  const shopProducts = Object.keys(expected).filter((s) => shopHtml.includes(`/products/${s}`));
-  if (shopProducts.length < 7) fail(`/shop lists ${shopProducts.length}/7 products`);
+  const expectedSlugs = Object.keys(expected);
+  const shopProducts = expectedSlugs.filter((s) => linksToProduct(shopHtml, s));
+  if (shopProducts.length < expectedSlugs.length)
+    fail(`/shop lists ${shopProducts.length}/${expectedSlugs.length} products`);
 
   const cat = await fetch(`${BASE}/categories/microfiber`, { cache: "no-store" });
   const catHtml = await cat.text();
-  const catCount = ["motoman-1200-gsm-microfiber-cloth", "motoman-680-gsm-microfiber-cloth",
-    "motoman-350-gsm-microfiber-cloth-pack-4", "motoman-microfiber-cleaning-gloves",
-    "motoman-glass-cleaning-microfiber-cloth"].filter((s) => catHtml.includes(`/products/${s}`)).length;
-  if (catCount < 5) fail(`/categories/microfiber lists ${catCount}/5 products`);
+  const microfiberSlugs = [
+    "motoman-1200-gsm-microfiber-cloth",
+    "motoman-680-gsm-microfiber-cloth",
+    "motoman-350-gsm-microfiber-cloth-pack-4",
+    "motoman-350-gsm-microfiber-cloth-set-of-4",
+    "motoman-microfiber-cleaning-gloves",
+    "motoman-microfiber-cleaning-gloves-set-of-2",
+    "motoman-glass-cleaning-microfiber-cloth-set-of-4",
+  ];
+  const catCount = microfiberSlugs.filter((s) => linksToProduct(catHtml, s)).length;
+  if (catCount < microfiberSlugs.length)
+    fail(`/categories/microfiber lists ${catCount}/${microfiberSlugs.length} products`);
 
   const home = await fetch(`${BASE}/`, { cache: "no-store" });
   const homeHtml = await home.text();
@@ -183,14 +244,14 @@ async function main() {
   const sitemap = await fetch(`${BASE}/sitemap.xml`, { cache: "no-store" });
   const smXml = await sitemap.text();
   for (const slug of Object.keys(expected)) {
-    if (!smXml.includes(`/products/${slug}`)) fail(`sitemap missing ${slug}`);
+    if (!linksToProduct(smXml, slug)) fail(`sitemap missing ${slug}`);
   }
 
   const feed = await fetch(`${BASE}/api/google-merchant-feed`, { cache: "no-store" });
   const feedXml = await feed.text();
   const items = (feedXml.match(/<item>/g) || []).length;
-  if (items < 7) fail(`merchant feed has ${items} items < 7`);
-  for (const sku of ["MOTO-CS-500", "MOTO-MFG-1", "MOTO-MF-1200-1", "MOTO-GLASS-MF-4", "MOTO-CMB-GLV-2"]) {
+  if (items < expectedSlugs.length) fail(`merchant feed has ${items} items < ${expectedSlugs.length}`);
+  for (const sku of ["MOTO-CS-500", "MOTO-MFG-1", "MOTO-MF-1200-1", "MOTO-GLASS-MF-4", "MOTO-MF-350-S4", "MOTO-MFG-S2", "MOTO-CMB-GLV-2"]) {
     if (!feedXml.includes(sku)) fail(`merchant feed missing sku ${sku}`);
   }
 

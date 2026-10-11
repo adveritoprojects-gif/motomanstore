@@ -9,6 +9,8 @@ import { TestimonialSection } from "@/components/home/testimonial-section";
 import { getBestSellers, getComboOffers, getCategories } from "@/lib/queries";
 import { pageMetadata } from "@/lib/seo/metadata";
 
+export const revalidate = 120;
+
 export const metadata: Metadata = pageMetadata({
   title: "Car Care & Detailing Products Online",
   absoluteTitle: "Car Care & Detailing Products Online | MOTOMAN",
@@ -26,7 +28,7 @@ export default async function HomePage() {
     [categories, bestSellers, comboOffers] = await Promise.all([
       getCategories(),
       getBestSellers(5),
-      getComboOffers(4),
+      getComboOffers(),
     ]);
   } catch {
     // Database not available

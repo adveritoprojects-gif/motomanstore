@@ -12,6 +12,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60 * 60,
     remotePatterns: [
       {
         protocol: "https",
@@ -97,7 +98,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/products/glass-cleaning-microfiber-cloth",
-        destination: "/products/motoman-glass-cleaning-microfiber-cloth",
+        destination: "/products/motoman-glass-cleaning-microfiber-cloth-set-of-4",
         permanent: true,
       },
     ];

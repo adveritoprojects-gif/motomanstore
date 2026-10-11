@@ -18,11 +18,13 @@ export function Hero() {
       <div className="relative hidden lg:block">
         {/* Background Image - Full Width */}
         <Image
-          src="/hero image.png"
+          src="/hero.webp"
           alt=""
           fill
-          className="object-cover object-center"
           priority
+          quality={75}
+          sizes="100vw"
+          className="object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/80 to-transparent" />
 
@@ -85,11 +87,13 @@ export function Hero() {
         <div className="relative min-h-[480px] overflow-hidden">
           {/* Background Image */}
           <Image
-            src="/hero image.png"
+            src="/hero.webp"
             alt=""
             fill
-            className="object-cover object-center"
             priority
+            quality={75}
+            sizes="100vw"
+            className="object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/80 via-neutral-950/60 to-neutral-950" />
 

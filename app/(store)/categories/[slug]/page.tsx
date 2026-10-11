@@ -9,6 +9,8 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { itemListJsonLd } from "@/lib/seo/json-ld";
 import { truncate } from "@/lib/seo/metadata";
 
+export const revalidate = 120;
+
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ sort?: string; page?: string }>;

@@ -5,6 +5,15 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 
+/** Refresh public catalog pages after an admin product change. */
+function revalidateCatalog(slug?: string) {
+  revalidatePath("/");
+  revalidatePath("/shop");
+  revalidatePath("/categories");
+  revalidatePath("/sitemap.xml");
+  if (slug) revalidatePath(`/products/${slug}`);
+}
+
 export async function getProducts(params?: {
   search?: string;
   categoryId?: string;
@@ -128,7 +137,7 @@ export async function createProduct(data: {
   });
 
   revalidatePath("/admin/products");
-  revalidatePath("/shop");
+  revalidateCatalog();
   return product;
 }
 
@@ -162,8 +171,7 @@ export async function updateProduct(
   });
 
   revalidatePath("/admin/products");
-  revalidatePath(`/products/${product.slug}`);
-  revalidatePath("/shop");
+  revalidateCatalog(product.slug);
   return product;
 }
 
@@ -172,7 +180,7 @@ export async function deleteProduct(id: string) {
 
   await prisma.product.delete({ where: { id } });
   revalidatePath("/admin/products");
-  revalidatePath("/shop");
+  revalidateCatalog();
 }
 
 export async function addProductImage(
@@ -196,15 +204,25 @@ export async function addProductImage(
     },
   });
 
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { slug: true },
+  });
   revalidatePath("/admin/products");
+  revalidateCatalog(product?.slug);
   return image;
 }
 
 export async function deleteProductImage(imageId: string) {
   await requireAdmin();
 
-  await prisma.productImage.delete({ where: { id: imageId } });
+  const image = await prisma.productImage.delete({
+    where: { id: imageId },
+    select: { product: { select: { slug: true } } },
+  });
+
   revalidatePath("/admin/products");
+  revalidateCatalog(image.product.slug);
 }
 
 export type VariantInput = {
@@ -306,9 +324,8 @@ export async function saveProductVariants(
       return rows;
     });
 
-    revalidatePath("/admin/products");
-    revalidatePath(`/products/${product.slug}`);
-    revalidatePath("/shop");
+  revalidatePath("/admin/products");
+  revalidateCatalog(product.slug);
     return { ok: true, variants: saved };
   } catch (error) {
     if (

@@ -245,36 +245,119 @@ const PRODUCTS: SpecProduct[] = [
     ],
   },
   {
-    slug: "motoman-glass-cleaning-microfiber-cloth",
-    name: "Motoman Glass Cleaning Microfiber Cloth",
+    slug: "motoman-glass-cleaning-microfiber-cloth-set-of-4",
+    name: "Motoman Glass Cleaning Microfiber Cloth — Set of 4",
     sku: "MOTO-GLASS-MF-4",
     description:
-      "Specialized microfiber cloth designed for streak-free glass and windshield cleaning. Set of 4.",
-    price: 399,
-    compareAtPrice: null,
-    metaTitle: "Motoman Glass Cleaning Microfiber Cloth Set of 4",
+      "Keep your automotive glass clean and clear with the Motoman Glass Cleaning Microfiber Cloth Set of 4. Designed for everyday car-care use, these soft microfiber cloths help remove dust, fingerprints, and light dirt from glass surfaces.\n\nKey Features\n- Set of 4 microfiber cloths\n- Soft microfiber texture\n- Helps achieve a streak-free finish\n- Absorbent material\n- Suitable for automotive glass cleaning\n- Useful for cars, bikes, and scooters\n- Reusable and easy to maintain",
+    price: 339,
+    compareAtPrice: 500,
+    metaTitle: "Motoman Glass Cleaning Microfiber Cloth Set of 4 | Motoman Store",
     metaDescription:
-      "Buy Motoman glass cleaning microfiber cloth set of 4 for car windshield, glass and mirror cleaning.",
+      "Shop Motoman Glass Cleaning Microfiber Cloth Set of 4 for automotive glass care. Get the set for ₹339, reduced from ₹500.",
+    categorySlug: "microfiber",
+    featured: true,
+    isNew: false,
+    tags: [
+      "glass cleaning microfiber cloth",
+      "glass cleaning cloth",
+      "microfiber cloth set of 4",
+      "car glass cleaning cloth",
+      "windshield cleaning cloth",
+      "streak free glass cloth",
+      "microfiber glass cloth",
+      "car cleaning cloth",
+      "microfiber cloth for car",
+      "bike glass cleaning cloth",
+    ],
+    images: [
+      { url: "/products/glass-cloth-1.jpg", alt: "Motoman Glass Cleaning Microfiber Cloth set of 4 folded grey cloths" },
+      { url: "/products/glass-cloth-2.jpg", alt: "Motoman glass cleaning microfiber cloth wiping a car window" },
+    ],
+    variants: [
+      { previousSkus: ["MTM-MF-006-4S"], name: "Set of 4", sku: "MOTO-GLASS-MF-4", price: 339, size: "Set of 4", stock: 75 },
+    ],
+  },
+  {
+    slug: "motoman-350-gsm-microfiber-cloth-set-of-4",
+    name: "Motoman 350 GSM Microfiber Cloth — Set of 4",
+    sku: "MOTO-MF-350-S4",
+    description:
+      "Keep your vehicle clean with the Motoman 350 GSM Microfiber Cloth Set of 4. These reusable microfiber cloths are suitable for everyday automotive cleaning and help remove dust, fingerprints, and light dirt from vehicle surfaces.",
+    price: 399,
+    compareAtPrice: 499,
+    metaTitle: "Motoman 350 GSM Microfiber Cloth Set of 4 | Motoman Store",
+    metaDescription:
+      "Shop the Motoman 350 GSM Microfiber Cloth Set of 4 in red, green, blue and pink. Get four cloths for ₹399, reduced from ₹499.",
     categorySlug: "microfiber",
     featured: false,
     isNew: true,
     tags: [
-      "glass cleaning microfiber cloth",
-      "glass cleaning cloth",
-      "windshield cleaning cloth",
-      "car glass cleaning cloth",
-      "streak free glass cloth",
-      "microfiber glass cloth",
-      "car windshield cloth",
+      "350 gsm microfiber cloth",
+      "microfiber cloth set of 4",
+      "car cleaning cloth",
+      "car microfiber cloth",
+      "automotive cleaning cloth",
+      "reusable microfiber cloth",
     ],
     images: [
-      { url: "/products/glass-1.jpg", alt: "Motoman glass cleaning microfiber cloth" },
-      { url: "/products/glass-2.jpg", alt: "Motoman glass cleaning microfiber cloth texture close-up" },
-      { url: "/products/glass-3.jpg", alt: "Motoman glass cleaning microfiber cloth cleaning a car windshield" },
-      { url: "/products/glass-4.jpg", alt: "Motoman glass cleaning microfiber cloth set of 4" },
+      {
+        url: "/products/motoman-350gsm-microfiber-set-4.webp",
+        alt: "Motoman 350 GSM microfiber cloth set of 4 in red, green, blue and pink",
+      },
+      {
+        url: "/products/motoman-350gsm-microfiber-red-cloth.webp",
+        alt: "Folded red Motoman 350 GSM microfiber cloth",
+      },
     ],
     variants: [
-      { previousSkus: ["MTM-MF-006-4S"], name: "Set of 4", sku: "MOTO-GLASS-MF-4", price: 399, size: "Set of 4", stock: 75 },
+      {
+        previousSkus: [],
+        name: "Set of 4",
+        sku: "MOTO-MF-350-S4",
+        price: 399,
+        size: "Set of 4",
+        stock: 80,
+      },
+    ],
+  },
+  {
+    slug: "motoman-microfiber-cleaning-gloves-set-of-2",
+    name: "Motoman Microfiber Cleaning Gloves — Set of 2",
+    sku: "MOTO-MFG-S2",
+    description:
+      "Make your vehicle-cleaning routine easier with Motoman Microfiber Cleaning Gloves. Their plush chenille microfiber texture helps lift dust and dirt during everyday car washing and cleaning. The glove-style design provides a convenient grip while cleaning vehicle surfaces.",
+    price: 329,
+    compareAtPrice: 499,
+    metaTitle: "Motoman Microfiber Cleaning Gloves Set of 2 | Motoman Store",
+    metaDescription:
+      "Shop Motoman Microfiber Cleaning Gloves Set of 2 in blue. Two chenille cleaning gloves for ₹329, reduced from ₹499.",
+    categorySlug: "microfiber",
+    featured: false,
+    isNew: true,
+    tags: [
+      "microfiber cleaning gloves",
+      "cleaning gloves set of 2",
+      "car cleaning gloves",
+      "car wash gloves",
+      "chenille microfiber glove",
+      "blue cleaning gloves",
+    ],
+    images: [
+      {
+        url: "/products/motoman-microfiber-cleaning-gloves-set-2.webp",
+        alt: "Blue Motoman microfiber cleaning glove on a white background",
+      },
+    ],
+    variants: [
+      {
+        previousSkus: [],
+        name: "Set of 2",
+        sku: "MOTO-MFG-S2",
+        price: 329,
+        size: "Set of 2",
+        stock: 70,
+      },
     ],
   },
   {
@@ -371,13 +454,97 @@ const PRODUCTS: SpecProduct[] = [
       { previousSkus: [], name: "3 Pieces", sku: "MOTO-CMB-MF680-3", price: 310, size: "3 Pieces", stock: 50 },
     ],
   },
+  {
+    slug: "motoman-complete-car-care-combo",
+    name: "Complete Car Care Combo",
+    sku: "MOTO-CMB-CARE",
+    description:
+      "Foam sprayer, 500 ml shampoo, 1200 GSM cloth, and a blue cleaning glove.",
+    price: 1299,
+    compareAtPrice: null,
+    metaTitle: "Complete Car Care Combo | Motoman Store",
+    metaDescription:
+      "Motoman Complete Car Care Combo at ₹1,299. Includes a foam sprayer, 500 ml shampoo, 1200 GSM microfiber cloth, and a blue cleaning glove.",
+    categorySlug: "car-wash",
+    featured: false,
+    isNew: false,
+    tags: ["combo", "combo offer", "car care combo", "car shampoo", "foam sprayer"],
+    images: [
+      {
+        url: "/products/motoman-complete-car-care-combo.webp",
+        alt: "Motoman complete car care combo with foam sprayer, blue shampoo, microfiber cloth, and cleaning glove",
+      },
+    ],
+    variants: [
+      { previousSkus: [], name: "Combo", sku: "MOTO-CMB-CARE", price: 1299, size: "1 Combo", stock: 40 },
+    ],
+  },
+  {
+    slug: "motoman-foam-can-car-shampoo-combo",
+    name: "Foam Can + Car Shampoo",
+    sku: "MOTO-CMB-FOAM",
+    description: "Foam sprayer and 500 ml Premium Car Shampoo.",
+    price: 699,
+    compareAtPrice: null,
+    metaTitle: "Foam Can + Car Shampoo Combo | Motoman Store",
+    metaDescription:
+      "Motoman Foam Can and Car Shampoo combo at ₹699. Includes a foam sprayer and 500 ml Premium Car Shampoo.",
+    categorySlug: "car-wash",
+    featured: false,
+    isNew: false,
+    tags: ["combo", "combo offer", "foam sprayer", "car shampoo"],
+    images: [
+      {
+        url: "/products/motoman-foam-can-shampoo-combo.webp",
+        alt: "Motoman foam sprayer and blue Premium Car Shampoo bottle",
+      },
+    ],
+    variants: [
+      { previousSkus: [], name: "Combo", sku: "MOTO-CMB-FOAM", price: 699, size: "1 Combo", stock: 40 },
+    ],
+  },
+  {
+    slug: "motoman-shampoo-microfiber-combo",
+    name: "Car Shampoo + Microfiber Cleaning Kit",
+    sku: "MOTO-CMB-KIT",
+    description:
+      "500 ml Premium Car Shampoo, a microfiber cloth, and a blue cleaning glove.",
+    price: 599,
+    compareAtPrice: null,
+    metaTitle: "Car Shampoo + Microfiber Cleaning Kit | Motoman Store",
+    metaDescription:
+      "Motoman Car Shampoo and Microfiber Cleaning Kit at ₹599. Includes 500 ml shampoo, a microfiber cloth, and a blue cleaning glove.",
+    categorySlug: "car-wash",
+    featured: false,
+    isNew: false,
+    tags: ["combo", "combo offer", "car shampoo", "microfiber cloth", "cleaning glove"],
+    images: [
+      {
+        url: "/products/motoman-shampoo-microfiber-combo.webp",
+        alt: "Motoman blue shampoo, microfiber cloth, and blue cleaning glove",
+      },
+    ],
+    variants: [
+      { previousSkus: [], name: "Combo", sku: "MOTO-CMB-KIT", price: 599, size: "1 Combo", stock: 40 },
+    ],
+  },
 ];
 
 async function sync() {
   const categories = await prisma.category.findMany();
   const bySlug = new Map(categories.map((c) => [c.slug, c]));
 
-  for (const spec of PRODUCTS) {
+  // `--only=<slug>` syncs a single product (used to add/update one product
+  // without re-applying the rest of the catalog).
+  const only = process.argv
+    .find((arg) => arg.startsWith("--only="))
+    ?.slice("--only=".length);
+  const specs = only ? PRODUCTS.filter((p) => p.slug === only) : PRODUCTS;
+  if (only && specs.length === 0) {
+    throw new Error(`No product in the catalog matches slug: ${only}`);
+  }
+
+  for (const spec of specs) {
     const category = bySlug.get(spec.categorySlug);
     if (!category) throw new Error(`Category not found: ${spec.categorySlug}`);
 

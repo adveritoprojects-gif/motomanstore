@@ -3,7 +3,8 @@ export const BRAND = {
   name: "MOTOMAN",
   tagline: "PREMIUM CAR CARE",
   slogan: "Drive Cleaner. Drive Better.",
-  description: "Professional car care products designed for a cleaner, shinier and longer-lasting drive.",
+  description:
+    "Professional car care products designed for a cleaner, shinier and longer-lasting drive.",
   email: "motoman@gmail.com",
   phone: "+91 89431 76189",
   address: "Payyannur, Kannur, Kerala , India",
@@ -46,7 +47,8 @@ export const PRODUCTS: LegacyProduct[] = [
     id: "2",
     name: "Motoman Foam Sprayer",
     slug: "motoman-foam-sprayer",
-    description: "Handheld foam sprayer designed for convenient car and bike cleaning.",
+    description:
+      "Handheld foam sprayer designed for convenient car and bike cleaning.",
     price: 599,
     compareAtPrice: 699,
     image: "/products/form-spray.jpeg",
@@ -206,7 +208,7 @@ export const CATEGORIES: LegacyCategory[] = [
     name: "Car Wash",
     slug: "car-wash",
     description: "Shampoos, foams & wash essentials",
-    image: "/categories/car-wash.jpg",
+    image: "/category/CarWash.png",
     productCount: 2,
   },
   {
@@ -214,7 +216,7 @@ export const CATEGORIES: LegacyCategory[] = [
     name: "Microfiber",
     slug: "microfiber",
     description: "Cloths, gloves & glass cleaning essentials",
-    image: "/categories/microfiber.jpg",
+    image: "/category/Microfiber.png",
     productCount: 7,
   },
   {
@@ -222,7 +224,7 @@ export const CATEGORIES: LegacyCategory[] = [
     name: "Exterior Care",
     slug: "exterior-care",
     description: "Polish, wax & paint protection",
-    image: "/categories/exterior.jpg",
+    image: "/category/exterior.jpg",
     productCount: 0,
   },
   {
@@ -230,7 +232,7 @@ export const CATEGORIES: LegacyCategory[] = [
     name: "Accessories",
     slug: "accessories",
     description: "Buckets, brushes & detailing tools",
-    image: "/categories/accessories.jpg",
+    image: "/category/accessories.jpg",
     productCount: 0,
   },
 ];
@@ -353,8 +355,7 @@ export const FOOTER_LINKS = {
     { href: "/terms-and-conditions", label: "Terms" },
   ],
   social: [
-    { href: "https://instagram.com", label: "Instagram", icon: "instagram" },
-    { href: "https://pinterest.com", label: "Pinterest", icon: "pin" },
-    { href: "https://youtube.com", label: "YouTube", icon: "youtube" },
+    { href: "https://www.instagram.com/motomanstore_?utm_source=ig_web_button_share_sheet&psln=ZDNlZDc0MzIxNw==", label: "Instagram", icon: "instagram" },
+    { href: "https://www.facebook.com/share/1DrgsVAhq9/?mibextid=wwXIfr", label: "facebook", icon: "facebook" },
   ],
 };

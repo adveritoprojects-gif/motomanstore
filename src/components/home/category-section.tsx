@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { CATEGORIES } from "@/lib/data";
 
@@ -25,6 +26,15 @@ function CategoryCard({ category }: { category: CategoryCardCategory }) {
     >
       {/* Background placeholder */}
       <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-transform duration-500 group-hover:scale-105" aria-hidden="true" />
+      {category.image && (
+        <Image
+          src={category.image}
+          alt=""
+          fill
+          sizes="(min-width: 768px) 25vw, 200px"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" aria-hidden="true" />
 
       {/* Content */}

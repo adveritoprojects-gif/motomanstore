@@ -22,7 +22,7 @@ async function main() {
       name: "Car Wash",
       slug: "car-wash",
       description: "Shampoos, foams & wash essentials for a spotless clean",
-      image: "/categories/car-wash.jpg",
+      image: "/category/CarWash.png",
       sortOrder: 1,
     },
   });
@@ -32,27 +32,27 @@ async function main() {
       name: "Microfiber",
       slug: "microfiber",
       description: "Premium cloths, mitts & drying towels",
-      image: "/categories/microfiber.jpg",
+      image: "/category/Microfiber.png",
       sortOrder: 2,
     },
   });
 
-  await prisma.category.create({
+  const ExteriorCare = await prisma.category.create({
     data: {
       name: "Exterior Care",
       slug: "exterior-care",
       description: "Polish, wax & paint protection",
-      image: "/categories/exterior.jpg",
+      image: "/category/exterior.jpg",
       sortOrder: 3,
     },
   });
 
-  await prisma.category.create({
+  const accessories = await prisma.category.create({
     data: {
       name: "Accessories",
       slug: "accessories",
       description: "Buckets, brushes & detailing tools",
-      image: "/categories/accessories.jpg",
+      image: "/category/accessories.jpg",
       sortOrder: 4,
     },
   });

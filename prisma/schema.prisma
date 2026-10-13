@@ -128,6 +128,8 @@ model Order {
   status          String       @default("pending") // pending | paid | processing | shipped | delivered | cancelled | refunded
   subtotal        Float
   shippingCost    Float        @default(0)
+  /// Flat Cash-on-Delivery handling charge (₹20). Always 0 for online payments.
+  codFee          Float        @default(0)
   total           Float
   shippingAddress Json
   customerEmail   String

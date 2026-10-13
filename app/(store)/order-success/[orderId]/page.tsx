@@ -139,6 +139,12 @@ export default async function OrderSuccessPage({ params }: OrderSuccessPageProps
                     : formatPrice(order.shippingCost)}
                 </span>
               </div>
+              {order.codFee > 0 && (
+                <div className="flex justify-between text-sm text-neutral-500">
+                  <span>COD Handling Fee</span>
+                  <span>{formatPrice(order.codFee)}</span>
+                </div>
+              )}
               <div className="mt-2 flex justify-between border-t border-neutral-200 pt-2">
                 <span className="font-semibold text-neutral-950">Total</span>
                 <span className="font-bold text-neutral-950">

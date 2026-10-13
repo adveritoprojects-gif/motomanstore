@@ -25,6 +25,8 @@ interface OrderEmailData {
   }[];
   subtotal: number;
   shippingCost: number;
+  /** COD handling charge. Omitted / zero for online payments. */
+  codFee?: number;
   total: number;
   shippingAddress: {
     address1: string;
@@ -110,6 +112,14 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
               <td colspan="2" style="padding: 8px 0; text-align: right; color: #666;">Shipping</td>
               <td style="padding: 8px 0; text-align: right;">${data.shippingCost === 0 ? "Free" : `₹${data.shippingCost.toLocaleString("en-IN")}`}</td>
             </tr>
+            ${
+              data.codFee
+                ? `<tr>
+              <td colspan="2" style="padding: 8px 0; text-align: right; color: #666;">COD Handling Fee</td>
+              <td style="padding: 8px 0; text-align: right;">₹${data.codFee.toLocaleString("en-IN")}</td>
+            </tr>`
+                : ""
+            }
             <tr style="border-top: 2px solid #333;">
               <td colspan="2" style="padding: 12px 0 0; text-align: right; font-weight: bold;">Total</td>
               <td style="padding: 12px 0 0; text-align: right; font-weight: bold; font-size: 18px;">₹${data.total.toLocaleString("en-IN")}</td>

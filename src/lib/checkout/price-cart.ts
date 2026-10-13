@@ -7,6 +7,41 @@ export interface CheckoutCartLine {
   price?: number;
 }
 
+/** Flat handling charge applied to Cash on Delivery orders only. */
+export const COD_HANDLING_FEE = 20;
+
+export type PaymentMethod = "cod" | "razorpay";
+
+/** COD adds a handling fee; online payments never do. */
+export function codHandlingFee(method: PaymentMethod): number {
+  return method === "cod" ? COD_HANDLING_FEE : 0;
+}
+
+export interface OrderTotals {
+  subtotal: number;
+  shippingCost: number;
+  codFee: number;
+  total: number;
+}
+
+/**
+ * Server-authoritative order totals. The COD handling fee is included in the
+ * total so the amount charged / recorded always matches what was displayed.
+ */
+export function orderTotals(
+  subtotal: number,
+  method: PaymentMethod,
+  shippingCost = 0,
+): OrderTotals {
+  const codFee = codHandlingFee(method);
+  return {
+    subtotal,
+    shippingCost,
+    codFee,
+    total: subtotal + shippingCost + codFee,
+  };
+}
+
 export interface CheckoutProductRecord {
   id: string;
   name: string;

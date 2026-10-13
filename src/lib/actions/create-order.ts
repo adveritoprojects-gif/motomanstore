@@ -1,11 +1,11 @@
 "use server";
 
 import type { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+import { prisma, TX_OPTIONS } from "@/lib/prisma";
 import { createRazorpayOrder } from "@/lib/razorpay";
 import { checkoutRequestSchema, cartSchema } from "@/lib/validations";
 import type { CheckoutRequestData, CartItemInput } from "@/lib/validations";
-import { paymentMethodAvailable, priceCart } from "@/lib/checkout/price-cart";
+import { orderTotals, paymentMethodAvailable, priceCart } from "@/lib/checkout/price-cart";
 import { InsufficientStockError, reserveInventory } from "@/lib/checkout/inventory";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 
@@ -52,6 +52,7 @@ async function notifyPlacedOrder(order: {
   customerEmail: string;
   subtotal: number;
   shippingCost: number;
+  codFee?: number;
   total: number;
   shippingAddress: unknown;
   items: { name: string; quantity: number; price: number }[];
@@ -67,6 +68,7 @@ async function notifyPlacedOrder(order: {
       items: order.items,
       subtotal: order.subtotal,
       shippingCost: order.shippingCost,
+      codFee: order.codFee,
       total: order.total,
       paymentNote: order.paymentNote,
       shippingAddress: {
@@ -132,7 +134,9 @@ export async function createOrder(
     }
 
     const shippingCost = 0;
-    const total = priced.subtotal + shippingCost;
+    // COD adds the flat handling fee; online (Razorpay) orders never include it.
+    const totals = orderTotals(priced.subtotal, checkout.paymentMethod, shippingCost);
+    const total = totals.total;
     const stockLines = priced.items.map((item) => ({
       variantId: item.variantId,
       quantity: item.quantity,
@@ -160,6 +164,7 @@ export async function createOrder(
             status: "pending",
             subtotal: priced.subtotal,
             shippingCost,
+            codFee: totals.codFee,
             total,
             shippingAddress: JSON.parse(JSON.stringify(checkout)),
             customerEmail: checkout.email ?? "",
@@ -173,14 +178,17 @@ export async function createOrder(
                 currency: "INR",
                 status: "pending",
                 method: checkout.paymentMethod,
-                metadata: { attemptId: checkout.attemptId },
+                metadata: {
+                  attemptId: checkout.attemptId,
+                  codFee: totals.codFee,
+                },
               },
             },
           },
           include: orderInclude,
         });
         return { created: true, order: placed };
-      });
+      }, TX_OPTIONS);
       created = result.created;
       order = result.order;
     } catch (error) {
@@ -230,7 +238,7 @@ export async function createOrder(
                 name: item.name,
               })),
           );
-        });
+        }, TX_OPTIONS);
         order = { ...order, inventoryHeld: true };
       } catch (error) {
         if (error instanceof InsufficientStockError) {
@@ -268,12 +276,22 @@ export async function createOrder(
       };
     }
 
-    const razorpayOrder = await createRazorpayOrder({
-      amount: Math.round(order.total * 100),
-      currency: "INR",
-      receipt: order.orderNumber,
-      notes: { orderId: order.id, orderNumber: order.orderNumber },
-    });
+    let razorpayOrder;
+    try {
+      razorpayOrder = await createRazorpayOrder({
+        amount: Math.round(order.total * 100),
+        currency: "INR",
+        receipt: order.orderNumber,
+        notes: { orderId: order.id, orderNumber: order.orderNumber },
+      });
+    } catch {
+      // The order row already exists so a retry reuses it instead of duplicating.
+      return {
+        success: false,
+        error:
+          "Online payment is unavailable right now. Your order is saved as unpaid — please try again.",
+      };
+    }
 
     const attached = await prisma.order.updateMany({
       where: { id: order.id, razorpayOrderId: null },

@@ -21,6 +21,7 @@ type OrderDetail = {
   status: string;
   subtotal: number;
   shippingCost: number;
+  codFee: number;
   total: number;
   shippingAddress: Record<string, string>;
   customerEmail: string;
@@ -245,6 +246,12 @@ export default function AdminOrderDetailPage() {
                     : formatPrice(order.shippingCost)}
                 </span>
               </div>
+              {order.codFee > 0 && (
+                <div className="flex justify-between text-sm text-neutral-500">
+                  <span>COD Handling Fee</span>
+                  <span>{formatPrice(order.codFee)}</span>
+                </div>
+              )}
               <div className="flex justify-between border-t border-neutral-200 pt-2">
                 <span className="font-semibold">Total</span>
                 <span className="text-lg font-bold">

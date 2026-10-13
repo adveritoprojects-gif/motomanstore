@@ -3,7 +3,10 @@ import { createHmac } from "node:crypto";
 import test from "node:test";
 import { checkoutRequestSchema, cartSchema } from "../validations";
 import {
+  COD_HANDLING_FEE,
   captureDecision,
+  codHandlingFee,
+  orderTotals,
   paymentAmountMatches,
   paymentCurrencyMatches,
   paymentMethodAvailable,
@@ -119,6 +122,53 @@ test("COD stays available when Razorpay is not configured", () => {
   assert.equal(paymentMethodAvailable("cod", false).ok, true);
   assert.equal(paymentMethodAvailable("razorpay", false).ok, false);
   assert.equal(paymentMethodAvailable("razorpay", true).ok, true);
+});
+
+test("online payment totals never include the COD handling fee", () => {
+  assert.equal(codHandlingFee("razorpay"), 0);
+  const totals = orderTotals(499, "razorpay");
+  assert.equal(totals.codFee, 0);
+  assert.equal(totals.total, 499);
+  // Amount sent to Razorpay is in paise and excludes the COD fee.
+  assert.equal(Math.round(totals.total * 100), 49900);
+});
+
+test("COD totals add the flat ₹20 handling fee", () => {
+  assert.equal(COD_HANDLING_FEE, 20);
+  assert.equal(codHandlingFee("cod"), 20);
+  const totals = orderTotals(499, "cod");
+  assert.equal(totals.codFee, 20);
+  assert.equal(totals.subtotal, 499);
+  assert.equal(totals.shippingCost, 0);
+  assert.equal(totals.total, 519);
+});
+
+test("switching between Pay Online and COD toggles the ₹20 fee immediately", () => {
+  const online = orderTotals(499, "razorpay");
+  const cod = orderTotals(499, "cod");
+  assert.equal(online.total, 499);
+  assert.equal(cod.total, 519);
+  assert.equal(cod.total - online.total, COD_HANDLING_FEE);
+  // Shipping stays free and subtotal untouched in both cases.
+  assert.equal(online.subtotal, cod.subtotal);
+  assert.equal(online.shippingCost, 0);
+  assert.equal(cod.shippingCost, 0);
+});
+
+test("COD order records the fee-inclusive total", async () => {
+  const store = createMemoryCheckout({ "var-1": 4 });
+  const totals = orderTotals(340, "cod");
+  const placed = await executePlace(store, {
+    attemptId: "attempt-cod-fee",
+    paymentMethod: "cod",
+    orderNumber: "MT-COD-FEE",
+    total: totals.total,
+    lines: [line],
+  });
+  assert.equal(placed.ok, true);
+  if (!placed.ok) return;
+  assert.equal(placed.order.total, 360);
+  assert.equal(store.stockOf("var-1"), 3);
 });
 
 const line = { variantId: "var-1", quantity: 1, name: "Shampoo" };

@@ -8,6 +8,7 @@ export type OrderWithItems = {
   status: string;
   subtotal: number;
   shippingCost: number;
+  codFee: number;
   total: number;
   shippingAddress: Record<string, string>;
   customerEmail: string;
@@ -48,6 +49,7 @@ export async function getOrder(
       status: order.status,
       subtotal: order.subtotal,
       shippingCost: order.shippingCost,
+      codFee: order.codFee,
       total: order.total,
       shippingAddress: order.shippingAddress as Record<string, string>,
       customerEmail: order.customerEmail,

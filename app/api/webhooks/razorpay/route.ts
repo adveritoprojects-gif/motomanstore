@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, TX_OPTIONS } from "@/lib/prisma";
 import { verifyWebhookSignature } from "@/lib/razorpay";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import {
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
               },
             });
             return true;
-          });
+          }, TX_OPTIONS);
         } catch (error) {
           if (error instanceof InsufficientStockError) break;
           throw error;
@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
             },
           });
           await releaseHeldInventory(tx, order.id, { onlyStatus: "pending" });
-        });
+        }, TX_OPTIONS);
 
         break;
       }
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
             where: { id: order.id, status: { not: "refunded" } },
             data: { status: "refunded" },
           });
-        });
+        }, TX_OPTIONS);
 
         break;
       }

@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma, TX_OPTIONS } from "@/lib/prisma";
 import { getRazorpayInstance, verifyRazorpaySignature } from "@/lib/razorpay";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { paymentAmountMatches, paymentCurrencyMatches } from "@/lib/checkout/price-cart";
@@ -67,7 +67,7 @@ export async function verifyPayment(
                 name: item.name,
               })),
           );
-        });
+        }, TX_OPTIONS);
       } catch (error) {
         if (error instanceof InsufficientStockError) {
           return { success: false, error: error.message };

@@ -5,9 +5,8 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { JsonLd } from "@/components/seo/json-ld";
 import { itemListJsonLd } from "@/lib/seo/json-ld";
 import { ProductGrid } from "@/components/product/product-grid";
-import { CategoryGrid } from "@/components/shop/category-grid";
 import { getLandingPage } from "@/lib/seo/landing-pages";
-import { getLandingProducts, getCategories } from "@/lib/queries";
+import { getLandingProducts } from "@/lib/queries";
 
 interface LandingPageViewProps {
   /** Key into LANDING_PAGES, e.g. "microfiber-cloths" */
@@ -23,19 +22,13 @@ export async function LandingPageView({ pageKey }: LandingPageViewProps) {
   if (!page) return null;
 
   let products: Awaited<ReturnType<typeof getLandingProducts>> = [];
-  let categories: Awaited<ReturnType<typeof getCategories>> = [];
 
   try {
-    const [productRows, categoryRows] = await Promise.all([
-      getLandingProducts({
-        categorySlugs: page.hub ? undefined : page.categorySlugs,
-        tags: page.tags,
-        limit: 48,
-      }),
-      page.hub ? getCategories() : Promise.resolve([]),
-    ]);
-    products = productRows;
-    categories = categoryRows;
+    products = await getLandingProducts({
+      categorySlugs: page.categorySlugs,
+      tags: page.tags,
+      limit: 48,
+    });
   } catch (error) {
     console.error(`Failed to load landing page ${pageKey}:`, error);
   }
@@ -82,15 +75,6 @@ export async function LandingPageView({ pageKey }: LandingPageViewProps) {
           ))}
         </ul>
       </nav>
-
-      {page.hub && categories.length > 0 && (
-        <section className="mb-12">
-          <h2 className="mb-5 text-xl font-bold text-neutral-950 sm:text-2xl">
-            Shop by Category
-          </h2>
-          <CategoryGrid categories={categories} />
-        </section>
-      )}
 
       <section>
         <h2 className="mb-5 text-xl font-bold text-neutral-950 sm:text-2xl">

@@ -55,7 +55,7 @@ export function Hero() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/collections"
+                  href="/categories"
                   className="inline-flex items-center gap-2 rounded-full border border-neutral-600 px-7 py-3 text-sm font-semibold text-white transition-all duration-200 hover:border-white"
                 >
                   Explore Products

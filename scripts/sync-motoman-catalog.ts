@@ -341,7 +341,7 @@ const PRODUCTS: SpecProduct[] = [
       "car cleaning gloves",
       "car wash gloves",
       "chenille microfiber glove",
-      "blue cleaning gloves",
+      "cleaning gloves",
     ],
     images: [
       {
@@ -459,12 +459,12 @@ const PRODUCTS: SpecProduct[] = [
     name: "Complete Car Care Combo",
     sku: "MOTO-CMB-CARE",
     description:
-      "Foam sprayer, 500 ml shampoo, 1200 GSM cloth, and a blue cleaning glove.",
+      "Foam sprayer, 500 ml shampoo, 1200 GSM cloth, and a cleaning glove.",
     price: 1299,
     compareAtPrice: null,
     metaTitle: "Complete Car Care Combo | Motoman Store",
     metaDescription:
-      "Motoman Complete Car Care Combo at ₹1,299. Includes a foam sprayer, 500 ml shampoo, 1200 GSM microfiber cloth, and a blue cleaning glove.",
+      "Motoman Complete Car Care Combo at ₹1,299. Includes a foam sprayer, 500 ml shampoo, 1200 GSM microfiber cloth, and a cleaning glove.",
     categorySlug: "car-wash",
     featured: false,
     isNew: false,
@@ -508,12 +508,12 @@ const PRODUCTS: SpecProduct[] = [
     name: "Car Shampoo + Microfiber Cleaning Kit",
     sku: "MOTO-CMB-KIT",
     description:
-      "500 ml Premium Car Shampoo, a microfiber cloth, and a blue cleaning glove.",
+      "500 ml Premium Car Shampoo, a microfiber cloth, and a cleaning glove.",
     price: 599,
     compareAtPrice: null,
     metaTitle: "Car Shampoo + Microfiber Cleaning Kit | Motoman Store",
     metaDescription:
-      "Motoman Car Shampoo and Microfiber Cleaning Kit at ₹599. Includes 500 ml shampoo, a microfiber cloth, and a blue cleaning glove.",
+      "Motoman Car Shampoo and Microfiber Cleaning Kit at ₹599. Includes 500 ml shampoo, a microfiber cloth, and a cleaning glove.",
     categorySlug: "car-wash",
     featured: false,
     isNew: false,
@@ -521,7 +521,7 @@ const PRODUCTS: SpecProduct[] = [
     images: [
       {
         url: "/products/motoman-shampoo-microfiber-combo.webp",
-        alt: "Motoman blue shampoo, microfiber cloth, and blue cleaning glove",
+        alt: "Motoman blue shampoo, microfiber cloth, and cleaning glove",
       },
     ],
     variants: [

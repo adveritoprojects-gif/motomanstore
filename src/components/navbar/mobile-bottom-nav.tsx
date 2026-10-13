@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const BOTTOM_LINKS = [
   { href: "/", label: "Home", icon: Home },
   { href: "/shop", label: "Shop", icon: ShoppingBag },
-  { href: "/collections", label: "Categories", icon: Grid3X3 },
+  { href: "/categories", label: "Categories", icon: Grid3X3 },
   { href: "/account", label: "Account", icon: User },
 ];
 

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getProducts, getCategories, getCollections } from "@/lib/queries";
+import { getProducts, getCategories } from "@/lib/queries";
 import { LANDING_PAGE_KEYS, LANDING_PAGES } from "@/lib/seo/landing-pages";
 
 const BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || "https://motoman.in").replace(
@@ -28,14 +28,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${BASE_URL}${LANDING_PAGES[key].path}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
-      priority: key === "car-care-products" ? 0.9 : 0.8,
+      priority: 0.8,
     })),
-    {
-      url: `${BASE_URL}/collections`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
     {
       url: `${BASE_URL}/categories`,
       lastModified: now,
@@ -108,17 +102,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     );
 
-    const collections = await getCollections();
-    const collectionPages: MetadataRoute.Sitemap = collections.map(
-      (collection) => ({
-        url: `${BASE_URL}/collections/${collection.slug}`,
-        lastModified: collection.updatedAt || now,
-        changeFrequency: "weekly" as const,
-        priority: 0.6,
-      })
-    );
-
-    return [...staticPages, ...productPages, ...categoryPages, ...collectionPages];
+    return [...staticPages, ...productPages, ...categoryPages];
   } catch (error) {
     console.error("Sitemap DB query failed, serving static pages only:", error);
     return staticPages;

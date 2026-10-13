@@ -22,33 +22,11 @@ export interface SeoLandingPage {
   categorySlugs?: string[];
   /** Product tags to include (any match), combined with categories via OR. */
   tags?: string[];
-  /** When true, shows all categories + all products (hub page). */
-  hub?: boolean;
   /** Internal links section (related categories / landing pages). */
   related: LandingLink[];
 }
 
 export const LANDING_PAGES: Record<string, SeoLandingPage> = {
-  "car-care-products": {
-    path: "/car-care-products",
-    title: "Car Care Products Online",
-    description:
-      "Shop car care products online at MOTOMAN — car cleaning supplies, detailing essentials, microfiber cloths and wash accessories for a cleaner, better-looking car.",
-    h1: "Car Care Products Online",
-    overline: "Shop",
-    intro: [
-      "Find everything you need to keep your car looking its best. MOTOMAN car care products cover washing, drying, polishing and paint protection — whether you're doing a quick weekend wash or a full detail.",
-      "Browse by category or explore the full range below. Every product is priced clearly, with sizes and pack options available on the product page.",
-    ],
-    productsHeading: "Shop All Car Care Products",
-    hub: true,
-    related: [
-      { href: "/car-cleaning-products", label: "Car Cleaning Products" },
-      { href: "/car-detailing-products", label: "Car Detailing Products" },
-      { href: "/microfiber-cloths", label: "Microfiber Cloths" },
-      { href: "/shop", label: "All Products" },
-    ],
-  },
   "car-cleaning-products": {
     path: "/car-cleaning-products",
     title: "Car Cleaning Products Online",
@@ -65,7 +43,6 @@ export const LANDING_PAGES: Record<string, SeoLandingPage> = {
     related: [
       { href: "/categories/car-wash", label: "Car Wash Category" },
       { href: "/microfiber-cloths", label: "Microfiber Cloths" },
-      { href: "/car-care-products", label: "All Car Care Products" },
       { href: "/shop", label: "All Products" },
     ],
   },
@@ -85,7 +62,6 @@ export const LANDING_PAGES: Record<string, SeoLandingPage> = {
     related: [
       { href: "/exterior-car-cleaning", label: "Exterior Car Cleaning" },
       { href: "/microfiber-cloths", label: "Microfiber Cloths" },
-      { href: "/car-care-products", label: "All Car Care Products" },
       { href: "/shop", label: "All Products" },
     ],
   },
@@ -106,7 +82,7 @@ export const LANDING_PAGES: Record<string, SeoLandingPage> = {
       { href: "/microfiber-drying-towels", label: "Microfiber Drying Towels" },
       { href: "/car-cleaning-products", label: "Car Cleaning Products" },
       { href: "/categories/microfiber", label: "Microfiber Category" },
-      { href: "/car-care-products", label: "All Car Care Products" },
+      { href: "/shop", label: "All Products" },
     ],
   },
   "microfiber-drying-towels": {
@@ -146,7 +122,7 @@ export const LANDING_PAGES: Record<string, SeoLandingPage> = {
       { href: "/car-detailing-products", label: "Car Detailing Products" },
       { href: "/categories/exterior-care", label: "Exterior Care Category" },
       { href: "/car-cleaning-products", label: "Car Cleaning Products" },
-      { href: "/car-care-products", label: "All Car Care Products" },
+      { href: "/shop", label: "All Products" },
     ],
   },
 };

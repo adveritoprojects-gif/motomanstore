@@ -46,7 +46,7 @@ export default async function CategoriesPage() {
           Categories
         </Typography>
         <Typography variant="body" className="text-neutral-500">
-          Explore our curated collections for every part of your car.
+          Explore our curated categories for every part of your car.
         </Typography>
       </div>
 

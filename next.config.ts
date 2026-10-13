@@ -26,6 +26,13 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Car Care Products hub page was removed — send old indexed URLs to the
+      // shop instead of 404.
+      {
+        source: "/car-care-products",
+        destination: "/shop",
+        permanent: true,
+      },
       // Alias kept for keyword URL consistency — /car-cleaning-products is canonical
       {
         source: "/car-wash-products",
@@ -56,6 +63,18 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/categories/interior-care",
+        destination: "/categories",
+        permanent: true,
+      },
+      // Collections section was removed — send old indexed URLs (index and
+      // per-collection slugs) to the categories hub instead of 404.
+      {
+        source: "/collections",
+        destination: "/categories",
+        permanent: true,
+      },
+      {
+        source: "/collections/:slug",
         destination: "/categories",
         permanent: true,
       },

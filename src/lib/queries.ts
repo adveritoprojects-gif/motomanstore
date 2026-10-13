@@ -9,12 +9,11 @@ export type ProductWithImages = Prisma.ProductGetPayload<{
 }>;
 
 export type ProductWithDetails = Prisma.ProductGetPayload<{
-  include: { images: true; category: true; variants: true; collection: true };
+  include: { images: true; category: true; variants: true };
 }>;
 
 export async function getProducts(params?: {
   category?: string;
-  collection?: string;
   featured?: boolean;
   isNew?: boolean;
   search?: string;
@@ -24,7 +23,6 @@ export async function getProducts(params?: {
 }) {
   const {
     category,
-    collection,
     featured,
     isNew,
     search,
@@ -37,10 +35,6 @@ export async function getProducts(params?: {
 
   if (category) {
     where.category = { slug: category };
-  }
-
-  if (collection) {
-    where.collection = { slug: collection };
   }
 
   if (featured !== undefined) {
@@ -99,7 +93,6 @@ export async function getProductBySlug(slug: string) {
       // Cheapest variant first — it matches the product's base price and is
       // the default selection on the product page.
       variants: { orderBy: { price: "asc" } },
-      collection: true,
     },
   });
 }
@@ -249,21 +242,3 @@ export async function getCategoryBySlug(slug: string) {
   });
 }
 
-// ─── Collection Queries ─────────────────────────────────
-
-export async function getCollections() {
-  return prisma.collection.findMany({
-    include: { _count: { select: { products: true } } },
-    orderBy: { createdAt: "desc" },
-  });
-}
-
-export async function getCollectionBySlug(slug: string) {
-  return prisma.collection.findUnique({
-    where: { slug },
-    include: {
-      products: { include: { images: true, category: true } },
-      _count: { select: { products: true } },
-    },
-  });
-}

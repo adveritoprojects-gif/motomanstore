@@ -33,7 +33,6 @@ interface ProductDetailProduct {
   tags?: string[];
   weight?: number | null;
   category: { name: string; slug: string };
-  collection?: { name: string; slug: string } | null;
   images: { url: string; alt?: string | null; sortOrder: number }[];
   variants: {
     id: string;
@@ -345,12 +344,6 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 <div className="flex items-center gap-2">
                   <Package className="h-4 w-4 text-neutral-400" aria-hidden="true" />
                   <span>Weight: {product.weight}g</span>
-                </div>
-              )}
-              {product.collection && (
-                <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4 text-neutral-400" aria-hidden="true" />
-                  <span>Collection: {product.collection.name}</span>
                 </div>
               )}
             </div>

@@ -106,7 +106,7 @@ const expected: Record<
     images: ["motoman-complete-car-care-combo.webp"],
     title: "Complete Car Care Combo | Motoman Store",
     description:
-      "Motoman Complete Car Care Combo at ₹1,299. Includes a foam sprayer, 500 ml shampoo, 1200 GSM microfiber cloth, and a blue cleaning glove.",
+      "Motoman Complete Car Care Combo at ₹1,299. Includes a foam sprayer, 500 ml shampoo, 1200 GSM microfiber cloth, and a cleaning glove.",
     prices: ["1299"],
     skus: ["MOTO-CMB-CARE"],
   },
@@ -122,7 +122,7 @@ const expected: Record<
     images: ["motoman-shampoo-microfiber-combo.webp"],
     title: "Car Shampoo + Microfiber Cleaning Kit | Motoman Store",
     description:
-      "Motoman Car Shampoo and Microfiber Cleaning Kit at ₹599. Includes 500 ml shampoo, a microfiber cloth, and a blue cleaning glove.",
+      "Motoman Car Shampoo and Microfiber Cleaning Kit at ₹599. Includes 500 ml shampoo, a microfiber cloth, and a cleaning glove.",
     prices: ["599"],
     skus: ["MOTO-CMB-KIT"],
   },

@@ -5,7 +5,7 @@ export const BRAND = {
   slogan: "Drive Cleaner. Drive Better.",
   description:
     "Professional car care products designed for a cleaner, shinier and longer-lasting drive.",
-  email: "motoman@gmail.com",
+  email: "bigdaddycompany25@gmail.com",
   phone: "+91 89431 76189",
   address: "Payyannur, Kannur, Kerala , India",
 } as const;
@@ -13,7 +13,6 @@ export const BRAND = {
 export const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/shop", label: "Shop" },
-  { href: "/collections", label: "Car Care" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ] as const;
@@ -161,7 +160,7 @@ export const COMBO_PRODUCTS: ComboProduct[] = [
     name: "Complete Car Care Combo",
     slug: "motoman-complete-car-care-combo",
     description:
-      "Foam sprayer, 500 ml shampoo, 1200 GSM cloth, and a blue cleaning glove.",
+      "Foam sprayer, 500 ml shampoo, 1200 GSM cloth, and a cleaning glove.",
     price: 1299,
     compareAtPrice: null,
     image: "/products/motoman-complete-car-care-combo.webp",
@@ -184,7 +183,7 @@ export const COMBO_PRODUCTS: ComboProduct[] = [
     name: "Car Shampoo + Microfiber Cleaning Kit",
     slug: "motoman-shampoo-microfiber-combo",
     description:
-      "500 ml Premium Car Shampoo, a microfiber cloth, and a blue cleaning glove.",
+      "500 ml Premium Car Shampoo, a microfiber cloth, and a cleaning glove.",
     price: 599,
     compareAtPrice: null,
     image: "/products/motoman-shampoo-microfiber-combo.webp",
@@ -254,7 +253,7 @@ export const BUNDLE_ITEMS = [
     alt: "Motoman 1200 GSM premium microfiber cloth",
   },
   {
-    name: "Blue Cleaning Glove",
+    name: "Cleaning Glove",
     image: "/products/gloves-1.jpg",
     alt: "Motoman blue chenille microfiber cleaning glove",
   },
@@ -336,7 +335,6 @@ export const FOOTER_LINKS = {
   quickLinks: [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
-    { href: "/car-care-products", label: "Car Care Products" },
     { href: "/microfiber-cloths", label: "Microfiber Cloths" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },

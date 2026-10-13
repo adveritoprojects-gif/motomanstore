@@ -596,7 +596,7 @@ async function main() {
       },
     },
     {
-      name: "Foam Can + Car Shampoo",
+      name: "Foam Can + Car Shampoo",     
       slug: "motoman-foam-can-car-shampoo-combo",
       sku: "MOTO-CMB-FOAM",
       description: "Foam sprayer and 500 ml Premium Car Shampoo.",

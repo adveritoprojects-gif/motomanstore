@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,9 +20,21 @@ import { checkoutSchema } from "@/lib/validations";
 import type { CheckoutFormData } from "@/lib/validations";
 import { createOrder, verifyPayment } from "@/lib/actions";
 import { codHandlingFee } from "@/lib/checkout/price-cart";
+import {
+  RAZORPAY_CHECKOUT_SRC,
+  RazorpayScriptError,
+  ensureRazorpayScript,
+  markRazorpayScriptLoading,
+  notifyRazorpayScriptFailed,
+  notifyRazorpayScriptLoaded,
+} from "@/lib/checkout/razorpay-script";
 import { Container } from "@/components/ui/container";
 
 const checkoutLock = { held: false };
+
+function subscribeNoop() {
+  return () => {};
+}
 
 function claimCheckout(): boolean {
   if (checkoutLock.held) return false;
@@ -31,6 +44,27 @@ function claimCheckout(): boolean {
 
 function releaseCheckout() {
   checkoutLock.held = false;
+}
+
+/**
+ * `completed` flips to true as soon as Razorpay reports a successful payment
+ * (the handler runs exactly once per successful payment). Some checkout
+ * versions also fire `modal.ondismiss` when the modal closes after that, and
+ * such a close must never be reported as a cancellation or release the
+ * checkout lock while we are still verifying and navigating.
+ */
+const paymentState = { completed: false };
+
+function resetPaymentCompletion() {
+  paymentState.completed = false;
+}
+
+function markPaymentCompleted() {
+  paymentState.completed = true;
+}
+
+function paymentAlreadyCompleted() {
+  return paymentState.completed;
 }
 
 const INDIAN_STATES = [
@@ -90,13 +124,27 @@ export function CheckoutForm({
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // The cart is rehydrated from localStorage after the server has already
+  // rendered this form as empty. Until that first client render has settled,
+  // "no items" only means "not rehydrated yet" — treating it as an empty cart
+  // would bounce the shopper to /shop before checkout can render.
+  const cartReady = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "razorpay">(
     razorpayEnabled ? "razorpay" : "cod"
   );
   const [attemptId, setAttemptId] = useState(() => crypto.randomUUID());
 
   function choosePaymentMethod(method: "cod" | "razorpay") {
-    if (method === paymentMethod || isProcessing) return;
+    if (isProcessing) return;
+    if (method === "razorpay" && (!razorpayEnabled || !razorpayKeyId)) {
+      setError(
+        "Online payment is unavailable right now. You can still place a cash on delivery order.",
+      );
+      return;
+    }
+    // Clicking a card fires both the label's onClick and the radio's onChange;
+    // only a real change starts a new checkout attempt.
+    if (paymentMethod === method) return;
     setPaymentMethod(method);
     setAttemptId(crypto.randomUUID());
   }
@@ -119,12 +167,26 @@ export function CheckoutForm({
   });
 
   useEffect(() => {
-    // Wait for a placed order to finish navigating to its success page —
-    // otherwise clearing the cart would bounce the shopper to /shop first.
-    if (items.length === 0 && !isProcessing) {
+    // The checkout script starts loading as soon as the page renders so it is
+    // ready by the time the shopper submits.
+    if (razorpayEnabled) markRazorpayScriptLoading();
+  }, [razorpayEnabled]);
+
+  useEffect(() => {
+    // Empty-cart bounce only after hydration: on the server (and the first
+    // client render) the persisted cart has not rehydrated yet. Also skipped
+    // while a placed order is navigating to its success page — otherwise
+    // clearing the cart would bounce the shopper to /shop first.
+    if (cartReady && items.length === 0 && !isProcessing) {
       router.push("/shop");
     }
-  }, [items.length, isProcessing, router]);
+  }, [cartReady, items.length, isProcessing, router]);
+
+  useEffect(() => {
+    // Never leave the single-flight checkout lock behind if this form is
+    // unmounted mid-payment (e.g. the shopper presses Back).
+    return () => releaseCheckout();
+  }, []);
 
   if (items.length === 0) {
     return null;
@@ -132,16 +194,30 @@ export function CheckoutForm({
 
   const onSubmit = async (data: CheckoutFormData) => {
     if (!claimCheckout()) return;
-    if (paymentMethod === "razorpay" && (!razorpayEnabled || !razorpayKeyId)) {
-      setError("Online payment is unavailable. Choose cash on delivery.");
-      releaseCheckout();
-      return;
-    }
 
     setIsProcessing(true);
     setError(null);
 
+    // Single exit for every failure path: report, unlock and allow a retry.
+    const fail = (message: string) => {
+      setError(message);
+      setIsProcessing(false);
+      releaseCheckout();
+    };
+
     try {
+      if (paymentMethod === "razorpay") {
+        if (!razorpayEnabled || !razorpayKeyId) {
+          fail(
+            "Online payment is unavailable right now. You can still place a cash on delivery order.",
+          );
+          return;
+        }
+        // Never open Razorpay before its checkout library has loaded, and
+        // never create an order we have no way to pay for.
+        await ensureRazorpayScript();
+      }
+
       const result = await createOrder(
         {
           ...data,
@@ -161,9 +237,7 @@ export function CheckoutForm({
       );
 
       if (!result.success) {
-        setError(result.error);
-        setIsProcessing(false);
-        releaseCheckout();
+        fail(result.error);
         return;
       }
 
@@ -175,11 +249,11 @@ export function CheckoutForm({
       }
 
       if (!razorpayKeyId || typeof window.Razorpay !== "function") {
-        setError("Online payment could not be loaded. Please try again.");
-        setIsProcessing(false);
-        releaseCheckout();
+        fail("The secure payment window could not be loaded. Please try again.");
         return;
       }
+
+      resetPaymentCompletion();
 
       const razorpay = new window.Razorpay({
         key: razorpayKeyId,
@@ -189,16 +263,23 @@ export function CheckoutForm({
         description: `Order ${result.orderNumber}`,
         order_id: result.razorpayOrderId,
         handler: async (response) => {
-          const verified = await verifyPayment(response);
-          if (!verified.success) {
-            setError(verified.error || "Payment could not be verified.");
-            setIsProcessing(false);
+          // Runs only for a successful payment — stop modal.ondismiss from
+          // reporting a cancellation while we verify.
+          markPaymentCompleted();
+          try {
+            const verified = await verifyPayment(response);
+            if (!verified.success) {
+              fail(verified.error || "Payment could not be verified. Please try again.");
+              return;
+            }
+            clearCart();
             releaseCheckout();
-            return;
+            router.push(`/order-success/${verified.orderId}`);
+          } catch {
+            fail(
+              "We could not confirm your payment. If you were charged, the order will be confirmed automatically — please contact support before paying again.",
+            );
           }
-          clearCart();
-          releaseCheckout();
-          router.push(`/order-success/${verified.orderId}`);
         },
         prefill: {
           name: [data.firstName, data.lastName].filter(Boolean).join(" "),
@@ -214,20 +295,23 @@ export function CheckoutForm({
         },
         modal: {
           ondismiss: () => {
-            setError(
-              "Payment was cancelled. Your order is saved as unpaid. You can try again."
+            // Fires when the shopper closes the modal without paying (and on
+            // some versions right after a successful payment, hence the guard).
+            if (paymentAlreadyCompleted()) return;
+            fail(
+              "Payment was not completed. Your cart is unchanged — you can try again.",
             );
-            setIsProcessing(false);
-            releaseCheckout();
           },
           escape: false,
         },
       });
       razorpay.open();
-    } catch {
-      setError("An unexpected error occurred. Please try again.");
-      setIsProcessing(false);
-      releaseCheckout();
+    } catch (err) {
+      fail(
+        err instanceof RazorpayScriptError
+          ? err.message
+          : "An unexpected error occurred. Please try again.",
+      );
     }
   };
 
@@ -246,16 +330,16 @@ export function CheckoutForm({
       </h1>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid gap-8 lg:grid-cols-12">
+        <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
           {/* ── Shipping Form ── */}
-          <div className="lg:col-span-7">
-            <div className="rounded-xl border border-neutral-200 bg-white p-6">
+          <div className="min-w-0 lg:col-span-7">
+            <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6">
               <h2 className="mb-6 text-lg font-semibold text-neutral-950">
                 Shipping Information
               </h2>
 
               {/* Name */}
-              <div className="mb-4 grid grid-cols-2 gap-4">
+              <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-neutral-700">
                     First Name *
@@ -263,7 +347,7 @@ export function CheckoutForm({
                   <input
                     {...register("firstName")}
                     className={cn(
-                      "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
+                      "w-full rounded-lg border px-4 py-2.5 text-base sm:text-sm transition-colors outline-none",
                       errors.firstName
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                         : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
@@ -283,7 +367,7 @@ export function CheckoutForm({
                   <input
                     {...register("lastName")}
                     className={cn(
-                      "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
+                      "w-full rounded-lg border px-4 py-2.5 text-base sm:text-sm transition-colors outline-none",
                       errors.lastName
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                         : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
@@ -307,7 +391,7 @@ export function CheckoutForm({
                   {...register("email")}
                   type="email"
                   className={cn(
-                    "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
+                    "w-full rounded-lg border px-4 py-2.5 text-base sm:text-sm transition-colors outline-none",
                     errors.email
                       ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                       : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
@@ -330,7 +414,7 @@ export function CheckoutForm({
                   {...register("phone")}
                   type="tel"
                   className={cn(
-                    "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
+                    "w-full rounded-lg border px-4 py-2.5 text-base sm:text-sm transition-colors outline-none",
                     errors.phone
                       ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                       : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
@@ -352,7 +436,7 @@ export function CheckoutForm({
                 <input
                   {...register("address1")}
                   className={cn(
-                    "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
+                    "w-full rounded-lg border px-4 py-2.5 text-base sm:text-sm transition-colors outline-none",
                     errors.address1
                       ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                       : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
@@ -372,12 +456,12 @@ export function CheckoutForm({
                 </label>
                 <input
                   {...register("address2")}
-                  className="w-full rounded-lg border border-neutral-200 px-4 py-2.5 text-sm outline-none transition-colors focus:border-orange-500 focus:ring-orange-500/20"
+                  className="w-full rounded-lg border border-neutral-200 px-4 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-orange-500 focus:ring-orange-500/20"
                   placeholder="Street, locality, landmark"
                 />
               </div>
 
-              <div className="mb-4 grid grid-cols-2 gap-4">
+              <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-neutral-700">
                     City *
@@ -385,7 +469,7 @@ export function CheckoutForm({
                   <input
                     {...register("city")}
                     className={cn(
-                      "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
+                      "w-full rounded-lg border px-4 py-2.5 text-base sm:text-sm transition-colors outline-none",
                       errors.city
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                         : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
@@ -405,7 +489,7 @@ export function CheckoutForm({
                   <input
                     {...register("postalCode")}
                     className={cn(
-                      "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
+                      "w-full rounded-lg border px-4 py-2.5 text-base sm:text-sm transition-colors outline-none",
                       errors.postalCode
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                         : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
@@ -421,7 +505,7 @@ export function CheckoutForm({
                 </div>
               </div>
 
-              <div className="mb-4 grid grid-cols-2 gap-4">
+              <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-neutral-700">
                     State *
@@ -429,7 +513,7 @@ export function CheckoutForm({
                   <select
                     {...register("state")}
                     className={cn(
-                      "w-full rounded-lg border px-4 py-2.5 text-sm transition-colors outline-none",
+                      "w-full rounded-lg border px-4 py-2.5 text-base sm:text-sm transition-colors outline-none",
                       errors.state
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                         : "border-neutral-200 focus:border-orange-500 focus:ring-orange-500/20",
@@ -454,7 +538,7 @@ export function CheckoutForm({
                   </label>
                   <input
                     {...register("country")}
-                    className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm text-neutral-500"
+                    className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-base sm:text-sm text-neutral-500"
                     disabled
                   />
                 </div>
@@ -468,7 +552,7 @@ export function CheckoutForm({
                 <textarea
                   {...register("notes")}
                   rows={3}
-                  className="w-full resize-none rounded-lg border border-neutral-200 px-4 py-2.5 text-sm outline-none transition-colors focus:border-orange-500 focus:ring-orange-500/20"
+                  className="w-full resize-none rounded-lg border border-neutral-200 px-4 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-orange-500 focus:ring-orange-500/20"
                   placeholder="Any special instructions for delivery?"
                 />
                 {errors.notes && (
@@ -481,8 +565,8 @@ export function CheckoutForm({
           </div>
 
           {/* ── Order Summary ── */}
-          <div className="lg:col-span-5">
-            <div className="sticky top-24 rounded-xl border border-neutral-200 bg-white p-6">
+          <div className="min-w-0 lg:col-span-5">
+            <div className="self-start rounded-xl border border-neutral-200 bg-white p-4 sm:p-6 lg:sticky lg:top-24">
               <h2 className="mb-6 text-lg font-semibold text-neutral-950">
                 Order Summary
               </h2>
@@ -507,7 +591,7 @@ export function CheckoutForm({
                         {item.name}
                       </p>
                       {item.variantName && (
-                        <p className="text-xs text-neutral-400">
+                        <p className="truncate text-xs text-neutral-400">
                           {item.variantName}
                         </p>
                       )}
@@ -521,33 +605,37 @@ export function CheckoutForm({
 
               {/* Totals */}
               <div className="border-t border-neutral-200 pt-4">
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm text-neutral-500">Subtotal</span>
-                  <span className="text-sm font-medium text-neutral-700">
+                <div className="flex items-center justify-between gap-3 py-2">
+                  <span className="min-w-0 text-sm text-neutral-500">
+                    Subtotal
+                  </span>
+                  <span className="shrink-0 text-right text-sm font-medium text-neutral-700">
                     {formatPrice(subtotal)}
                   </span>
                 </div>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm text-neutral-500">Shipping</span>
-                  <span className="text-sm font-medium text-green-600">
+                <div className="flex items-center justify-between gap-3 py-2">
+                  <span className="min-w-0 text-sm text-neutral-500">
+                    Shipping
+                  </span>
+                  <span className="shrink-0 text-right text-sm font-medium text-green-600">
                     Free
                   </span>
                 </div>
                 {codFee > 0 && (
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-sm text-neutral-500">
+                  <div className="flex items-center justify-between gap-3 py-2">
+                    <span className="min-w-0 text-sm text-neutral-500">
                       COD Handling Fee
                     </span>
-                    <span className="text-sm font-medium text-neutral-700">
+                    <span className="shrink-0 text-right text-sm font-medium text-neutral-700">
                       {formatPrice(codFee)}
                     </span>
                   </div>
                 )}
-                <div className="flex items-center justify-between border-t border-neutral-200 pt-3">
-                  <span className="text-base font-semibold text-neutral-950">
+                <div className="flex items-center justify-between gap-3 border-t border-neutral-200 pt-3">
+                  <span className="min-w-0 text-base font-semibold text-neutral-950">
                     Total
                   </span>
-                  <span className="text-xl font-bold text-neutral-950">
+                  <span className="shrink-0 text-right text-xl font-bold text-neutral-950">
                     {formatPrice(total)}
                   </span>
                 </div>
@@ -557,18 +645,22 @@ export function CheckoutForm({
                 <legend className="mb-2 text-sm font-semibold text-neutral-950">
                   Payment method
                 </legend>
-                {/* Pay Online — first and default when Razorpay is configured */}
+                {/* Pay Online — first and default when Razorpay is configured.
+                    The whole card (label, icon, copy and radio) selects it. */}
                 <label
+                  htmlFor="payment-razorpay"
+                  onClick={() => choosePaymentMethod("razorpay")}
                   className={cn(
-                    "flex min-h-11 items-start gap-3 rounded-lg border px-3 py-3",
+                    "flex min-h-11 items-start gap-3 rounded-lg border px-3 py-3 transition-colors",
                     !razorpayEnabled && "cursor-not-allowed opacity-60",
-                    razorpayEnabled && "cursor-pointer",
+                    razorpayEnabled && "cursor-pointer hover:border-orange-300",
                     paymentMethod === "razorpay"
                       ? "border-orange-500 bg-orange-50"
                       : "border-neutral-200",
                   )}
                 >
                   <input
+                    id="payment-razorpay"
                     type="radio"
                     name="paymentMethod"
                     value="razorpay"
@@ -576,38 +668,43 @@ export function CheckoutForm({
                     disabled={!razorpayEnabled}
                     onChange={() => choosePaymentMethod("razorpay")}
                     className="mt-0.5 accent-orange-500"
+                    aria-label="Pay Online with Razorpay"
                   />
-                  <span>
+                  <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-900">
                       <CreditCard className="h-4 w-4 text-orange-500" />
                       Pay Online
                     </span>
                     <span className="mt-0.5 block text-xs text-neutral-500">
                       {razorpayEnabled
-                        ? "Pay securely online using Razorpay."
+                        ? "Pay securely online using Razorpay — UPI, cards and net banking."
                         : "Online payment is currently unavailable."}
                     </span>
                   </span>
                 </label>
                 {/* Cash on Delivery — with handling fee */}
                 <label
+                  htmlFor="payment-cod"
+                  onClick={() => choosePaymentMethod("cod")}
                   className={cn(
-                    "flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border px-3 py-3",
+                    "flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border px-3 py-3 transition-colors hover:border-orange-300",
                     paymentMethod === "cod"
                       ? "border-orange-500 bg-orange-50"
                       : "border-neutral-200",
                   )}
                 >
                   <input
+                    id="payment-cod"
                     type="radio"
                     name="paymentMethod"
                     value="cod"
                     checked={paymentMethod === "cod"}
                     onChange={() => choosePaymentMethod("cod")}
                     className="mt-0.5 accent-orange-500"
+                    aria-label="Cash on Delivery"
                   />
                   <span className="min-w-0 flex-1">
-                    <span className="flex items-center justify-between gap-2">
+                    <span className="flex flex-wrap items-center justify-between gap-2">
                       <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-900">
                         <Banknote className="h-4 w-4 text-orange-500" />
                         Cash on Delivery
@@ -670,8 +767,17 @@ export function CheckoutForm({
         </div>
       </form>
 
-      {/* Razorpay script */}
-      <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+      {/* Razorpay checkout library — loaded by the router after hydration and
+          never opened before onLoad reports success (see ensureRazorpayScript). */}
+      {razorpayEnabled && (
+        <Script
+          id="razorpay-checkout"
+          src={RAZORPAY_CHECKOUT_SRC}
+          strategy="afterInteractive"
+          onLoad={() => notifyRazorpayScriptLoaded()}
+          onError={() => notifyRazorpayScriptFailed()}
+        />
+      )}
     </Container>
   );
 }

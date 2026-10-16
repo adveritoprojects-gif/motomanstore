@@ -83,6 +83,133 @@ test("rejects a quantity above variant stock", () => {
   assert.equal(priced.ok, false);
 });
 
+// ─── Product / variant resolution ───────────────────────
+
+const foamSprayer = {
+  // Mirrors production: single "1 Unit" variant, product price 599.
+  id: "prod-fs",
+  name: "Motoman Foam Sprayer",
+  price: 599,
+  inStock: true,
+  images: [{ url: "/products/form-spray.jpeg" }],
+  variants: [{ id: "var-fs-1", name: "1 Unit", price: 599, stock: 50 }],
+};
+
+const multiVariant = {
+  id: "prod-mv",
+  name: "Motoman 1200 GSM Microfiber Cloth",
+  price: 499,
+  inStock: true,
+  images: [{ url: "/products/cloth.jpg" }],
+  variants: [
+    { id: "var-mv-1", name: "Pack of 1", price: 499, stock: 100 },
+    { id: "var-mv-2", name: "Pack of 2", price: 799, stock: 60 },
+  ],
+};
+
+const simpleProduct = {
+  id: "prod-simple",
+  name: "Motoman Basic Sponge",
+  price: 149,
+  inStock: true,
+  images: [{ url: "/products/sponge.jpg" }],
+  variants: [],
+};
+
+test("Foam Sprayer cart line without a variant id resolves to its only variant", () => {
+  // Listing cards historically stored no variantId — checkout must reconcile.
+  const priced = priceCart(
+    [{ id: "prod-fs", name: "Motoman Foam Sprayer", quantity: 1, price: 599 }],
+    [foamSprayer],
+  );
+  assert.equal(priced.ok, true);
+  if (!priced.ok) return;
+  assert.equal(priced.items[0]?.variantId, "var-fs-1");
+  assert.equal(priced.items[0]?.price, 599);
+  assert.equal(priced.items[0]?.name, "Motoman Foam Sprayer - 1 Unit");
+  assert.equal(priced.subtotal, 599);
+});
+
+test("simple product without variants checks out at the database price", () => {
+  const priced = priceCart(
+    [{ id: "prod-simple", name: "Sponge", quantity: 2, price: 1 }],
+    [simpleProduct],
+  );
+  assert.equal(priced.ok, true);
+  if (!priced.ok) return;
+  assert.equal(priced.items[0]?.variantId, null);
+  assert.equal(priced.items[0]?.price, 149);
+  assert.equal(priced.subtotal, 298);
+});
+
+test("simple product that is out of stock is rejected", () => {
+  const priced = priceCart(
+    [{ id: "prod-simple", name: "Sponge", quantity: 1 }],
+    [{ ...simpleProduct, inStock: false }],
+  );
+  assert.equal(priced.ok, false);
+});
+
+test("legacy cart line on a multi-variant product reconciles by option name", () => {
+  const priced = priceCart(
+    [{ id: "prod-mv", name: "Cloth", quantity: 1, variantName: "Pack of 2", price: 1 }],
+    [multiVariant],
+  );
+  assert.equal(priced.ok, true);
+  if (!priced.ok) return;
+  assert.equal(priced.items[0]?.variantId, "var-mv-2");
+  assert.equal(priced.items[0]?.price, 799);
+});
+
+test("legacy cart line on a multi-variant product without a matching name asks to re-add", () => {
+  const missingName = priceCart(
+    [{ id: "prod-mv", name: "Cloth", quantity: 1 }],
+    [multiVariant],
+  );
+  assert.equal(missingName.ok, false);
+  if (missingName.ok) return;
+  assert.match(missingName.error, /re-add/);
+
+  const wrongName = priceCart(
+    [{ id: "prod-mv", name: "Cloth", quantity: 1, variantName: "Pack of 9" }],
+    [multiVariant],
+  );
+  assert.equal(wrongName.ok, false);
+  if (wrongName.ok) return;
+  assert.match(wrongName.error, /re-add/);
+});
+
+test("variant id from another product is rejected", () => {
+  const priced = priceCart(
+    [{ id: "prod-fs", name: "Foam Sprayer", quantity: 1, variantId: "var-mv-1" }],
+    [foamSprayer],
+  );
+  assert.equal(priced.ok, false);
+  if (priced.ok) return;
+  assert.match(priced.error, /no longer available/);
+});
+
+test("valid variant id still prices from the variant record", () => {
+  const priced = priceCart(
+    [{ id: "prod-mv", name: "Cloth", quantity: 2, variantId: "var-mv-2", price: 1 }],
+    [multiVariant],
+  );
+  assert.equal(priced.ok, true);
+  if (!priced.ok) return;
+  assert.equal(priced.items[0]?.price, 799);
+  assert.equal(priced.subtotal, 1598);
+});
+
+test("variant stock limits still apply after reconciliation", () => {
+  const priced = priceCart(
+    [{ id: "prod-fs", name: "Foam Sprayer", quantity: 3 }],
+    [{ ...foamSprayer, variants: [{ id: "var-fs-1", name: "1 Unit", price: 599, stock: 2 }] }],
+  );
+  assert.equal(priced.ok, false);
+  if (priced.ok) return;
+  assert.match(priced.error, /2 units/);
+});
+
 test("verifies a Razorpay payment signature and rejects a tampered one", () => {
   process.env.RAZORPAY_KEY_SECRET = "test-secret";
   const payload = {

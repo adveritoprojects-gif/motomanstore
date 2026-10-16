@@ -3,6 +3,8 @@ export interface CheckoutCartLine {
   name: string;
   quantity: number;
   variantId?: string;
+  /** Stored option label ("500 ml"); only used to reconcile legacy carts. */
+  variantName?: string;
   /** Ignored. Prices always come from the product record. */
   price?: number;
 }
@@ -57,7 +59,8 @@ export interface PricedOrderLine {
   price: number;
   quantity: number;
   image: string;
-  variantId: string;
+  /** null only for simple products that have no variants in the catalog. */
+  variantId: string | null;
 }
 
 export type PriceCartResult =
@@ -92,29 +95,51 @@ export function priceCart(
       return { ok: false, error: `"${dbProduct.name}" is currently out of stock` };
     }
 
-    if (!cartItem.variantId || dbProduct.variants.length === 0) {
-      return {
-        ok: false,
-        error: `Please re-add "${dbProduct.name}" to your cart.`,
-      };
+    // Resolve which catalog variant this line refers to. The variant id in the
+    // cart is only ever a pointer — the name and price always come from the
+    // database record resolved here.
+    let variant: CheckoutProductRecord["variants"][number] | null = null;
+    if (cartItem.variantId) {
+      const match = dbProduct.variants.find((entry) => entry.id === cartItem.variantId);
+      if (!match) {
+        return {
+          ok: false,
+          error: `Variant for "${dbProduct.name}" is no longer available`,
+        };
+      }
+      variant = match;
+    } else if (dbProduct.variants.length === 1) {
+      // Single-variant product (e.g. "Motoman Foam Sprayer" — 1 Unit) or a
+      // legacy cart line saved before the variant id was stored. The only
+      // variant is unambiguous.
+      variant = dbProduct.variants[0] ?? null;
+    } else if (dbProduct.variants.length > 1) {
+      // Legacy cart line without a variant id on a multi-variant product:
+      // reconcile by the stored option label when exactly one variant matches.
+      const matches = cartItem.variantName
+        ? dbProduct.variants.filter((entry) => entry.name === cartItem.variantName)
+        : [];
+      if (matches.length !== 1) {
+        return {
+          ok: false,
+          error: `Please re-add "${dbProduct.name}" to your cart.`,
+        };
+      }
+      variant = matches[0] ?? null;
     }
+    // else: simple product with no variants — priced from the product record.
 
-    const variant = dbProduct.variants.find((entry) => entry.id === cartItem.variantId);
-    if (!variant) {
-      return {
-        ok: false,
-        error: `Variant for "${dbProduct.name}" is no longer available`,
-      };
-    }
-    if (variant.stock < cartItem.quantity) {
+    if (variant && variant.stock < cartItem.quantity) {
       return {
         ok: false,
         error: `Only ${variant.stock} units of "${dbProduct.name} - ${variant.name}" are available`,
       };
     }
 
-    const itemPrice = variant.price ?? dbProduct.price;
-    const itemName = `${dbProduct.name} - ${variant.name}`;
+    // Simple products have no per-unit stock counter in the catalog — the
+    // product-level inStock flag (checked above) is the availability gate.
+    const itemPrice = variant ? variant.price ?? dbProduct.price : dbProduct.price;
+    const itemName = variant ? `${dbProduct.name} - ${variant.name}` : dbProduct.name;
 
     subtotal += itemPrice * cartItem.quantity;
     items.push({
@@ -123,7 +148,7 @@ export function priceCart(
       price: itemPrice,
       quantity: cartItem.quantity,
       image: dbProduct.images[0]?.url || "/placeholder-product.jpg",
-      variantId: variant.id,
+      variantId: variant?.id ?? null,
     });
   }
 

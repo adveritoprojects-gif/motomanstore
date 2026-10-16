@@ -137,11 +137,15 @@ export async function createOrder(
     // COD adds the flat handling fee; online (Razorpay) orders never include it.
     const totals = orderTotals(priced.subtotal, checkout.paymentMethod, shippingCost);
     const total = totals.total;
-    const stockLines = priced.items.map((item) => ({
-      variantId: item.variantId,
-      quantity: item.quantity,
-      name: item.name,
-    }));
+    // Simple products (no variants) have no stock row to reserve — only the
+    // product-level inStock gate, which priceCart already checked.
+    const stockLines = priced.items
+      .filter((item): item is typeof item & { variantId: string } => item.variantId !== null)
+      .map((item) => ({
+        variantId: item.variantId,
+        quantity: item.quantity,
+        name: item.name,
+      }));
 
     let created = false;
     let order: CheckoutOrder;

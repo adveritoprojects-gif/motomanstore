@@ -67,7 +67,9 @@ export async function getProducts(params?: {
   const [products, total] = await Promise.all([
     prisma.product.findMany({
       where,
-      include: { images: true, category: true },
+      // Variants are included so add-to-cart from listing cards stores the
+      // real variant id — checkout prices and reserves stock per variant.
+      include: { images: true, category: true, variants: true },
       orderBy,
       skip: (page - 1) * limit,
       take: limit,
@@ -121,7 +123,7 @@ export async function getLandingProducts(params?: {
 
   return prisma.product.findMany({
     where,
-    include: { images: { orderBy: { sortOrder: "asc" } }, category: true },
+    include: { images: true, category: true, variants: true },
     orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
     take: limit,
   });
@@ -151,7 +153,11 @@ export async function getBestSellers(limit = 5) {
     .slice(0, limit)
     .map(([id]) => id);
 
-  const include = { images: { orderBy: { sortOrder: "asc" as const } }, category: true } as const;
+  const include = {
+    images: { orderBy: { sortOrder: "asc" as const } },
+    category: true,
+    variants: true,
+  } as const;
 
   const soldProducts = rankedIds.length
     ? await prisma.product.findMany({
@@ -221,7 +227,7 @@ export async function getRelatedProducts(productId: string, categorySlug: string
       id: { not: productId },
       category: { slug: categorySlug },
     },
-    include: { images: true, category: true },
+    include: { images: true, category: true, variants: true },
     take: limit,
   });
 }

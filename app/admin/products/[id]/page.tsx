@@ -54,7 +54,7 @@ export default async function ProductEditPage({ params }: Props) {
           images: product.images.map((img) => ({
             id: img.id,
             url: img.url,
-            alt: img.alt,
+            alt: img.alt || "",
             sortOrder: img.sortOrder,
           })),
           variants: product.variants.map((v) => ({

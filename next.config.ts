@@ -22,6 +22,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
+      {
+        // Product images uploaded from the admin dashboard.
+        protocol: "https",
+        hostname: "**.blob.vercel-storage.com",
+      },
     ],
   },
   async redirects() {

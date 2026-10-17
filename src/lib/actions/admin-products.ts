@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
+import { del } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { isAllowedImageUrl, isBlobImageUrl } from "@/lib/product-images";
 
 /** Refresh public catalog pages after an admin product change. */
 function revalidateCatalog(slug?: string) {
@@ -13,6 +15,30 @@ function revalidateCatalog(slug?: string) {
   revalidatePath("/sitemap.xml");
   if (slug) revalidatePath(`/products/${slug}`);
 }
+
+/**
+ * Removes a Vercel Blob object only when nothing still references its URL.
+ * `public/` paths are never touched, and files still used by other products,
+ * categories, collections or past orders are kept.
+ */
+async function deleteBlobIfUnreferenced(url: string): Promise<void> {
+  if (!isBlobImageUrl(url)) return;
+  try {
+    const [images, orderItems, categories, collections] = await Promise.all([
+      prisma.productImage.count({ where: { url } }),
+      prisma.orderItem.count({ where: { image: url } }),
+      prisma.category.count({ where: { image: url } }),
+      prisma.collection.count({ where: { image: url } }),
+    ]);
+    if (images + orderItems + categories + collections > 0) return;
+    await del(url);
+  } catch (error) {
+    // Never fail the admin action because blob cleanup failed (e.g. missing
+    // BLOB_READ_WRITE_TOKEN locally) — the orphaned file is harmless.
+    console.error("[images] skipped blob cleanup", error);
+  }
+}
+
 
 export async function getProducts(params?: {
   search?: string;
@@ -60,7 +86,12 @@ export async function getProductById(id: string) {
 
   return prisma.product.findUnique({
     where: { id },
-    include: { images: true, category: true, variants: true, collection: true },
+    include: {
+      images: { orderBy: { sortOrder: "asc" } },
+      category: true,
+      variants: true,
+      collection: true,
+    },
   });
 }
 
@@ -93,6 +124,18 @@ export async function createProduct(data: {
 }) {
   await requireAdmin();
 
+  const imageRows = data.images
+    ? data.images.map((img, i) => {
+        const url = img.url.trim();
+        if (!isAllowedImageUrl(url)) throw new Error("Invalid image URL");
+        return {
+          url,
+          alt: img.alt || data.name,
+          sortOrder: img.sortOrder ?? i,
+        };
+      })
+    : null;
+
   const product = await prisma.product.create({
     data: {
       name: data.name,
@@ -111,15 +154,7 @@ export async function createProduct(data: {
       weight: data.weight ?? null,
       brand: data.brand ?? null,
       tags: data.tags ?? [],
-      images: data.images
-        ? {
-            create: data.images.map((img, i) => ({
-              url: img.url,
-              alt: img.alt || data.name,
-              sortOrder: img.sortOrder ?? i,
-            })),
-          }
-        : undefined,
+      images: imageRows ? { create: imageRows } : undefined,
       variants: data.variants
         ? {
             create: data.variants.map((v) => ({
@@ -178,7 +213,14 @@ export async function updateProduct(
 export async function deleteProduct(id: string) {
   await requireAdmin();
 
+  const images = await prisma.productImage.findMany({
+    where: { productId: id },
+    select: { url: true },
+  });
   await prisma.product.delete({ where: { id } });
+  for (const image of images) {
+    await deleteBlobIfUnreferenced(image.url);
+  }
   revalidatePath("/admin/products");
   revalidateCatalog();
 }
@@ -190,6 +232,11 @@ export async function addProductImage(
 ) {
   await requireAdmin();
 
+  const normalizedUrl = url.trim();
+  if (!isAllowedImageUrl(normalizedUrl)) {
+    throw new Error("Invalid image URL");
+  }
+
   const maxSort = await prisma.productImage.aggregate({
     where: { productId },
     _max: { sortOrder: true },
@@ -198,7 +245,7 @@ export async function addProductImage(
   const image = await prisma.productImage.create({
     data: {
       productId,
-      url,
+      url: normalizedUrl,
       alt: alt || "",
       sortOrder: (maxSort._max.sortOrder ?? -1) + 1,
     },
@@ -218,11 +265,60 @@ export async function deleteProductImage(imageId: string) {
 
   const image = await prisma.productImage.delete({
     where: { id: imageId },
-    select: { product: { select: { slug: true } } },
+    select: { url: true, product: { select: { slug: true } } },
   });
 
+  await deleteBlobIfUnreferenced(image.url);
   revalidatePath("/admin/products");
   revalidateCatalog(image.product.slug);
+}
+
+/**
+ * Deletes an uploaded Blob file that was never saved as a product image
+ * (e.g. the admin removed it from the create form before saving). Still
+ * guarded by the reference check, so shared files are never removed.
+ */
+export async function discardImageBlob(url: string) {
+  await requireAdmin();
+  await deleteBlobIfUnreferenced(url.trim());
+}
+
+/** Persists the drag/arrow order of a product's images in one transaction. */
+export async function reorderProductImages(
+  productId: string,
+  imageIds: string[]
+) {
+  await requireAdmin();
+
+  const stored = await prisma.productImage.findMany({
+    where: { productId },
+    select: { id: true },
+  });
+  const storedIds = new Set(stored.map((s) => s.id));
+  const uniqueIds = new Set(imageIds);
+  const inSync =
+    imageIds.length === stored.length &&
+    uniqueIds.size === imageIds.length &&
+    imageIds.every((id) => storedIds.has(id));
+  if (!inSync) {
+    throw new Error("Image order is out of sync — reload the page and retry");
+  }
+
+  await prisma.$transaction(
+    imageIds.map((id, index) =>
+      prisma.productImage.update({
+        where: { id },
+        data: { sortOrder: index },
+      })
+    )
+  );
+
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { slug: true },
+  });
+  revalidatePath("/admin/products");
+  revalidateCatalog(product?.slug);
 }
 
 export type VariantInput = {

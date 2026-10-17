@@ -7,6 +7,10 @@ import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
 import { cn, slugify } from "@/lib/utils";
 import { createProduct, getCategories } from "@/lib/actions/admin-products";
 import { FormToast } from "@/components/admin";
+import {
+  ProductImageManager,
+  type ManagedProductImage,
+} from "@/components/admin/product-image-manager";
 
 type Category = { id: string; name: string };
 
@@ -38,6 +42,9 @@ export default function NewProductPage() {
     { name: string; sku: string; price: string; stock: string }[]
   >([{ name: "Default", sku: "", price: "", stock: "10" }]);
 
+  const [images, setImages] = useState<ManagedProductImage[]>([]);
+  const [imagesBusy, setImagesBusy] = useState(false);
+
   useEffect(() => {
     getCategories().then((cats) =>
       setCategories(cats.map((c) => ({ id: c.id, name: c.name })))
@@ -53,6 +60,10 @@ export default function NewProductPage() {
 
     if (!form.name || !form.sku || !form.price || !form.categoryId) {
       setError("Please fill in all required fields");
+      return;
+    }
+    if (imagesBusy) {
+      setError("Please wait for the image uploads to finish");
       return;
     }
 
@@ -79,6 +90,14 @@ export default function NewProductPage() {
         inStock: form.inStock,
         featured: form.featured,
         isNew: form.isNew,
+        images:
+          images.length > 0
+            ? images.map((img, i) => ({
+                url: img.url,
+                alt: img.alt,
+                sortOrder: i,
+              }))
+            : undefined,
         variants: variants
           .filter((v) => v.name && v.sku)
           .map((v) => ({
@@ -377,6 +396,14 @@ export default function NewProductPage() {
           </div>
         </div>
 
+        <ProductImageManager
+          productName={form.name}
+          defaultAlt={form.name}
+          images={images}
+          onImagesChange={setImages}
+          onBusyChange={setImagesBusy}
+        />
+
         <div className="rounded-xl border border-neutral-200 bg-white p-4 sm:p-6">
           <h2 className="mb-4 text-base font-semibold text-neutral-950 sm:text-lg">
             Search Preview (SEO)
@@ -454,7 +481,7 @@ export default function NewProductPage() {
         <div className="sticky bottom-[calc(4.5rem_+_env(safe-area-inset-bottom))] z-10 -mx-4 flex flex-col gap-3 border-t border-neutral-200 bg-neutral-50/95 px-4 py-3 backdrop-blur sm:mx-0 sm:flex-row sm:justify-end sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-0 lg:static">
           <button
             type="submit"
-            disabled={isSaving}
+            disabled={isSaving || imagesBusy}
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
           >
             {isSaving ? (

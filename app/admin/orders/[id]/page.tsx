@@ -9,11 +9,30 @@ import {
   Loader2,
   MapPin,
   CreditCard,
+  Mail,
   Package,
+  RefreshCw,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
-import { getOrderById, updateOrderStatus } from "@/lib/actions/admin-orders";
+import {
+  getOrderById,
+  retryOrderEmailNotification,
+  updateOrderStatus,
+} from "@/lib/actions/admin-orders";
 import { StatusBadge } from "@/components/admin";
+
+type OrderNotification = {
+  id: string;
+  eventType: string;
+  recipientRole: string;
+  recipientMasked: string;
+  subject: string;
+  status: string;
+  attempts: number;
+  lastError: string | null;
+  lastAttemptAt: string;
+  sentAt: string | null;
+};
 
 type OrderDetail = {
   id: string;
@@ -43,6 +62,7 @@ type OrderDetail = {
     method: string | null;
     createdAt: string;
   }[];
+  notifications?: OrderNotification[];
 };
 
 const STATUSES = [
@@ -54,6 +74,12 @@ export default function AdminOrderDetailPage() {
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [retryingId, setRetryingId] = useState<string | null>(null);
+
+  async function refresh() {
+    const data = await getOrderById(params.id as string);
+    setOrder(data as unknown as OrderDetail);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -75,11 +101,22 @@ export default function AdminOrderDetailPage() {
     setUpdating(true);
     try {
       await updateOrderStatus(order.id, newStatus);
-      setOrder({ ...order, status: newStatus });
+      await refresh();
     } catch {
       // Failed to update status
     }
     setUpdating(false);
+  }
+
+  async function handleRetry(notificationId: string) {
+    setRetryingId(notificationId);
+    try {
+      await retryOrderEmailNotification(notificationId);
+      await refresh();
+    } catch {
+      // Failed to retry
+    }
+    setRetryingId(null);
   }
 
   if (loading) {
@@ -190,6 +227,76 @@ export default function AdminOrderDetailPage() {
               <p className="text-sm text-neutral-600">{order.notes}</p>
             </div>
           )}
+
+          {/* Email notifications (outbox) */}
+          <div className="rounded-xl border border-neutral-200 bg-white p-5 sm:p-6">
+            <h2 className="mb-3 flex items-center gap-2 font-semibold text-neutral-950">
+              <Mail className="h-4 w-4" />
+              Email notifications
+            </h2>
+            {!order.notifications || order.notifications.length === 0 ? (
+              <p className="text-sm text-neutral-500">
+                No notifications scheduled for this order yet.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {order.notifications.map((n) => (
+                  <div
+                    key={n.id}
+                    className="rounded-lg border border-neutral-100 p-3"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-neutral-900">
+                          {n.eventType.replace(/_/g, " ").toLowerCase()}
+                        </p>
+                        <p className="text-xs text-neutral-400">
+                          {n.recipientRole} · {n.recipientMasked}
+                        </p>
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${
+                          n.status === "sent"
+                            ? "bg-green-50 text-green-700"
+                            : n.status === "failed"
+                              ? "bg-red-50 text-red-700"
+                              : n.status === "processing"
+                                ? "bg-blue-50 text-blue-700"
+                                : "bg-amber-50 text-amber-700"
+                        }`}
+                      >
+                        {n.status}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-neutral-500">
+                      Attempts: {n.attempts} · Last attempt:{" "}
+                      {new Date(n.lastAttemptAt).toLocaleString("en-IN")}
+                    </p>
+                    {n.lastError && (
+                      <p className="mt-1 break-words text-xs text-red-600">
+                        {n.lastError}
+                      </p>
+                    )}
+                    {n.status === "failed" && (
+                      <button
+                        type="button"
+                        onClick={() => handleRetry(n.id)}
+                        disabled={retryingId !== null}
+                        className="mt-2 inline-flex min-h-9 items-center gap-1 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-700 transition-colors hover:border-orange-500 hover:text-orange-600 disabled:opacity-50"
+                      >
+                        {retryingId === n.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <RefreshCw className="h-3 w-3" />
+                        )}
+                        Retry
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Items + payment */}

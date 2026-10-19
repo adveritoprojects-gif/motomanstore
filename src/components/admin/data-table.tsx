@@ -63,8 +63,20 @@ export function AdminDataTable<T extends Record<string, any> = Record<string, an
                 <tr
                   key={i}
                   onClick={() => onRowClick?.(item)}
+                  onKeyDown={
+                    onRowClick
+                      ? (e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            onRowClick(item);
+                          }
+                        }
+                      : undefined
+                  }
+                  tabIndex={onRowClick ? 0 : undefined}
+                  role={onRowClick ? "button" : undefined}
                   className={cn(
-                    "transition-colors hover:bg-neutral-50",
+                    "transition-colors hover:bg-neutral-50 focus-visible:bg-neutral-50",
                     onRowClick && "cursor-pointer"
                   )}
                 >
@@ -92,8 +104,20 @@ export function AdminDataTable<T extends Record<string, any> = Record<string, an
             <div
               key={i}
               onClick={() => onRowClick?.(item)}
+              onKeyDown={
+                onRowClick
+                  ? (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onRowClick(item);
+                      }
+                    }
+                  : undefined
+              }
+              tabIndex={onRowClick ? 0 : undefined}
+              role={onRowClick ? "button" : undefined}
               className={cn(
-                "rounded-xl border border-neutral-200 bg-white p-4 shadow-sm",
+                "rounded-xl border border-neutral-200 bg-white p-4 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500",
                 onRowClick && "cursor-pointer active:bg-neutral-50"
               )}
             >

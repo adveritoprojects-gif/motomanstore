@@ -141,6 +141,7 @@ model Order {
   /// True while variant stock is deducted for this order.
   inventoryHeld     Boolean   @default(false)
   notes             String?
+  emailNotifications EmailNotification[]
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
@@ -185,4 +186,38 @@ model Payment {
   @@index([orderId])
   @@index([razorpayPaymentId])
   @@index([status])
+}
+
+// ─── Email notifications (transactional outbox) ─────────
+
+/// Durable outbox for transactional emails. Rows are created by trusted
+/// server-side events only; the unique eventKey is the idempotency guard
+/// against webhook retries and repeated status updates.
+model EmailNotification {
+  id            String    @id @default(cuid())
+  /// Logical event identity, e.g. "ORDER_PLACED:<orderId>:customer".
+  eventKey      String    @unique
+  eventType     String    // ORDER_PLACED | PAYMENT_SUCCEEDED | PAYMENT_FAILED | ORDER_SHIPPED | ORDER_DELIVERED | ORDER_CANCELLED | REFUND_PROCESSED
+  orderId       String?
+  order         Order?    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  /// Destination address (customer email or configured admin address).
+  recipient     String
+  /// "customer" | "admin" — never a client-supplied value.
+  recipientRole String
+  subject       String
+  status        String    @default("pending") // pending | processing | sent | failed
+  attempts      Int       @default(0)
+  /// Safe, truncated error summary — never credentials or full payloads.
+  lastError     String?
+  /// Earliest time a delivery attempt may run (backoff). Null = terminal
+  /// failure; only an explicit admin retry requeues it.
+  nextRetryAt   DateTime?
+  /// Set while a worker holds the row; stale locks are reclaimable.
+  lockedAt      DateTime?
+  sentAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, nextRetryAt])
+  @@index([orderId])
 }

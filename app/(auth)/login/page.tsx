@@ -84,7 +84,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-neutral-400 hover:text-neutral-600"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
@@ -126,7 +126,7 @@ function LoginForm() {
           First time?{" "}
           <a
             href="/login/setup"
-            className="font-medium text-orange-500 hover:text-orange-600"
+            className="inline-flex min-h-11 items-center px-1 font-medium text-orange-500 hover:text-orange-600"
           >
             Set up admin account
           </a>

@@ -60,7 +60,7 @@ export function AdminDrawer({ open, onClose, user }: AdminDrawerProps) {
             href="/admin"
             onClick={onClose}
             aria-label="MOTOMAN Admin"
-            className="flex items-center"
+            className="flex min-h-11 items-center"
           >
             <Image
               src="/logo.png"

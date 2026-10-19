@@ -1,8 +1,9 @@
 "use server";
 
+import { after } from "next/server";
 import { prisma, TX_OPTIONS } from "@/lib/prisma";
 import { getRazorpayInstance, verifyRazorpaySignature } from "@/lib/razorpay";
-import { sendOrderConfirmationEmail } from "@/lib/email";
+import { scheduleAndDeliverNow } from "@/lib/notifications";
 import { paymentAmountMatches, paymentCurrencyMatches } from "@/lib/checkout/price-cart";
 import { InsufficientStockError, reserveInventory } from "@/lib/checkout/inventory";
 import type { RazorpayVerificationParams } from "@/types/razorpay";
@@ -101,31 +102,21 @@ export async function verifyPayment(
       },
     });
 
-    const shippingAddress = order.shippingAddress as Record<string, string>;
-    if (order.customerEmail) {
-      sendOrderConfirmationEmail({
-        orderNumber: order.orderNumber,
-        customerName: order.customerName,
-        customerEmail: order.customerEmail,
-        items: order.items.map((item) => ({
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-        subtotal: order.subtotal,
-        shippingCost: order.shippingCost,
-        total: order.total,
-        shippingAddress: {
-          address1: shippingAddress.address1 || "",
-          address2: shippingAddress.address2,
-          city: shippingAddress.city || "",
-          state: shippingAddress.state || "",
-          postalCode: shippingAddress.postalCode || "",
-          country: shippingAddress.country || "India",
-        },
-        paymentNote: "Payment received.",
-      }).catch(() => undefined);
-    }
+    // Signature + remote amount/status were verified above; only the winner
+    // of the pending→paid transition schedules PAYMENT_SUCCEEDED, so a
+    // concurrent webhook retry cannot produce duplicate emails (outbox key).
+    after(async () => {
+      await scheduleAndDeliverNow({
+        eventType: "PAYMENT_SUCCEEDED",
+        orderId: order.id,
+        recipientRole: "customer",
+      });
+      await scheduleAndDeliverNow({
+        eventType: "PAYMENT_SUCCEEDED",
+        orderId: order.id,
+        recipientRole: "admin",
+      });
+    });
 
     return { success: true, orderId: order.id };
   } catch {

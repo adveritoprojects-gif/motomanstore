@@ -1,5 +1,6 @@
 "use server";
 
+import { after } from "next/server";
 import type { Prisma } from "@prisma/client";
 import { prisma, TX_OPTIONS } from "@/lib/prisma";
 import { createRazorpayOrder } from "@/lib/razorpay";
@@ -7,7 +8,7 @@ import { checkoutRequestSchema, cartSchema } from "@/lib/validations";
 import type { CheckoutRequestData, CartItemInput } from "@/lib/validations";
 import { orderTotals, paymentMethodAvailable, priceCart } from "@/lib/checkout/price-cart";
 import { InsufficientStockError, reserveInventory } from "@/lib/checkout/inventory";
-import { sendOrderConfirmationEmail } from "@/lib/email";
+import { scheduleAndDeliverNow } from "@/lib/notifications";
 
 function generateOrderNumber(): string {
   const date = new Date();
@@ -46,43 +47,24 @@ function isAttemptConflict(error: unknown): boolean {
   return text.includes("checkoutAttemptId");
 }
 
-async function notifyPlacedOrder(order: {
-  orderNumber: string;
-  customerName: string;
-  customerEmail: string;
-  subtotal: number;
-  shippingCost: number;
-  codFee?: number;
-  total: number;
-  shippingAddress: unknown;
-  items: { name: string; quantity: number; price: number }[];
-  paymentNote?: string;
-}) {
-  if (!order.customerEmail) return;
-  const shippingAddress = order.shippingAddress as Record<string, string>;
-  try {
-    await sendOrderConfirmationEmail({
-      orderNumber: order.orderNumber,
-      customerName: order.customerName,
-      customerEmail: order.customerEmail,
-      items: order.items,
-      subtotal: order.subtotal,
-      shippingCost: order.shippingCost,
-      codFee: order.codFee,
-      total: order.total,
-      paymentNote: order.paymentNote,
-      shippingAddress: {
-        address1: shippingAddress.address1 || "",
-        address2: shippingAddress.address2,
-        city: shippingAddress.city || "",
-        state: shippingAddress.state || "",
-        postalCode: shippingAddress.postalCode || "",
-        country: shippingAddress.country || "India",
-      },
+/**
+ * Schedules the customer confirmation and admin alert for a newly created
+ * order. Runs after the response via `after()` — email delivery can never
+ * block or fail checkout, and the outbox unique key dedupes retried submits.
+ */
+function schedulePlacedOrderNotifications(orderId: string) {
+  after(async () => {
+    await scheduleAndDeliverNow({
+      eventType: "ORDER_PLACED",
+      orderId,
+      recipientRole: "customer",
     });
-  } catch {
-    // Email is optional. A missing provider must not fail the order.
-  }
+    await scheduleAndDeliverNow({
+      eventType: "ORDER_PLACED",
+      orderId,
+      recipientRole: "admin",
+    });
+  });
 }
 
 const orderInclude = {
@@ -252,14 +234,13 @@ export async function createOrder(
       }
     }
 
+    // Both COD and Razorpay orders get the order-placed notifications on first
+    // creation only. The Razorpay wording never claims payment succeeded.
+    if (created) {
+      schedulePlacedOrderNotifications(order.id);
+    }
+
     if (checkout.paymentMethod === "cod") {
-      if (created) {
-        await notifyPlacedOrder({
-          ...order,
-          paymentNote:
-            "Payment method: Cash on Delivery. Please keep the amount ready at delivery.",
-        });
-      }
       return {
         success: true,
         orderId: order.id,

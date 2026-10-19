@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { prisma, TX_OPTIONS } from "@/lib/prisma";
 import { verifyWebhookSignature } from "@/lib/razorpay";
-import { sendOrderConfirmationEmail } from "@/lib/email";
+import { scheduleAndDeliverNow } from "@/lib/notifications";
 import {
   captureDecision,
   paymentAmountMatches,
@@ -114,30 +114,21 @@ export async function POST(request: NextRequest) {
 
         if (!markedPaid) break;
 
-        const shippingAddress = order.shippingAddress as Record<string, string>;
-        if (order.customerEmail) {
-          sendOrderConfirmationEmail({
-            orderNumber: order.orderNumber,
-            customerName: order.customerName,
-            customerEmail: order.customerEmail,
-            items: order.items.map((item) => ({
-              name: item.name,
-              quantity: item.quantity,
-              price: item.price,
-            })),
-            subtotal: order.subtotal,
-            shippingCost: order.shippingCost,
-            total: order.total,
-            shippingAddress: {
-              address1: shippingAddress.address1 || "",
-              address2: shippingAddress.address2,
-              city: shippingAddress.city || "",
-              state: shippingAddress.state || "",
-              postalCode: shippingAddress.postalCode || "",
-              country: shippingAddress.country || "India",
-            },
+        // Only the transaction that flipped pending→paid schedules the
+        // notification; the outbox event key makes webhook retries no-ops.
+        const paidOrderId = order.id;
+        after(async () => {
+          await scheduleAndDeliverNow({
+            eventType: "PAYMENT_SUCCEEDED",
+            orderId: paidOrderId,
+            recipientRole: "customer",
           });
-        }
+          await scheduleAndDeliverNow({
+            eventType: "PAYMENT_SUCCEEDED",
+            orderId: paidOrderId,
+            recipientRole: "admin",
+          });
+        });
 
         break;
       }
@@ -153,6 +144,10 @@ export async function POST(request: NextRequest) {
         });
 
         if (!order) break;
+
+        // A failure event is only meaningful while the order is still
+        // awaiting payment — never for orders that were later captured.
+        const stillPending = order.status === "pending";
 
         await prisma.$transaction(async (tx) => {
           const current = await tx.order.findUnique({ where: { id: order.id } });
@@ -172,6 +167,17 @@ export async function POST(request: NextRequest) {
           await releaseHeldInventory(tx, order.id, { onlyStatus: "pending" });
         }, TX_OPTIONS);
 
+        if (stillPending) {
+          const failedOrderId = order.id;
+          after(async () => {
+            await scheduleAndDeliverNow({
+              eventType: "PAYMENT_FAILED",
+              orderId: failedOrderId,
+              recipientRole: "customer",
+            });
+          });
+        }
+
         break;
       }
 
@@ -185,17 +191,41 @@ export async function POST(request: NextRequest) {
 
         if (!order || order.status === "refunded") break;
 
+        // Persist the provider's refund reference/amount (paise → rupees)
+        // so the customer email can quote the real refunded figure.
+        const refundEntity = event.payload.refund?.entity;
+        const refundId =
+          typeof refundEntity?.id === "string" ? refundEntity.id : null;
+        const refundAmount =
+          typeof refundEntity?.amount === "number"
+            ? refundEntity.amount / 100
+            : null;
+
         await prisma.$transaction(async (tx) => {
           await releaseHeldInventory(tx, order.id);
           await tx.payment.updateMany({
             where: { orderId: order.id, status: { not: "refunded" } },
-            data: { status: "refunded" },
+            data: {
+              status: "refunded",
+              metadata: refundId || refundAmount !== null
+                ? { refund_id: refundId, refund_amount: refundAmount }
+                : undefined,
+            },
           });
           await tx.order.updateMany({
             where: { id: order.id, status: { not: "refunded" } },
             data: { status: "refunded" },
           });
         }, TX_OPTIONS);
+
+        const refundedOrderId = order.id;
+        after(async () => {
+          await scheduleAndDeliverNow({
+            eventType: "REFUND_PROCESSED",
+            orderId: refundedOrderId,
+            recipientRole: "customer",
+          });
+        });
 
         break;
       }

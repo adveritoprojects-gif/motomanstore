@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { getPageTitle } from "./admin-nav";
 
 interface AdminTopbarProps {
@@ -30,7 +30,7 @@ export function AdminTopbar({ onMenuClick }: AdminTopbarProps) {
         <Link
           href="/admin"
           aria-label="MOTOMAN Admin"
-          className="flex shrink-0 items-center"
+          className="flex min-h-11 shrink-0 items-center"
         >
           <Image
             src="/logo.png"
@@ -54,18 +54,10 @@ export function AdminTopbar({ onMenuClick }: AdminTopbarProps) {
         <Link
           href="/"
           target="_blank"
-          className="hidden items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-2 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-50 sm:inline-flex"
+          className="hidden min-h-11 items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-2 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-50 sm:inline-flex"
         >
           View Store
         </Link>
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="relative flex h-11 w-11 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-700"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-orange-500" />
-        </button>
       </div>
     </header>
   );

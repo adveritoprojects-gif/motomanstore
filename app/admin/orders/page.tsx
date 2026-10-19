@@ -159,7 +159,7 @@ export default function AdminOrdersPage() {
                 setStatus(f.value);
                 setPage(1);
               }}
-              className={`min-h-9 shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`min-h-11 shrink-0 rounded-lg px-3.5 py-2 text-xs font-medium transition-colors ${
                 status === f.value
                   ? "bg-orange-500 text-white"
                   : "border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
@@ -193,31 +193,34 @@ export default function AdminOrdersPage() {
                       <p className="truncate font-semibold text-neutral-900">
                         {item.orderNumber}
                       </p>
-                      <p className="mt-0.5 truncate text-sm text-neutral-700">
-                        {item.customerName}
-                      </p>
-                      <p className="truncate text-xs text-neutral-400">
-                        {item.customerEmail || item.customerPhone || "No contact"}
-                      </p>
-                      <p className="mt-0.5 text-xs text-neutral-500">{paymentLabel(item)}</p>
-                    </div>
-                    <StatusBadge status={item.status} />
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-neutral-100 pt-3">
-                    <div className="min-w-0 text-xs text-neutral-500">
-                      <p>
-                        {itemCount > 0
-                          ? `${itemCount} item${itemCount === 1 ? "" : "s"}`
-                          : "Order"}
-                      </p>
-                      <p className="mt-0.5">
+                      <p className="mt-0.5 text-xs text-neutral-400">
                         {new Date(item.createdAt).toLocaleDateString("en-IN", {
                           day: "numeric",
                           month: "short",
                           year: "numeric",
                         })}
                       </p>
+                    </div>
+                    <StatusBadge status={item.status} />
+                  </div>
+
+                  <div className="mt-2">
+                    <p className="truncate text-sm text-neutral-700">
+                      {item.customerName}
+                    </p>
+                    <p className="truncate text-xs text-neutral-400">
+                      {item.customerEmail || item.customerPhone || "No contact"}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-neutral-100 pt-3">
+                    <div className="min-w-0 text-xs text-neutral-500">
+                      <p className="truncate">{paymentLabel(item)}</p>
+                      {itemCount > 0 && (
+                        <p className="mt-0.5">
+                          {itemCount} item{itemCount === 1 ? "" : "s"}
+                        </p>
+                      )}
                     </div>
                     <div className="flex shrink-0 items-center gap-3">
                       <span className="text-base font-bold text-neutral-900">

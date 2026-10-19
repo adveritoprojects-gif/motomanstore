@@ -69,11 +69,11 @@ export default async function AdminDashboardPage() {
       <div className="grid gap-4 lg:gap-6 lg:grid-cols-2">
         {/* Recent Orders */}
         <div className="rounded-xl border border-neutral-200 bg-white">
-          <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
+          <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-2">
             <h2 className="font-semibold text-neutral-950">Recent Orders</h2>
             <Link
               href="/admin/orders"
-              className="text-xs font-medium text-orange-500 hover:text-orange-600"
+              className="inline-flex min-h-11 items-center px-1 text-xs font-medium text-orange-500 hover:text-orange-600"
             >
               View all
             </Link>
@@ -109,11 +109,11 @@ export default async function AdminDashboardPage() {
 
         {/* Top Products */}
         <div className="rounded-xl border border-neutral-200 bg-white">
-          <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
+          <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-2">
             <h2 className="font-semibold text-neutral-950">Top Products</h2>
             <Link
               href="/admin/products"
-              className="text-xs font-medium text-orange-500 hover:text-orange-600"
+              className="inline-flex min-h-11 items-center px-1 text-xs font-medium text-orange-500 hover:text-orange-600"
             >
               View all
             </Link>

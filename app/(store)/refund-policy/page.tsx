@@ -42,7 +42,7 @@ export default function RefundPolicyPage() {
               href="tel:7591960202"
               className="font-medium text-orange-500 hover:text-orange-600"
             >
-              7591960202
+             +91 89431 76189
             </a>
             .
           </Typography>
@@ -191,7 +191,7 @@ export default function RefundPolicyPage() {
                 href="tel:7591960202"
                 className="text-orange-500 hover:text-orange-600"
               >
-                7591960202
+               +91 89431 76189
               </a>
             </Typography>
 

@@ -6,7 +6,7 @@ export const BRAND = {
   description:
     "Professional car care products designed for a cleaner, shinier and longer-lasting drive.",
   email: "bigdaddycompany25@gmail.com",
-  phone: "+91 89431 76189",
+  phone: "+91 85473 45429",
   address: "Payyannur, Kannur, Kerala , India",
 } as const;
 

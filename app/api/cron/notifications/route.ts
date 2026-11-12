@@ -6,8 +6,12 @@ export const dynamic = "force-dynamic";
 /**
  * Protected retry worker: delivers due outbox notifications (retries with
  * backoff, recovery of rows stuck `processing` after a deploy). Vercel Cron
- * invokes it every 5 minutes with `Authorization: Bearer $CRON_SECRET`;
- * it can also be triggered manually with the same header.
+ * invokes it once a day (00:00 IST) with `Authorization: Bearer $CRON_SECRET`;
+ * it can also be triggered manually with the same header. Primary delivery is
+ * always inline via scheduleAndDeliverNow — this worker only sweeps what
+ * inline delivery could not send. If faster retries are required on the
+ * Hobby plan, point an external scheduler (e.g. GitHub Actions cron,
+ * cron-job.org, Upstash QStash) at this same path with the same header.
  */
 async function handle(request: Request) {
   const secret = process.env.CRON_SECRET;

@@ -134,10 +134,10 @@ export function Navbar() {
 
         {/* Mobile */}
         <div className="lg:hidden">
-          <div className="flex h-16 items-center justify-between px-4">
+          <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center px-4">
             <button
               onClick={() => setIsOpen(true)}
-              className="flex h-10 w-10 items-center justify-center text-white"
+              className="flex h-10 w-10 items-center justify-center justify-self-start text-white"
               aria-label="Open menu"
             >
               <Menu className="h-5 w-5" />
@@ -151,7 +151,7 @@ export function Navbar() {
               height={56}
             />
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 justify-self-end">
               <Link
                 href="/search"
                 className="flex h-10 w-10 items-center justify-center text-white"

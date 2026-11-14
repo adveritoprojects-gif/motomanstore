@@ -67,12 +67,12 @@ export function ProductImageGallery({
   }
 
   return (
-    <div className="flex flex-col-reverse gap-3 lg:flex-col">
+    <div className="flex w-full min-w-0 flex-col-reverse gap-3 lg:flex-col">
       {/* Thumbnails */}
       {images.length > 1 && (
         <div
           ref={thumbRef}
-          className="flex gap-2 overflow-x-auto hide-scrollbar lg:overflow-x-visible"
+          className="flex w-full min-w-0 gap-2 overflow-x-auto hide-scrollbar"
         >
           {images.map((img, i) => (
             <button
@@ -85,7 +85,7 @@ export function ProductImageGallery({
               }
               aria-pressed={selected === i}
               className={cn(
-                "relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all",
+                "relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-all sm:h-16 sm:w-16",
                 selected === i
                   ? "border-orange-500 shadow-md"
                   : "border-neutral-200 hover:border-neutral-400"
@@ -96,8 +96,9 @@ export function ProductImageGallery({
                   <Image
                     src={img.url}
                     alt={img.alt || `${productName} — image ${i + 1}`}
-                    fill
-                    className="object-cover"
+                    width={128}
+                    height={128}
+                    className="h-full w-full max-w-full object-contain"
                     sizes="64px"
                   />
                 ) : (
@@ -110,9 +111,9 @@ export function ProductImageGallery({
       )}
 
       {/* Main Image */}
-      <div className="relative">
+      <div className="relative w-full min-w-0">
         <div
-          className="relative aspect-square w-full overflow-hidden rounded-xl bg-neutral-50"
+          className="relative aspect-square w-full max-w-full overflow-hidden rounded-xl bg-neutral-50 p-2 md:p-0"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -120,10 +121,11 @@ export function ProductImageGallery({
             <Image
               src={images[selected].url}
               alt={images[selected].alt || productName}
-              fill
-              className="object-contain"
+              width={1200}
+              height={1200}
+              className="h-full w-full max-w-full object-contain"
               priority={selected === 0}
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="(max-width: 767px) 100vw, (max-width: 1024px) 50vw, 600px"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
@@ -134,19 +136,19 @@ export function ProductImageGallery({
           )}
         </div>
 
-        {/* Navigation Arrows - Desktop only */}
+        {/* Navigation Arrows */}
         {images.length > 1 && (
           <>
             <button
               onClick={prev}
-              className="absolute left-3 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-md transition-all hover:bg-white hover:shadow-lg lg:flex"
+              className="absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-md transition-all hover:bg-white hover:shadow-lg lg:left-3 lg:h-9 lg:w-9"
               aria-label="Previous image"
             >
               <ChevronLeft className="h-4 w-4 text-neutral-700" />
             </button>
             <button
               onClick={next}
-              className="absolute right-3 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-md transition-all hover:bg-white hover:shadow-lg lg:flex"
+              className="absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-md transition-all hover:bg-white hover:shadow-lg lg:right-3 lg:h-9 lg:w-9"
               aria-label="Next image"
             >
               <ChevronRight className="h-4 w-4 text-neutral-700" />
@@ -156,7 +158,7 @@ export function ProductImageGallery({
 
         {/* Dot Indicators - Mobile */}
         {images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 lg:hidden">
+          <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/20 px-2 py-1 lg:hidden">
             {images.map((_, i) => (
               <button
                 key={i}
@@ -165,7 +167,7 @@ export function ProductImageGallery({
                   "h-2 rounded-full transition-all",
                   selected === i
                     ? "w-5 bg-orange-500"
-                    : "w-2 bg-white/60"
+                    : "w-2 bg-white/70"
                 )}
                 aria-label={`Go to image ${i + 1}`}
               />

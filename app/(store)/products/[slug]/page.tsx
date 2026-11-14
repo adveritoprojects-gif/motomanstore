@@ -14,6 +14,21 @@ import { absoluteImage, SITE_NAME } from "@/lib/seo/site";
 
 export const revalidate = 120;
 
+async function getProductWithRetry(slug: string) {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      return await getProductBySlug(slug);
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) {
+        await new Promise((resolve) => setTimeout(resolve, 300 * attempt));
+      }
+    }
+  }
+  throw lastError;
+}
+
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -68,22 +83,24 @@ export async function generateMetadata({
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
 
-  let product = null;
-  let relatedProducts = null;
+  // Transient database errors must never be reported as a 404: only a
+  // genuinely missing product may call notFound(). Retry briefly so a
+  // dropped connection doesn't fail the page, then surface real errors.
+  const product = await getProductWithRetry(slug);
+  if (!product) {
+    notFound();
+  }
 
+  // Related products are optional — never fail the page over them.
+  let relatedProducts: Awaited<ReturnType<typeof getRelatedProducts>> = [];
   try {
-    product = await getProductBySlug(slug);
-    if (!product) {
-      notFound();
-    }
-
     relatedProducts = await getRelatedProducts(
       product.id,
       product.category.slug,
       4
     );
   } catch {
-    notFound();
+    relatedProducts = [];
   }
 
   const jsonLd = productJsonLd({

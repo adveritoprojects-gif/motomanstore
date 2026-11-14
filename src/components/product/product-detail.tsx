@@ -93,26 +93,34 @@ export function ProductDetail({ product }: ProductDetailProps) {
   return (
     <>
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1 text-sm text-neutral-500">
-        <Link href="/" className="hover:text-orange-500 transition-colors">
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-6 flex max-w-full flex-wrap items-center gap-x-1 gap-y-1 text-sm text-neutral-500"
+      >
+        <Link href="/" className="shrink-0 hover:text-orange-500 transition-colors">
           Home
         </Link>
-        <ChevronRight className="h-3 w-3" />
-        <Link href="/shop" className="hover:text-orange-500 transition-colors">
+        <ChevronRight className="h-3 w-3 shrink-0" />
+        <Link href="/shop" className="shrink-0 hover:text-orange-500 transition-colors">
           Shop
         </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
+        <ChevronRight className="h-3 w-3 shrink-0" aria-hidden="true" />
         <Link
           href={`/categories/${product.category.slug}`}
-          className="hover:text-orange-500 transition-colors"
+          className="shrink-0 hover:text-orange-500 transition-colors"
         >
           {product.category.name}
         </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <span className="text-neutral-900" aria-current="page">{product.name}</span>
+        <ChevronRight className="h-3 w-3 shrink-0" aria-hidden="true" />
+        <span
+          className="min-w-0 break-words text-neutral-900"
+          aria-current="page"
+        >
+          {product.name}
+        </span>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+      <div className="grid items-start gap-8 md:grid-cols-2 lg:gap-12">
         {/* Image Gallery */}
         <ProductImageGallery
           images={product.images}
@@ -120,9 +128,9 @@ export function ProductDetail({ product }: ProductDetailProps) {
         />
 
         {/* Product Info */}
-        <div>
+        <div className="min-w-0">
           {/* Category & Badges */}
-          <div className="mb-3 flex items-center gap-2">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
             <Link
               href={`/categories/${product.category.slug}`}
               className="text-xs font-medium uppercase tracking-wider text-orange-500 hover:text-orange-600 transition-colors"
@@ -142,7 +150,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           </div>
 
           {/* Title */}
-          <h1 className="mb-3 text-2xl font-bold text-neutral-950 lg:text-3xl">
+          <h1 className="mb-3 break-words text-2xl font-bold text-neutral-950 lg:text-3xl">
             {product.name}
           </h1>
 
@@ -160,7 +168,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <p className="mb-4 text-xs text-neutral-400">SKU: {product.sku}</p>
 
           {/* Price */}
-          <div className="mb-6 flex items-baseline gap-3">
+          <div className="mb-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="text-3xl font-bold text-neutral-950">
               {formatPrice(displayPrice)}
             </span>
@@ -242,16 +250,16 @@ export function ProductDetail({ product }: ProductDetailProps) {
           )}
 
           {/* Quantity & Add to Cart */}
-          <div className="mb-6 flex items-center gap-4">
-            <div className="flex items-center rounded-lg border border-neutral-200">
+          <div className="mb-6 flex flex-wrap items-center gap-3 lg:gap-4">
+            <div className="flex shrink-0 items-center rounded-lg border border-neutral-200">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 disabled={quantity <= 1}
-                className="flex h-10 w-10 items-center justify-center text-neutral-600 transition-colors hover:text-neutral-900 disabled:cursor-not-allowed disabled:text-neutral-300"
+                className="flex h-11 w-10 items-center justify-center text-neutral-600 transition-colors hover:text-neutral-900 disabled:cursor-not-allowed disabled:text-neutral-300"
               >
                 -
               </button>
-              <span className="flex h-10 w-12 items-center justify-center border-x border-neutral-200 text-sm font-medium text-neutral-700">
+              <span className="flex h-11 w-12 items-center justify-center border-x border-neutral-200 text-sm font-medium text-neutral-700">
                 {quantity}
               </span>
               <button
@@ -259,7 +267,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   setQuantity(Math.min(quantity + 1, maxQty))
                 }
                 disabled={quantity >= maxQty}
-                className="flex h-10 w-10 items-center justify-center text-neutral-600 transition-colors hover:text-neutral-900 disabled:cursor-not-allowed disabled:text-neutral-300"
+                className="flex h-11 w-10 items-center justify-center text-neutral-600 transition-colors hover:text-neutral-900 disabled:cursor-not-allowed disabled:text-neutral-300"
               >
                 +
               </button>
@@ -268,7 +276,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <button
               onClick={handleAddToCart}
               disabled={!inStock}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-orange-600 active:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="order-last flex w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-orange-600 active:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50 lg:order-none lg:w-auto lg:min-w-0 lg:flex-1 lg:py-3"
             >
               <ShoppingBag className="h-4 w-4" />
               {inStock ? "Add to Cart" : "Out of Stock"}
@@ -277,7 +285,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <button
               onClick={() => setIsWishlisted(!isWishlisted)}
               className={cn(
-                "flex h-12 w-12 items-center justify-center rounded-lg border transition-all",
+                "ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border transition-all lg:ml-0 lg:h-12 lg:w-12",
                 isWishlisted
                   ? "border-red-200 bg-red-50 text-red-500"
                   : "border-neutral-200 text-neutral-400 hover:border-neutral-400 hover:text-neutral-600"

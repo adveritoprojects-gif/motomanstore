@@ -3,3 +3,4 @@ export { ProductGrid } from "./product-grid";
 export { ProductDetail } from "./product-detail";
 export { ProductImageGallery } from "./product-image-gallery";
 export { MobileStickyPurchaseBar } from "./mobile-sticky-purchase-bar";
+export { ShareProduct } from "./share-product";

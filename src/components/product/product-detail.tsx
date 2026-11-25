@@ -17,6 +17,7 @@ import { cn, formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cart-store";
 import { ProductImageGallery } from "./product-image-gallery";
 import { MobileStickyPurchaseBar } from "./mobile-sticky-purchase-bar";
+import { ShareProduct } from "./share-product";
 
 interface ProductDetailProduct {
   id: string;
@@ -150,9 +151,16 @@ export function ProductDetail({ product }: ProductDetailProps) {
           </div>
 
           {/* Title */}
-          <h1 className="mb-3 break-words text-2xl font-bold text-neutral-950 lg:text-3xl">
-            {product.name}
-          </h1>
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <h1 className="min-w-0 break-words text-2xl font-bold text-neutral-950 lg:text-3xl">
+              {product.name}
+            </h1>
+            <ShareProduct
+              productName={product.name}
+              slug={product.slug}
+              className="mt-0.5 lg:mt-1"
+            />
+          </div>
 
           {/* Brand */}
           {product.brand && (

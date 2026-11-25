@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ShoppingBag, Grid3X3, User } from "lucide-react";
+import { Home, ShoppingBag, Grid3X3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BOTTOM_LINKS = [
   { href: "/", label: "Home", icon: Home },
   { href: "/shop", label: "Shop", icon: ShoppingBag },
   { href: "/categories", label: "Categories", icon: Grid3X3 },
-  { href: "/account", label: "Account", icon: User },
 ];
 
 export function MobileBottomNav() {
